@@ -3,6 +3,10 @@ import math
 import pandas as pd
 import streamlit as st
 
+st.markdown("""
+<h1 style='color:#16a34a;'>⚽ BET AI PRO</h1>
+<p>Prédictions intelligentes avec IA</p>
+""", unsafe_allow_html=True)
 st.set_page_config(page_title='Demo Sport Analytics Online', layout='wide')
 
 @st.cache_data
@@ -60,17 +64,24 @@ def confidence_label(prob):
 
 
 def inject_style():
-    st.markdown(
-        '''
-        <style>
-        .block-container {padding-top: 1.2rem; padding-bottom: 1.2rem;}
-        .main-title {font-size: 2rem; font-weight: 700; margin-bottom: 0.1rem;}
-        .subtitle {color: #6b7280; margin-bottom: 1rem;}
-        [data-testid="stMetricValue"] {font-size: 1.3rem;}
-        </style>
-        ''',
-        unsafe_allow_html=True,
-    )
+    st.markdown("""
+<style>
+.main-title {
+    font-size: 38px;
+    font-weight: bold;
+    color: #16a34a;
+}
+.card {
+    background-color: #f3f4f6;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<p class="main-title">⚽ BET AI PRO</p>', unsafe_allow_html=True)
+st.markdown("🚀 Prédictions football avec intelligence artificielle")
 
 
 inject_style()
@@ -108,13 +119,26 @@ if not cards:
     st.info('Aucun match ne correspond aux filtres actuels.')
 else:
     for row, s in cards:
-        with st.container(border=True):
-            col1, col2, col3, col4 = st.columns([2.2, 1, 1, 1])
-            with col1:
-                st.subheader(f"{row['home']} vs {row['away']}")
-                st.write(f"**Compétition :** {row['league']}")
-                st.write(f"**Date :** {row['date']}")
-                st.write(f"**xG estimés :** {row['xg_home']} - {row['xg_away']}")
+      with st.container():
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
+    st.subheader(f"{row['home']} vs {row['away']}")
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("🏠 Home", f"{s['home_win']*100:.1f}%")
+    col2.metric("🤝 Draw", f"{s['draw']*100:.1f}%")
+    col3.metric("🚀 Away", f"{s['away_win']*100:.1f}%")
+
+    st.metric("⚽ BTTS", f"{s['btts']*100:.1f}%")
+    st.metric("📊 Score", s["best_score"])
+
+    value = (s['home_win'] * 2.2) - 1
+
+    if value > 0:
+        st.success(f"🔥 VALUE BET (+{round(value,2)})")
+
+    st.markdown('</div>', unsafe_allow_html=True)
             with col2:
                 st.metric('Domicile', f"{s['home_win']*100:.1f}%")
                 st.metric('Nul', f"{s['draw']*100:.1f}%")
@@ -124,12 +148,47 @@ else:
             with col4:
                 st.metric('Score plausible', s['best_score'])
                 st.metric('Confiance', confidence_label(max(s['home_win'], s['draw'], s['away_win'])))
+                st.metric("Probabilité domicile", f"{s['home_win']*100:.1f}%")
+                st.metric("BTTS", f"{s['btts']*100:.1f}%")
+                st.metric("Score", s["best_score"])
+                value = (s['home_win'] * 2.2) - 1
+                confidence = max(s['home_win'], s['draw'], s['away_win'])
+
+                if confidence > 0.65:
+                st.success("✅ Haute confiance")
+                elif confidence > 0.5:
+                st.warning("⚖️ Moyenne")
+         else:
+                st.error("❌ Risqué")   
+
+             over25 = 1 - (s['home_win'] + s['draw'])  # approx simple
+             st.metric("🔥 Over 2.5", f"{round(over25*100,1)}%")
+
+                if value > 0:
+                st.success(f"🔥 VALUE BET (+{round(value,2)})")
             with st.expander('Détails'):
                 st.write(f"- Forme récente {row['home']} : {row['home_form']} points / 5 matchs")
                 st.write(f"- Forme récente {row['away']} : {row['away_form']} points / 5 matchs")
                 st.caption("Cette version emploie des données d'exemple. Tu peux ensuite la relier à tes propres statistiques.")
 
-st.divider()
+             if st.button("💎 ACCÈS VIP"):
+                st.write("Contact WhatsApp ou paiement Stripe")
+    if value > 0.2:
+            send_alert(f"🔥 VALUE BET: {row['home']} vs {row['away']}")
+
+              st.divider()
+              st.subheader("💎 ACCÈS VIP")
+
+              st.write("✅ 10 matchs / jour")
+              st.write("✅ Value bets")
+              st.write("✅ Alertes temps réel")
+
+          if st.button("🚀 Devenir VIP"):
+              st.write("Contact WhatsApp ou paiement (Stripe à venir)")
+
+
+          def send_alert(msg):
+    print("ALERTE:", msg)st.divider()
 st.markdown('### Déploiement rapide')
 st.code("""1) Pousse ce dossier sur GitHub
 2) Déploie sur Streamlit Community Cloud
