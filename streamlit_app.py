@@ -3,6 +3,48 @@ import pandas as pd
 import math
 import stripe
 import requests
+import pandas as pd
+import tensorflow as tf
+import pandas as pd
+
+def update_dataset(new_match):
+
+    df = pd.read_csv("data_full.csv")
+
+    df = pd.concat([df, pd.DataFrame([new_match])])
+
+    df.to_csv("data_full.csv", index=False)
+
+    print("✅ Match ajouté dataset")
+
+def retrain_model():
+
+    df = pd.read_csv("data_full.csv")
+
+    X = df[[
+        "xg_home", "xg_away",
+        "form_home", "form_away"
+    ]]
+
+    y = df["result"]
+
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dense(32, activation='relu'),
+        tf.keras.layers.Dense(3, activation='softmax')
+    ])
+
+    model.compile(
+        optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+
+    model.fit(X, y, epochs=15)
+
+    model.save("model_auto.h5")
+
+    print("✅ IA RÉENTRAÎNÉE")
 STRIPE_KEY = "ta_cle"
 
 API_KEY = "TA_CLE_API"
@@ -457,6 +499,48 @@ def generate_post(match):
 
 def auto_post():
     print("✅ Post publié TikTok / Facebook")
+
+update_dataset({
+    "xg_home":1.9,
+    "xg_away":1.1,
+    "form_home":4,
+    "form_away":2,
+    "result":0
+})
+
+import schedule
+import time
+from auto_learning import retrain_model
+
+# Réentraînement toutes les nuits
+schedule.every().day.at("02:00").do(retrain_model)
+
+print("🧠 AUTO LEARNING ACTIVÉ")
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)
+
+import tensorflow as tf
+import numpy as np
+
+model = tf.keras.models.load_model("model_auto.h5")
+
+def predict(features):
+    result = model.predict(np.array([features]))[0]
+    return result
+
+prediction = predict([1.8, 1.2, 5, 3])
+
+st.write("🏠 Home:", round(prediction[0]*100,1))
+st.write("🤝 Draw:", round(prediction[1]*100,1))
+st.write("🚀 Away:", round(prediction[2]*100,1))
+
+npm install -g expo-cli
+expo init bet-ai-mobile
+cd bet-ai-mobile
+npm install react-native-webview
+``
 
 
 
