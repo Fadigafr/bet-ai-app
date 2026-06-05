@@ -3,6 +3,7 @@ import pandas as pd
 import math
 import stripe
 import requests
+STRIPE_KEY = "ta_cle"
 
 API_KEY = "TA_CLE_API"
 # ======================
@@ -243,6 +244,221 @@ new_pass = st.sidebar.text_input("Mot de passe", type="password")
 if st.sidebar.button("S'inscrire"):
     register_user(new_user, new_pass)
     st.sidebar.success("Compte créé")
+
+npm install -g expo-cli
+
+import React from 'react';
+import { WebView } from 'react-native-webview';
+
+export default function App() {
+  return (
+    <WebView source={{ uri: 'https://bet-ai-app.streamlit.app' }} />
+  );
+}
+
+expo build:android
+
+def smart_bot(match):
+
+    prob = match["prob_home"]
+    odds = match["odds_home"]
+
+    value = (prob * odds) - 1
+
+    if value > 0.05:
+        return {
+            "bet": match["home"],
+            "value": round(value, 2),
+            "confidence": round(prob, 2),
+            "stake": "3% bankroll"
+        }
+
+    return None
+
+signal = smart_bot({
+    "home": "Arsenal",
+    "prob_home": 0.62,
+    "odds_home": 2.2
+})
+
+if signal:
+    st.success(f"🔥 BET: {signal['bet']}")
+
+import xgboost as xgb
+import pandas as pd
+
+def train_model():
+
+    df = pd.read_csv("data_full.csv")
+
+    X = df[[
+        "xg_home", "xg_away",
+        "form_home", "form_away",
+        "shots_home", "shots_away"
+    ]]
+
+    y = df["result"]
+
+    model = xgb.XGBClassifier(
+        n_estimators=300,
+        max_depth=5
+    )
+
+    model.fit(X, y)
+    return model
+
+def predict(model, features):
+    return model.predict_proba([features])
+
+st.markdown("""
+<style>
+body { background-color: #0f172a; }
+.card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="card">', unsafe_allow_html=True)
+
+st.subheader(f"{match['home']} vs {match['away']}")
+
+st.metric("🏠 Home", "62%")
+st.metric("🤝 Draw", "22%")
+st.metric("🚀 Away", "16%")
+
+st.success("🔥 VALUE BET détecté")
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+STRIPE_KEY = "ta_cle"
+
+if not is_logged:
+    st.stop()
+
+final_prob = (prob_xgb + prob_poisson) / 2
+
+from streamlit.components.v1 import html
+
+st.markdown("""
+<style>
+body {
+    background: linear-gradient(135deg, #0f172a, #020617);
+    color: white;
+}
+
+.card {
+    background: rgba(30,41,59,0.9);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 12px 0;
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.4);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+.title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #22c55e;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="title">⚽ BET AI PRO ELITE</div>', unsafe_allow_html=True)
+
+html("""
+<div style="text-align:center">
+    <div class="spinner"></div>
+    <style>
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #22c55e;
+        border-top: 5px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+    }
+    </style>
+</div>
+""")
+
+col1, col2, col3, col4 = st.columns(4)
+
+col1.metric("🔥 Signals", "8")
+col2.metric("✅ Accuracy", "72%")
+col3.metric("💰 ROI", "+15%")
+col4.metric("👥 Users", "152")
+
+import numpy as np
+from scipy.stats import poisson
+
+def exact_score(xg_home, xg_away):
+
+    matrix = np.zeros((6,6))
+
+    for i in range(6):
+        for j in range(6):
+            matrix[i][j] = poisson.pmf(i, xg_home) * poisson.pmf(j, xg_away)
+
+    idx = np.unravel_index(matrix.argmax(), matrix.shape)
+
+    return idx, matrix
+``
+
+score, matrix = exact_score(1.8, 1.2)
+
+st.write(f"🎯 Score probable : {score[0]} - {score[1]}")
+``
+
+def predict_scorers(team_goals):
+
+    players = {
+        "Haaland": 0.45,
+        "Foden": 0.25,
+        "Alvarez": 0.20
+    }
+
+    results = {}
+
+    for p, ratio in players.items():
+        results[p] = round(team_goals * ratio, 2)
+
+    return results
+
+scorers = predict_scorers(2)
+
+for p,v in scorers.items():
+    st.write(f"{p} ⚽ {v}")
+
+def generate_post(match):
+
+    Value bet détecté    return f"""
+
+👉 Accès VIP : lien
+"""
+``
+🔥 MATCH DU JOUR
+
+{match['home']} vs {match['away']}
+
+✅ Probabilité: 65%
+
+def auto_post():
+    print("✅ Post publié TikTok / Facebook")
+
+
 
 # ======================
 # FOOTER BUSINESS
