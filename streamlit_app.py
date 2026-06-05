@@ -2,6 +2,44 @@
 import math
 import pandas as pd
 import streamlit as st
+import stripe
+users = {
+    "fred": "1234",
+    "vip": "vip123"
+}
+
+stripe.api_key = "TA_CLE_SECRETE_STRIPE"
+
+st.sidebar.title("🔐 Connexion")
+
+username = st.sidebar.text_input("Utilisateur")
+password = st.sidebar.text_input("Mot de passe", type="password")
+
+if username in users and users[username] == password:
+    st.sidebar.success("✅ Connecté")
+    is_logged = True
+else:
+    st.sidebar.error("❌ Non connecté")
+    is_logged = False
+``
+
+st.sidebar.title("🔐 Connexion")
+
+username = st.sidebar.text_input("Utilisateur")
+password = st.sidebar.text_input("Mot de passe", type="password")
+
+if username in users and users[username] == password:
+    st.sidebar.success("✅ Connecté")
+    is_logged = True
+else:
+    st.sidebar.error("❌ Non connecté")
+    is_logged = False
+``
+if not is_logged:
+    st.warning("🔒 Connecte-toi pour voir les prédictions VIP")
+else:
+    st.success("🔥 Accès VIP activé")
+    
 
 st.markdown("""
 <h1 style='color:#16a34a;'>⚽ BET AI PRO</h1>
@@ -186,9 +224,33 @@ else:
           if st.button("🚀 Devenir VIP"):
               st.write("Contact WhatsApp ou paiement (Stripe à venir)")
 
+def create_checkout():
+    session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        mode='subscription',
+        line_items=[{
+            'price_data': {
+                'currency': 'eur',
+                'unit_amount': 1000,
+                'recurring': {'interval': 'month'},
+                'product_data': {'name': 'BET AI PRO VIP'},
+            },
+            'quantity': 1,
+        }],
+        success_url='https://bet-ai-app.streamlit.app',
+        cancel_url='https://bet-ai-app.streamlit.app',
+    )
+    return session.url
+
+if st.button("💎 Devenir VIP"):
+    url = create_checkout()
+    st.markdown(f"[👉 Payer ici]({url})")
+``
+
 
           def send_alert(msg):
     print("ALERTE:", msg)st.divider()
+
 st.markdown('### Déploiement rapide')
 st.code("""1) Pousse ce dossier sur GitHub
 2) Déploie sur Streamlit Community Cloud
