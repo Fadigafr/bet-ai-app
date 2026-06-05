@@ -41,3 +41,9 @@ h1 {
 }
 </style>
 """, unsafe_allow_html=True)
+
+curl --request GET \
+	--url 'https://free-api-live-football-data.p.rapidapi.com/football-players-search?search=m' \
+	--header 'Content-Type: application/json' \
+	--header 'x-rapidapi-host: free-api-live-football-data.p.rapidapi.com' \
+	--header 'x-rapidapi-key: acddc25c4amsh1b5de20e73be716p1933dfjsn4e554c3a6bf4'
