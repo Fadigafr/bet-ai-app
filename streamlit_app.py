@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import math
 import stripe
+import requests
 
+API_KEY = "TA_CLE_API"
 # ======================
 # CONFIG
 # ======================
@@ -103,6 +105,16 @@ def poisson_prob(home_xg, away_xg):
     
     return home_win, draw, away_win
 
+matches = get_live_matches()
+
+for m in matches[:5]:
+
+    st.subheader(f"{m['home']} vs {m['away']}")
+
+    home_win, draw, away_win = poisson_prob(
+        m["goals_home"], m["goals_away"]
+    )
+
 # ======================
 # AFFICHAGE
 # ======================
@@ -145,6 +157,92 @@ else:
             st.success(f"🔥 VALUE BET +{round(value,2)}")
 
         st.markdown('</div>', unsafe_allow_html=True)
+
+def get_live_matches():
+    
+    url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
+
+    headers = {
+        "X-RapidAPI-Key": API_KEY,
+        "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
+    }
+
+    params = {"league": 39, "season": 2023}
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    matches = []
+
+    for m in data["response"]:
+        matches.append({
+            "home": m["teams"]["home"]["name"],
+            "away": m["teams"]["away"]["name"],
+            "goals_home": m["goals"]["home"] or 1.2,
+            "goals_away": m["goals"]["away"] or 1.0,
+        })
+
+    return matches
+
+matches = get_live_matches()
+
+for m in matches[:5]:
+
+    st.subheader(f"{m['home']} vs {m['away']}")
+
+    home_win, draw, away_win = poisson_prob(
+        m["goals_home"], m["goals_away"]
+    )
+
+import sqlite3
+
+conn = sqlite3.connect("users.db")
+c = conn.cursor()
+
+c.execute("""
+CREATE TABLE IF NOT EXISTS users(
+    username TEXT,
+    password TEXT
+)
+""")
+
+conn.commit()
+conn.close()
+
+def register_user(user, password):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute(
+        "INSERT INTO users VALUES (?,?)",
+        (user, password)
+    )
+
+    conn.commit()
+    conn.close()
+
+def login_user(user, password):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute(
+        "SELECT * FROM users WHERE username=? AND password=?",
+        (user, password)
+    )
+
+    result = c.fetchone()
+    conn.close()
+
+    return result is not None
+
+st.sidebar.subheader("Créer compte")
+
+new_user = st.sidebar.text_input("Nouveau user")
+new_pass = st.sidebar.text_input("Mot de passe", type="password")
+
+if st.sidebar.button("S'inscrire"):
+    register_user(new_user, new_pass)
+    st.sidebar.success("Compte créé")
 
 # ======================
 # FOOTER BUSINESS
