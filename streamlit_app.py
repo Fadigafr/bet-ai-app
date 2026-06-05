@@ -132,7 +132,5 @@ else:
 st.divider()
 st.markdown('### Déploiement rapide')
 st.code("""1) Pousse ce dossier sur GitHub
-2) Déploie sur Streamlit Cloud
-3) Partage le lien""")
 2) Déploie sur Streamlit Community Cloud
-3) Partage ensuite le lien web', language='text')
+3) Partage le lien""")
