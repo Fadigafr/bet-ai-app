@@ -54,3 +54,54 @@ xg_home,xg_away,form_home,form_away,result
 2.0,1.1,5,2,0
 1.2,1.2,3,3,1
 
+import React from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import { WebView } from 'react-native-webview';
+
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>⚽ BET AI PRO</Text>
+      <WebView source={{ uri: 'https://bet-ai-app.streamlit.app' }} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: 30
+  },
+  header: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 5
+  }expo start
+});
+``
+expo build:android
+
+expo install expo-notifications
+
+import * as Notifications from 'expo-notifications';
+import { useEffect } from 'react';
+
+useEffect(() => {
+
+  Notifications.requestPermissionsAsync();
+
+  Notifications.scheduleNotificationAsync({
+    content: {
+      title: "🔥 VALUE BET",
+      body: "Nouveau match détecté !"
+    },
+    trigger: { seconds: 5 },
+  });
+
+}, []);
+
+
+
+
+
