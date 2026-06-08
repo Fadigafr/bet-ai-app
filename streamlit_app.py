@@ -536,6 +536,9 @@ st.write("🏠 Home:", round(prediction[0]*100,1))
 st.write("🤝 Draw:", round(prediction[1]*100,1))
 st.write("🚀 Away:", round(prediction[2]*100,1))
 
+send_telegram("🔥 VALUE BET détecté")
+
+
 npm install -g expo-cli
 expo init bet-ai-mobile
 cd bet-ai-mobile
