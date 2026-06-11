@@ -211,8 +211,6 @@ import xgboost as xgbimport xgboost as x,
 
 model_xgb = xgb.XGBClassifier(
     n_estimators=500,
-import tensorflow as tf
-
 model_dl = tf.keras.Sequential([
     tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(64, activation='relu'),
