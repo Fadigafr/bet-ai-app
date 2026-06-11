@@ -6,7 +6,53 @@ import stripe
 import requests
 import random
 import requests
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
 
+# Exemple dataset simulé
+data = pd.DataFrame({
+    "team1_strength": [1,2,3,4,5],
+    "team2_strength": [5,4,3,2,1],
+    "result": [0,0,1,1,1]
+})
+
+model = LogisticRegression()
+model.fit(data[["team1_strength", "team2_strength"]], data["result"])
+
+def predict(team1, team2):
+    return model.predict([[team1, team2]])
+``
+
+stripe.api_key = "TA_CLE_STR=["card"],stripe.api_key = "TA_CLE_STRIPE"
+        line_items=[{
+            "price": "price_id",
+            "quantity": 1,
+        }],
+        mode="subscription",
+        success_url="https://tonapp.com/success",
+        cancel_url="https://tonapp.com/cancel",
+    )
+    return session.url
+def send_prediction():
+    msg = "🔥 BET AI : Match du jour\nScore prévu 2-1\nConfiance 88%"
+    send_telegram(msg)    
+
+def create_checkout():
+    session = stripe.checkout.Session.create(
+
+from supabase import create_client
+
+url = "https://TON_URL.supabase.co"
+key = "TA_CLE_SUPABASE"
+
+supabase = create_client(url, key)
+
+def login(email, password):
+    response = supabase.auth.sign_in_with_password({
+        "email": email,
+        "password": password
+    })
+    return response
 def send_telegram(msg):
     TOKEN = "TOKEN"
     CHAT_ID = "ID"
