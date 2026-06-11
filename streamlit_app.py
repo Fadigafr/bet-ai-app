@@ -6,6 +6,18 @@ import stripe
 import requests
 import random
 
+def prediction_advanced():
+    home_goals = random.randint(0, 4)
+    away_goals = random.randint(0, 4)
+    confidence = random.randint(70, 95)
+
+    return home_goals, away_goals, confidence
+
+if st.button("Analyse PRO MAX"):
+    h, a, c = prediction_advanced()
+
+    st.metric("Confiance IA", f"{c}%")
+    st.write(f"Score exact : {h} - {a}")
 def prediction():
     score = random.randint(0, 3)
     score2 = random.randint(0, 3)
