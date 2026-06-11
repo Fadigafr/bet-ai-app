@@ -1,6 +1,37 @@
+password = st.text_input("Accès VIP", type="password")
+
+if password != "VIP2026":
+    st.warning("Accès réservé aux abonnés")
+    st.stop()
 import streamlit as stimport streamlit requests
 
-API_KEY = "TA_CLE_API"  # tu vas la créer
+API_KEY = "package main
+
+import (
+	"fmt"
+	"net/http"
+	"io"
+)
+
+func main() {
+
+	url := "https://free-api-live-football-data.p.rapidapi.com/football-players-search?search=m"
+
+	req, _ := http.NewRequest("GET", url, nil)
+
+	req.Header.Add("x-rapidapi-key", "acddc25c4amsh1b5de20e73be716p1933dfjsn4e554c3a6bf4")
+	req.Header.Add("x-rapidapi-host", "free-api-live-football-data.p.rapidapi.com")
+	req.Header.Add("Content-Type", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
+}"  # tu vas la créer
 
 st.title("BET AI PRO")
 
