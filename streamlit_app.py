@@ -1,6 +1,10 @@
 import streamlit as st
 import numpy as np
+password = st.text_input("Code d'accès", type="password")
 
+if password != "1234":
+    st.warning("Accès réservé aux abonnés")
+    st.stop()
 st.set_page_config(page_title="BET AI PRO", layout="wide")
 
 # Style CSS
