@@ -2,7 +2,39 @@ import streamlit as st
 import json
 import hashlib
 import os
+import stripe
+import requests
+import random
 
+def prediction():
+    score = random.randint(0, 3)
+    score2 = random.randint(0, 3)
+    prob = random.randint(60, 90)
+
+    return score, score2, prob
+
+if st.button("Analyser"):
+    s1, s2, prob = prediction()
+
+    st.metric("Probabilité", f"{prob}%")
+    st.write(f"Score prévu : {s1} - {s2}")
+TOKEN = "TON_TOKEN_TELEGRAM"
+CHAT_ID = "TON_CHAT_ID"
+
+def envoyer_message(msg):
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    data = {"chat_id": CHAT_ID, "text": msg}
+    requests.post(url, data=data)
+
+if st.button("Envoyer prédiction Telegram"):
+    envoyer_message(" Prédiction du jour : victoire équipe A")
+    st.success("Envoyé ")
+
+stripe.api_key = "TA_CLE_STRIPE"
+
+if st.button("Payer abonnement "):
+    st.write("Paiement en cours...")
+    st.success("Simulation paiement ")
 # Fichier utilisateurs
 USER_FILE = "users.json"
 
@@ -35,7 +67,7 @@ if menu == "Créer compte":
         if username not in users:
             users[username] = hash_password(password)
             save_users(users)
-            st.success("Compte créé ✅")
+            st.success("Compte créé ")
         else:
             st.error("Utilisateur existe déjà")
 
@@ -47,7 +79,7 @@ elif menu == "Login":
     if st.button("Se connecter"):
         if username in users and users[username] == hash_password(password):
             st.session_state["user"] = username
-            st.success("Connecté ✅")
+            st.success("Connecté ")
         else:
             st.error("Erreur login")
 
