@@ -194,7 +194,6 @@ for m in matches[:5]:
         send_telegram(f" VALUE BET: {m['home']} vs {m['away']}")
 
     st.markdown('</div>', unsafe_allow_html=True)
-     “dashboard ultra animé”
  “IA précision extrême (pro bookmaker)”
  “scaling 1000 clients concret plan”
 import xgboost as xgbimport xgboost as x,
