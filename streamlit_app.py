@@ -1,42 +1,58 @@
-import streamlit as stimportimport random
+import streamlit as st
+import json
+import hashlib
+import os
 
-API_KEY = "TA_CLE_API"
+# Fichier utilisateurs
+USER_FILE = "users.json"
 
-st.set_page_config(page_title="BET AI PRO", layout="wide")
+# Charger utilisateurs
+def load_users():
+    if os.path.exists(USER_FILE):
+        with open(USER_FILE, "r") as f:
+            return json.load(f)
+    return {}
 
-st.title("BET AI PRO")
+# Sauvegarder utilisateurs
+def save_users(users):
+    with open(USER_FILE, "w") as f:
+        json.dump(users, f)
 
-password = st.text_input("Accès VIP", type="password")
+# Hash mot de passe
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
-if password != "VIP2026":
-    st.warning("Accès réservé")
+users = load_users()
+
+menu = st.sidebar.selectbox("Menu", ["Login", "Créer compte"])
+
+if menu == "Créer compte":
+    st.subheader("Créer un compte")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("S'inscrire"):
+        if username not in users:
+            users[username] = hash_password(password)
+            save_users(users)
+            st.success("Compte créé ✅")
+        else:
+            st.error("Utilisateur existe déjà")
+
+elif menu == "Login":
+    st.subheader("Connexion")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Se connecter"):
+        if username in users and users[username] == hash_password(password):
+            st.session_state["user"] = username
+            st.success("Connecté ✅")
+        else:
+            st.error("Erreur login")
+
+# Vérifier connexion
+if "user" not in st.session_state:
     st.stop()
 
-team1 = st.text_input("Equipe 1")
-team2 = st.text_input("Equipe 2")
-
-if st.button("Analyser"):
-    if team1 and team2:
-
-        url = f"https://api-football-v1.p.rapidapi.com/v3/teams?search={team1}"
-
-        headers = {
-            "X-RapidAPI-Key": API_KEY,
-            "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
-        }
-
-        response = requests.get(url, headers=headers)
-
-        if response.status_code == 200:
-            st.success(f"{team1} vs {team2}")
-
-            prob = random.randint(60, 90)  # temporaire
-
-            st.metric("Prédiction IA", f"{prob}%")
-        else:
-            st.error("Erreur API")
-
-    else:
-        st.warning("Entre les équipes")
-``
-import requests
+st.write(f"Bienvenue {st.session_state['user']}")
