@@ -2,7 +2,6 @@ STRIPE_KEY = "TA_CLE_STRIPE"
 API_KEY = "TA_CLE_API"
 TELEGRAM_TOKEN = "TON_BOT_TOKEN"
 TELEGRAM_CHAT = "TON_CHAT_ID"
-import streamlit as stimport streamlit as pd
 import math
 import numpy as np
 ``
