@@ -106,9 +106,6 @@ def send_telegram(msg):
         "text": msg
     })  
 
-(“IA précision extrême (pro bookmaker)”)
-(“scaling 1000 clients concret plan”)
-
 def retrain():
     df = pd.read_csv("data_full.csv")
 
