@@ -5,7 +5,14 @@ import os
 import stripe
 import requests
 import random
+import requests
 
+def send_telegram(msg):
+    TOKEN = "TOKEN"
+    CHAT_ID = "ID"
+
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    requests.post(url, data={"chat_id": CHAT_ID, "text": msg})
 def prediction_advanced():
     home_goals = random.randint(0, 4)
     away_goals = random.randint(0, 4)
