@@ -2,8 +2,12 @@ STRIPE_KEY = "TA_CLE_STRIPE"
 API_KEY = "TA_CLE_API"
 TELEGRAM_TOKEN = "TON_BOT_TOKEN"
 TELEGRAM_CHAT = "TON_CHAT_ID"
-import streamlit as st
+import streamlit as stimport streamlit as pd
+import math
+import numpy as np
+``
 import requests
+import streamlit as st
 import stripe
 import pandas as pd
 import math
@@ -102,9 +106,9 @@ def send_telegram(msg):
         "text": msg
     })  
 
-✅ “dashboard ultra animé”
-✅ “IA précision extrême (pro bookmaker)”
-✅ “scaling 1000 clients concret plan”
+(“dashboard ultra animé”)
+(“IA précision extrême (pro bookmaker)”)
+(“scaling 1000 clients concret plan”)
 
 def retrain():
     df = pd.read_csv("data_full.csv")
@@ -152,7 +156,7 @@ body { background: #0f172a; color: white; }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("⚽ BET AI PRO")
+st.title(" BET AI PRO")
 
 # LOGIN
 user = st.sidebar.text_input("User")
@@ -169,8 +173,8 @@ if st.sidebar.button("Register"):
 
 # VIP BLOCK
 if not is_logged:
-    st.warning("🔒 Accès limité")
-    if st.button("💎 VIP"):
+    st.warning(" Accès limité")
+    if st.button(" VIP"):
         st.write(checkout())
     st.stop()
 
@@ -190,13 +194,13 @@ for m in matches[:5]:
     st.metric("Away", f"{away*100:.1f}%")
 
     if value > 0:
-        st.success("🔥 VALUE BET")
-        send_telegram(f"🔥 VALUE BET: {m['home']} vs {m['away']}")
+        st.success(" VALUE BET")
+        send_telegram(f" VALUE BET: {m['home']} vs {m['away']}")
 
     st.markdown('</div>', unsafe_allow_html=True)
-    ✅ “dashboard ultra animé”
-✅ “IA précision extrême (pro bookmaker)”
-✅ “scaling 1000 clients concret plan”
+     “dashboard ultra animé”
+ “IA précision extrême (pro bookmaker)”
+ “scaling 1000 clients concret plan”
 import xgboost as xgbimport xgboost as x,
     learning_rate=0.05
 )
@@ -221,28 +225,28 @@ def final_prediction(prob_poisson, prob_xgb, prob_dl):
     def generate_tiktok_text(match):
 
     return f"""
-🔥 PARI DU JOUR 🔥
+ PARI DU JOUR 
 
 {match['home']} vs {match['away']}
 
 ✅ IA détecte VALUE BET
 ✅ Probabilité élevée
 
-⚠️ Ne rate pas ce match
+ Ne rate pas ce match
 
-👉 lien en bio
+ lien en bio
 """
     def generate_script(match):
 
     return f"""
-⚠️ PARI À NE PAS RATER ⚠️
+  PARI À NE PAS RATER 
 
-🔥 {match['home']} vs {match['away']}
+ {match['home']} vs {match['away']}
 
 ✅ Probabilité : 65%
 ✅ VALUE BET détecté
 
-👉 Clique sur le lien dans la bio
+ Clique sur le lien dans la bio
 """
     pip install moviepy gtts pillow
     from moviepy.editor import *from moviepy    except:
@@ -363,25 +367,25 @@ driver = webdriver.Chrome()
 # Ouvrir TikTok upload
 driver.get("https://www.tiktok.com/upload")
 
-print("👉 Connecte-toi manuellement à TikTok...")
+print("Connecte-toi manuellement à TikTok...")
 time.sleep(30)  # temps pour login
 
 # Upload vidéo
 file_input = driver.find_element(By.XPATH, "//input[@type='file']")
 file_input.send_keys(VIDEO_PATH)
 
-print("✅ Vidéo upload en cours...")
+print("Vidéo upload en cours...")
 time.sleep(15)
 
 # Ajouter description
 description = driver.find_element(By.XPATH, "//div[@role='textbox']")
-description.send_keys("🔥 PARI DU JOUR ⚽ #bet #football #ia")
+description.send_keys(" PARI DU JOUR #bet #football #ia")
 
 # Publier
 publish_button = driver.find_element(By.XPATH, "//button[contains(., 'Post')]")
 publish_button.click()
 
-print("🚀 Vidéo publiée !")
+print("Vidéo publiée !")
 time.sleep(5)
 
 driver.quit()
