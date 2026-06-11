@@ -2,6 +2,9 @@ STRIPE_KEY = "TA_CLE_STRIPE"
 API_KEY = "TA_CLE_API"
 TELEGRAM_TOKEN = "TON_BOT_TOKEN"
 TELEGRAM_CHAT = "TON_CHAT_ID"
+import streamlit as st
+import requests
+import pandas as pd
 import math
 
 def poisson_model(xg_home, xg_away):
@@ -126,16 +129,17 @@ def retrain():
     model.fit(X, y, epochs=10)
 
     model.save("model_auto.h5")
-    import schedule
+import schedule
 import time
-from auto_learning import retrain
+from auto_learning 
+import retrain
 
 schedule.every().day.at("02:00").do(retrain)
 
 while True:
     schedule.run_pending()
     time.sleep(60)
-    import streamlit as st
+import streamlit as st
 from ai_engine import poisson_model, value_bet
 from api_data import get_matches
 from auth import login, register, init_db
