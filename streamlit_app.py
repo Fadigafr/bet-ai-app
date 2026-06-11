@@ -1,5 +1,5 @@
 import streamlit as st
-import requests application de prédiction ⚽")import requests
+import requests application de prédiction ")import requests
 
 # Exemple simple
 team1 = st.text_input("Equipe 1")
