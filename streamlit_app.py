@@ -357,4 +357,58 @@ schedule.every().day.at("09:00").do(daily_videos)
 while True:
     schedule.run_pending()
     time.sleep(60)
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import time
 
+# CONFIG
+VIDEO_PATH = "PSG_vs_Lyon.mp4"
+
+driver = webdriver.Chrome()
+
+# Ouvrir TikTok upload
+driver.get("https://www.tiktok.com/upload")
+
+print("👉 Connecte-toi manuellement à TikTok...")
+time.sleep(30)  # temps pour login
+
+# Upload vidéo
+file_input = driver.find_element(By.XPATH, "//input[@type='file']")
+file_input.send_keys(VIDEO_PATH)
+
+print("✅ Vidéo upload en cours...")
+time.sleep(15)
+
+# Ajouter description
+description = driver.find_element(By.XPATH, "//div[@role='textbox']")
+description.send_keys("🔥 PARI DU JOUR ⚽ #bet #football #ia")
+
+# Publier
+publish_button = driver.find_element(By.XPATH, "//button[contains(., 'Post')]")
+publish_button.click()
+
+print("🚀 Vidéo publiée !")
+time.sleep(5)
+
+driver.quit()
+from video_generator import create_video
+from tiktok_upload import upload_video  # fonction que tu crées
+
+matches = [
+    {"home": "PSG", "away": "Lyon"},
+    {"home": "Arsenal", "away": "Chelsea"}
+]
+
+for m in matches:
+    create_video(m)
+    upload_video(f"{m['home']}_vs_{m['away']}.mp4")
+    import schedule
+import time
+from main import run_auto
+
+schedule.every().day.at("09:00").do(run_auto)
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)
+    
