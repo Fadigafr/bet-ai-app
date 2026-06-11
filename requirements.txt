@@ -1,6 +1,7 @@
 streamlit
 requests
 pandas
-tensorflow
+numpy
+scipy
 stripe
 schedule
