@@ -106,7 +106,6 @@ def send_telegram(msg):
         "text": msg
     })  
 
-(“dashboard ultra animé”)
 (“IA précision extrême (pro bookmaker)”)
 (“scaling 1000 clients concret plan”)
 
