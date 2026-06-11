@@ -121,7 +121,6 @@ def retrain():
     model.save("model_auto.h5")
 
 import time
-from auto_learning 
 import retrain
 
 schedule.every().day.at("02:00").do(retrain)
