@@ -4,8 +4,11 @@ TELEGRAM_TOKEN = "TON_BOT_TOKEN"
 TELEGRAM_CHAT = "TON_CHAT_ID"
 import streamlit as st
 import requests
+import stripe
 import pandas as pd
 import math
+import tensorflow as tf
+import schedule
 
 def poisson_model(xg_home, xg_away):
     home = draw = away = 0
@@ -27,9 +30,6 @@ def poisson_model(xg_home, xg_away):
 
 def value_bet(prob, odds):
     return (prob * odds) - 1
-import requests
-import streamlit as st
-
 def get_matches():
     url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
 
@@ -75,8 +75,6 @@ def login(user, pwd):
     res = c.fetchone()
     conn.close()
     return res is not None
-import stripe
-import streamlit as st
 
 stripe.api_key = st.secrets["STRIPE_KEY"]
 
@@ -97,7 +95,6 @@ def checkout():
         cancel_url='https://bet-ai-app.streamlit.app',
     )
     return session.url
-
 def send_telegram(msg):
     url = f"https://api.telegram.org/bot{st.secrets['TELEGRAM_TOKEN']}/sendMessage"
 
@@ -105,8 +102,7 @@ def send_telegram(msg):
         "chat_id": st.secrets["TELEGRAM_CHAT"],
         "text": msg
     })  
-import pandas as pd
-import tensorflow as tf
+
 ✅ “dashboard ultra animé”
 ✅ “IA précision extrême (pro bookmaker)”
 ✅ “scaling 1000 clients concret plan”
@@ -127,7 +123,7 @@ def retrain():
     model.fit(X, y, epochs=10)
 
     model.save("model_auto.h5")
-import schedule
+
 import time
 from auto_learning 
 import retrain
