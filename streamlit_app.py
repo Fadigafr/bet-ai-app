@@ -1,21 +1,40 @@
 import streamlit as st
-import requests
-import pandas as pd
 import numpy as np
 
 st.set_page_config(page_title="BET AI PRO", layout="wide")
 
-st.title("BET AI PRO")
+# Style CSS
+st.markdown("""
+    <style>
+    .main {
+        background-color: #0b1c2c;
+        color: white;
+    }
+    .stTextInput>div>div>input {
+        background-color: #1e2a38;
+        color: white;
+    }
+    .stButton>button {
+        background-color: #00c853;
+        color: white;
+        font-size: 18px;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-st.write("Bienvenue sur ton application de prediction")
+st.title(" BET AI PRO")
+
+st.write("Analyse intelligente des matchs")
 
 team1 = st.text_input("Equipe 1")
 team2 = st.text_input("Equipe 2")
 
-if st.button("Analyser"):
+if st.button("Analyser "):
     if team1 and team2:
-        st.success(f"Analyse du match {team1} vs {team2}")
         prob = np.random.randint(40, 90)
-        st.metric("Probabilite equipe 1", f"{prob}%")
+
+        st.success(f"{team1} vs {team2}")
+        st.metric("Probabilité de victoire", f"{prob}%")
     else:
-        st.warning("Entre les equipes")
+        st.warning("Entre les équipes")
+``
