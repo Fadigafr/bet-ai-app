@@ -97,8 +97,6 @@ def checkout():
         cancel_url='https://bet-ai-app.streamlit.app',
     )
     return session.url
-  import requests
-import streamlit as st
 
 def send_telegram(msg):
     url = f"https://api.telegram.org/bot{st.secrets['TELEGRAM_TOKEN']}/sendMessage"
