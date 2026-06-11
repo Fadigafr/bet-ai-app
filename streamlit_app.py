@@ -21,7 +21,6 @@ model.fit(data[["team1_strength", "team2_strength"]], data["result"])
 
 def predict(team1, team2):
     return model.predict([[team1, team2]])
-
         mode="subscription",
         success_url="https://tonapp.com/success",
         cancel_url="https://tonapp.com/cancel",
