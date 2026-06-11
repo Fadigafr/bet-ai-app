@@ -97,7 +97,6 @@ def checkout():
     return session.url
 def send_telegram(msg):
     url = f"https://api.telegram.org/bot{st.secrets['TELEGRAM_TOKEN']}/sendMessage"
-
     requests.post(url, data={
         "chat_id": st.secrets["TELEGRAM_CHAT"],
         "text": msg
@@ -106,7 +105,6 @@ def send_telegram(msg):
 ✅ “dashboard ultra animé”
 ✅ “IA précision extrême (pro bookmaker)”
 ✅ “scaling 1000 clients concret plan”
-
 
 def retrain():
     df = pd.read_csv("data_full.csv")
