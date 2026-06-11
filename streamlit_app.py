@@ -4,7 +4,6 @@ TELEGRAM_TOKEN = "TON_BOT_TOKEN"
 TELEGRAM_CHAT = "TON_CHAT_ID"
 import math
 import numpy as np
-``
 import requests
 import streamlit as st
 import stripe
