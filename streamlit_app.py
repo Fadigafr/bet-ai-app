@@ -21,7 +21,6 @@ model.fit(data[["team1_strength", "team2_strength"]], data["result"])
 
 def predict(team1, team2):
     return model.predict([[team1, team2]])
-`` stripe.api_key = "TA_CLE_STR=["card"],stripe.api_key = "TA_CLE_STRIPE"
         line_items=[{
             "price": "price_id",
             "quantity": 1,
