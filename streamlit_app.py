@@ -106,6 +106,10 @@ def send_telegram(msg):
     })  
 import pandas as pd
 import tensorflow as tf
+✅ “dashboard ultra animé”
+✅ “IA précision extrême (pro bookmaker)”
+✅ “scaling 1000 clients concret plan”
+
 
 def retrain():
     df = pd.read_csv("data_full.csv")
@@ -194,4 +198,163 @@ for m in matches[:5]:
         send_telegram(f"🔥 VALUE BET: {m['home']} vs {m['away']}")
 
     st.markdown('</div>', unsafe_allow_html=True)
-    
+    ✅ “dashboard ultra animé”
+✅ “IA précision extrême (pro bookmaker)”
+✅ “scaling 1000 clients concret plan”
+import xgboost as xgbimport xgboost as x,
+    learning_rate=0.05
+)
+
+model_xgb = xgb.XGBClassifier(
+    n_estimators=500,
+import tensorflow as tf
+
+model_dl = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(3, activation='softmax')
+])
+def final_prediction(prob_poisson, prob_xgb, prob_dl):
+
+    return (
+        0.4 * prob_poisson +
+        0.3 * prob_xgb +
+        0.3 * prob_dl
+    )
+    def value_bet(prob, odds):
+
+    return (prob * odds) - 1 > 0.05
+    def generate_tiktok_text(match):
+
+    return f"""
+🔥 PARI DU JOUR 🔥
+
+{match['home']} vs {match['away']}
+
+✅ IA détecte VALUE BET
+✅ Probabilité élevée
+
+⚠️ Ne rate pas ce match
+
+👉 lien en bio
+"""
+    def generate_script(match):
+
+    return f"""
+⚠️ PARI À NE PAS RATER ⚠️
+
+🔥 {match['home']} vs {match['away']}
+
+✅ Probabilité : 65%
+✅ VALUE BET détecté
+
+👉 Clique sur le lien dans la bio
+"""
+    pip install moviepy gtts pillow
+    from moviepy.editor import *from moviepy    except:
+        font = ImageFont.load_default()
+
+    draw.text((50, 300), text, fill=(34, 197, 94), font=font)
+
+    img.save(filename)
+
+
+# ========================
+# AUDIO VOIX
+# ========================
+def create_voice(text, filename):
+
+    tts = gTTS(text=text, lang='fr')
+    tts.save(filename)
+
+
+# ========================
+# VIDEO
+# ========================
+def create_video(match):
+
+    text = generate_script(match)
+
+    create_image(text, "frame.png")
+    create_voice(text, "voice.mp3")
+
+    clip = ImageClip("frame.png").set_duration(6)
+    audio = AudioFileClip("voice.mp3")
+
+    video = clip.set_audio(audio)
+
+    video.write_videofile(
+        f"{match['home']}_vs_{match['away']}.mp4",
+        fps=24
+    )
+
+
+# ========================
+# TEST
+# ========================
+match = {
+    "home": "PSG",
+    "away": "Lyon"
+}
+
+create_video(match)
+from gtts import gTTS
+from PIL import Image, ImageDraw, ImageFont
+import os
+
+
+# ========================
+# TEXTE IA
+# ========================
+def generate_script(match):
+
+    return f"""
+Pari du jour !
+
+{match['home']} contre {match['away']}
+
+Probabilité élevée !
+Value bet détecté !
+
+Clique sur le lien en bio !
+"""
+
+
+# ========================
+# IMAGE TEXTE
+# ========================
+def create_image(text, filename):
+
+    img = Image.new('RGB', (720, 1280), color=(15, 23, 42))
+    draw = ImageDraw.Draw(img)
+
+    try:
+        font = ImageFont.truetype("arial.ttf", 40)
+matches = [
+    {"home": "PSG", "away": "Lyon"},
+    {"home": "Arsenal", "away": "Chelsea"},
+    {"home": "Barcelona", "away": "Real Madrid"}
+]
+
+for m in matches:
+    create_video(m)
+import schedule
+import time
+from video_generator import create_video
+
+def daily_videos():
+
+    matches = [
+        {"home": "PSG", "away": "Lyon"},
+        {"home": "Inter", "away": "Milan"}
+    ]
+
+    for m in matches:
+        create_video(m)
+
+schedule.every().day.at("09:00").do(daily_videos)
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)
+
