@@ -100,7 +100,7 @@ useEffect(() => {
   });
 
 }, []);
-
+pip install selenium
 
 
 
