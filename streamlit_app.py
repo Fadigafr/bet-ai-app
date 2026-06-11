@@ -33,7 +33,7 @@ def predict(team1, team2):
     )
     return session.url
 def send_prediction():
-    msg = "🔥 BET AI : Match du jour\nScore prévu 2-1\nConfiance 88%"
+    msg = " BET AI : Match du jour\nScore prévu 2-1\nConfiance 88%"
     send_telegram(msg)    
 
 def create_checkout():
