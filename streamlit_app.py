@@ -1,143 +1,138 @@
 import streamlit as st
-import requests
 import numpy as np
 
-# ================= "1X"# ========================
-   if s1 > s2:
-    winner = team1
-elif s2 > s1:
-    winner = team2
+# =====================
+# CONFIG
+# =====================
+st.set_page_config(page_title="BET AI    xg2 = attack2 * (2 - defense1)st.set_page_config(page_title="BET AI ULTIMATE", layout="wide")
 
-    # ========================
-    # AFFICHAGE
-    # ========================
-    st.subheader(" Paris recommandés")
+    # conversion en score
+    score1 = max(0, round(xg1))
+    score2 = max(0, round(xg2))
 
-    st.write(f" Gagnant probable : {winner}")
+    return score1, score2, xg1, xg2
+
+# =====================
+# ANALYSE
+# =====================
+if st.button(" Analyse ULTIMATE"):
+
+    if not team1 or not team2:
+        st.warning("Entre les équipes")
+        st.stop()
+
+    s1, s2, xg1, xg2 = predict_ultimate()
+
+    total = s1 + s2
+
+    st.subheader(" Prédiction IA")
+
+    st.success(f"{team1} {s1} - {s2} {team2}")
+
+    st.write(f"xG {team1} : {round(xg1,2)}")
+    st.write(f"xG {team2} : {round(xg2,2)}")
+
+    # =====================
+    # LOGIQUE PARIS
+    # =====================
+    btts = s1 > 0 and s2 > 0
+    over25 = total >= 3
+
+    # gagnant
+    if s1 > s2:
+        winner = team1
+        double = "1X"
+    elif s2 > s1:
+        winner = team2
+        double = "X2"
+    else:
+        winner = "Match nul"
+        double = "X"
+
+    # =====================
+    # AFFICHAGE PARIS
+    # =====================
+    st.subheader(" Analyse paris PRO")
+
+    st.write(f" Gagnant : {winner}")
     st.write(f" Double chance : {double}")
     st.write(f" BTTS : {'OUI' if btts else 'NON'}")
     st.write(f" +2.5 buts : {'OUI' if over25 else 'NON'}")
 
-    # ========================
-    # MEILLEUR PARI
-    # ========================
-    st.subheader(" Meilleur pari IA")
+    # =====================
+    # MEILLEUR PARI INTELLIGENT
+    # =====================
+    st.subheader(" Meilleur bet (IA intelligente)")
 
-    if over25 and btts:
+    # logique avancée
+    if xg1 > 1.5 and xg2 > 1.5:
         best = "BTTS + Over 2.5"
-    elif over25:
-        best = "Over 2.5"
-    elif btts:
-        best = "BTTS"
+    elif xg1 > xg2 + 1:
+        best = f"Victoire {team1}"
+    elif xg2 > xg1 + 1:
+        best = f"Victoire {team2}"
+    elif total <= 2:
+        best = "Under 2.5 buts"
     else:
-        best = f"Victoire {winner}"
+        best = "Double chance " + double
 
     st.success(best)
 
-    # ========================
-    # COMBINÉ
-    # ========================
-    st.subheader(" Combiné recommandé")
+    # =====================
+    # COMBINÉ VALUE
+    # =====================
+    st.subheader(" Combiné intelligent")
 
-    combo = [double]
+    combo = []
 
-    if over25:
-        combo.append("+2.5 buts")
+    if xg1 > xg2:
+        combo.append("1X")
+    else:
+        combo.append("X2")
 
     if btts:
         combo.append("BTTS")
 
+    if over25:
+        combo.append("+2.5 buts")
+
     st.warning(" + ".join(combo))
 
-    # ========================
+    # =====================
     # CONFIANCE
-    # ========================
-    conf = np.random.randint(70, 92)
-    st.write(f" Confiance IA : {conf}%")
+    # =====================
+    confidence = int((abs(xg1 - xg2) + total) * 20)
+    confidence = min(95, max(60, confidence))
 
-# ========================
+    st.subheader(" Niveau confiance")
+    st.write(f"{confidence}%")
+
+# =====================
 # FOOTER
-# ========================
+# =====================
 st.markdown("---")
-st.caption("BET AI REAL DATA © 2026")
-# CONFIG
-# ========================
-st.set_page_config(page_title="BET AI REAL DATA", layout="wide")
+st.caption("BET AI ULTIMATE © 2026")
 
-API_KEY = "TA_CLE_API_FOOT"
-BASE_URL = "https://v3.football.api-sports.io"
+st.title(" BET AI ULTIMATE AI")
 
-st.title(" BET AI PRO MAX + REAL DATA")
+# =====================
+# INPUT
+# =====================
+team1 = st.text_input("Équipe 1")
+team2 = st.text_input("Équipe 2")
 
-# ========================
-# RECUP MATCHS
-# ========================
-def get_matches():
-    headers = {"x-apisports-key": API_KEY}
-    url = BASE_URL + "/fixtures?next=10"
+# =====================
+# IA AVANCÉE SIMPLIFIÉE
+# =====================
+def predict_ultimate():
 
-    try:
-        r = requests.get(url, headers=headers)
-        data = r.json()
+    # force offensive (attaque)
+    attack1 = np.random.uniform(0.8, 2.2)
+    attack2 = np.random.uniform(0.8, 2.2)
 
-        matches = []
-        for m in data.get("response", []):
-            home = m["teams"]["home"]["name"]
-            away = m["teams"]["away"]["name"]
-            matches.append(f"{home} vs {away}")
+    # faiblesse défensive
+    defense1 = np.random.uniform(0.8, 2.0)
+    defense2 = np.random.uniform(0.8, 2.0)
 
-        return matches
-
-    except:
-        return []
-
-matches = get_matches()
-
-if not matches:
-    matches = ["PSG vs Marseille", "Real Madrid vs Barca"]
-
-match = st.selectbox("Choisir un match", matches)
-
-# ========================
-# LOGIQUE IA RÉELLE SIMPLIFIÉE
-# ========================
-def predict_real(match):
-
-    team1, team2 = match.split(" vs ")
-
-    # simulation "réaliste"
-    base1 = np.random.normal(1.5, 0.8)
-    base2 = np.random.normal(1.2, 0.8)
-
-    score1 = max(0, round(base1))
-    score2 = max(0, round(base2))
-
-    return team1, score1, score2, team2
-
-# ========================
-# ANALYSE
-# ========================
-if st.button(" Analyse PRO"):
-
-    team1, s1, s2, team2 = predict_real(match)
-
-    total = s1 + s2
-
-    st.subheader(" Résultat IA réaliste")
-    st.success(f"{team1} {s1} - {s2} {team2}")
-
-    # ========================
-    # BTTS
-    # ========================
-    btts = s1 > 0 and s2 > 0
-
-    # ========================
-    # OVER
-    # ========================
-    over25 = total >= 3
-
-    # ========================
-    # GAGNANT & DOUBLE
-    # ========================
-    if s1 > s2:
-        winner = team1
+    # calcul xG simplifié
+    xg1 = attack1 * (2 - defense2)
