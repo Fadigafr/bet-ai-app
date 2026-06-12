@@ -1,86 +1,59 @@
 import streamlit as st
 import numpy as np
-import stripe
-import sqlite3
+from database import init_db, add_user, check_user, is_premium, set_premium
 
-def init_db():
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        username TEXT PRIMARY KEY,
-        password TEXT,
-        premium INTEGER DEFAULT 0
-    )
-    """)
-
-    conn.commit()
-    conn.close()
-
-def add_user(username, password):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-
-    try:
-        c.execute("INSERT INTO users VALUES (?, ?, 0)", (username, password))
-        conn.commit()
-    except:
-        pass
-
-    conn.close()
-
-def check_user(username, password):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-
-    c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
-    result = c.fetchone()
-
-    conn.close()
-    return result
-
-def is_premium(username):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-
-    c.execute("SELECT premium FROM users WHERE username=?", (username,))
-    result = c.fetchone()
-
-    conn.close()
-
-    if result:
-        return result[0] == 1
-    return False
-
-def set_premium(username):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-
-    c.execute("UPDATE users SET premium=1 WHERE username=?", (username,))
-    conn.commit()
-    conn.close()
-``
 # =====================
-# CONFIG
+# INIT DB
 # =====================
-st.set_page_config(page_title="BET AI PRO", layout="wide")
+init_db()
 
-stripe.api_key = "TA_CLE_STRIPE"  #  mets ta vraie clé
+st.set_page_config(page_title="BET AI SaaS", layout="wide")
 
-st.title(" BET AI PRO (SaaS)")
+st.title(" BET AI SaaS LOGIN")
 
 # =====================
 # SESSION
 # =====================
-if "uses" not in st.session_state:
-    st.session_state.uses = 0
-
-if "premium" not in st.session_state:
-    st.session_state.premium = False
+if "user" not in st.session_state:
+    st.session_state.user = None
 
 # =====================
-# INPUT
+# AUTH
+# =====================
+st.sidebar.subheader("Compte")
+
+username = st.sidebar.text_input("Utilisateur")
+password = st.sidebar.text_input("Mot de passe", type="password")
+
+col1, col2 = st.sidebar.columns(2)
+
+if col1.button("Login"):
+    user = check_user(username, password)
+    if user:
+        st.session_state.user = username
+    else:
+        st.error("Erreur login")
+
+if col2.button("Register"):
+    add_user(username, password)
+    st.success("Compte créé")
+
+# =====================
+# BLOQUER SI PAS CONNECTÉ
+# =====================
+if not st.session_state.user:
+    st.warning("Connecte-toi")
+    st.stop()
+
+user = st.session_state.user
+
+# =====================
+# PREMIUM STATUS
+# =====================
+premium = is_premium(user)
+
+# =====================
+# INPUT MATCH
 # =====================
 team1 = st.text_input("Équipe 1")
 team2 = st.text_input("Équipe 2")
@@ -96,81 +69,36 @@ def predict():
 # =====================
 # ANALYSE
 # =====================
-if st.button(" Analyse premium"):
+if st.button(" Analyse"):
 
     if not team1 or not team2:
         st.warning("Entre les équipes")
         st.stop()
 
-    #  BLOCAGE FREE
-    if not st.session_state.premium:
-        if st.session_state.uses >= 2:
-            st.error(" Limite gratuite atteinte")
-            st.info("Passe Premium pour continuer")
-            st.stop()
+    #  FREE LIMIT
+    if not premium:
+        st.error(" Réservé PREMIUM")
+        st.stop()
 
     s1, s2 = predict()
 
-    total = s1 + s2
-
     st.success(f"{team1} {s1} - {s2} {team2}")
 
-    # logique paris
-    if s1 > s2:
-        winner = team1
-    elif s2 > s1:
-        winner = team2
-    else:
-        winner = "Match nul"
+# =====================
+# STRIPE SIMULÉ (ACTIVATION)
+# =====================
+st.subheader(" Upgrade Premium")
 
-    btts = s1 > 0 and s2 > 0
-    over = total >= 3
-
-    # affichage
-    st.subheader(" Paris recommandés")
-
-    st.write(f" Gagnant : {winner}")
-    st.write(f" BTTS : {'OUI' if btts else 'NON'}")
-    st.write(f" +2.5 : {'OUI' if over else 'NON'}")
-
-    # compteur free
-    st.session_state.uses += 1
+if not premium:
+    if st.button("Activer Premium"):
+        set_premium(user)
+        st.success(" Premium activé")
 
 # =====================
-# STRIPE PAIEMENT
+# INFO USER
 # =====================
-st.subheader(" Pass Premium")
-
-if st.button("S'abonner (10€)"):
-    try:
-        session = stripe.checkout.Session.create(
-            payment_method_types=["card"],
-            line_items=[{
-                "price_data": {
-                    "currency": "eur",
-                    "product_data": {"name": "Bet AI Premium"},
-                    "unit_amount": 1000,
-                },
-                "quantity": 1,
-            }],
-            mode="payment",
-            success_url="https://bet-ai-app.streamlit.app",
-            cancel_url="https://bet-ai-app.streamlit.app",
-        )
-
-        st.success(" Paiement prêt")
-        st.write(session.url)
-
-        #  simulation activation
-        st.session_state.premium = True
-
-    except Exception as e:
-        st.error(str(e))
-
-# =====================
-# STATUS UTILISATEUR
-# =====================
-if st.session_state.premium:
-    st.success(" Compte PREMIUM actif")
+if premium:
+    st.success(" Compte Premium")
 else:
-    st.warning(" Compte GRATUIT (2 essais)")
+    st.warning("Compte Gratuit")
+``
