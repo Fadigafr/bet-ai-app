@@ -3,13 +3,49 @@ import requests
 import pandas as pd
 import numpy as np
 import stripe
+import sqlite3
 
+def init_db():
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        premium INTEGER DEFAULT 0
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+def add_user(username):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute("INSERT INTO users (username) VALUES (?)", (username,))
+    conn.commit()
+    conn.close()
+
+def is_premium(username):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute("SELECT premium FROM users WHERE username=?", (username,))
+    result = c.fetchone()
+
+    conn.close()
+
+    if result and result[0] == 1:
+        return True
+    return False
 # ================================
 # CONFIG
 # ================================
 st.set_page_config(page_title="Bet AI ULTRA MAX", layout="wide")
 
-API_KEY = "TA_CLE_API_FOOT"  # 👉 API-Football
+API_KEY = "TA_CLE_API_FOOT"  #  API-Football
 BASE_URL = "v3.football.api-sports.io"
 
 stripe.api_key = "TA_CLE_STRIPE"
@@ -23,7 +59,7 @@ if "user" not in st.session_state:
 # ================================
 # LOGIN
 # ================================
-st.sidebar.title("🔐 Connexion")
+st.sidebar.title(" Connexion")
 
 username = st.sidebar.text_input("Username")
 password = st.sidebar.text_input("Password", type="password")
@@ -43,7 +79,7 @@ else:
 # ================================
 # UI
 # ================================
-st.title("⚽ BET AI ULTRA MAX")
+st.title(" BET AI ULTRA MAX")
 
 # ================================
 # SELECT MATCH (LIVE API)
@@ -93,21 +129,21 @@ if "uses" not in st.session_state:
 
 FREE_LIMIT = 2
 
-if st.button("🔍 Analyser"):
+if st.button(" Analyser"):
     if st.session_state.uses >= FREE_LIMIT:
-        st.error("🔒 Limite gratuite atteinte → Abonne-toi")
+        st.error(" Limite gratuite atteinte → Abonne-toi")
     else:
         team1, s1, s2, team2, conf = predict(selected_match)
 
         st.success(f"{team1} {s1} - {s2} {team2}")
-        st.write(f"📊 Confiance IA : {conf}%")
+        st.write(f" Confiance IA : {conf}%")
 
         st.session_state.uses += 1
 
 # ================================
 # STRIPE PAIEMENT
 # ================================
-st.subheader("💰 Premium")
+st.subheader(" Premium")
 
 if st.button("S'abonner (10€)"):
     try:
@@ -126,7 +162,7 @@ if st.button("S'abonner (10€)"):
             cancel_url="https://bet-ai-app.streamlit.app",
         )
 
-        st.success("✅ Paiement prêt")
+        st.success(" Paiement prêt")
         st.markdown(session.url)
 
     except Exception as e:
