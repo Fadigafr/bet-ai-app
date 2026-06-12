@@ -1,5 +1,5 @@
 import streamlit as st
-:import numpy as np
+import numpy as np
         st.warning("Entre les équipes")
         st.stop()
 
