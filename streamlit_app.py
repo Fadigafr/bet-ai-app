@@ -3,7 +3,6 @@ import numpy as np
 import requests
 import schedule
 import time
-from auto_prono import generate_prono
 
 def job():
     generate_prono()
