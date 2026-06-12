@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
-        st.warning("Entre les équipes")
-        st.stop()
+    st.warning("Entre les équipes")
+    st.stop()
 
     s1, s2, xg1, xg2 = predict()
 
