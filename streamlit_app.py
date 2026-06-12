@@ -4,7 +4,46 @@ import pandas as pd
 import numpy as np
 import stripe
 import sqlite3
+import schedule
+import time
+from telegram_bot import send_prediction
 
+def job():
+    send_prediction(" Prono du jour : 2-1")
+
+schedule.every().day.at("10:00").do(job)
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)
+from database import init_db, add_user, is_premium
+from telegram_bot import send_prediction
+
+def auto_send():
+    message = " Prediction du jour : PSG 2 - 1 Marseille"
+    send_prediction(message)
+    
+
+TOKEN = "TON_BOT_TOKEN"
+CHAT_ID = "TON_CHAT_ID"
+
+def send_prediction(message):
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+
+    requests.post(url, data={
+        "chat_id": CHAT_ID,
+        "text": message
+    })
+init_db()
+if username and password:
+    add_user(username)
+    st.session_state.user = username
+    if st.button("Activer Premium (10€)"):
+    st.session_state.premium = True
+    if not st.session_state.get("premium"):
+    if st.session_state.uses >= 2:
+        st.error(" Passe Premium")
+        st.stop()
 def init_db():
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
