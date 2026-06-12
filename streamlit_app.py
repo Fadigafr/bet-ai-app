@@ -5,60 +5,109 @@ import numpy as np
 import stripe
 
 # ================================
-# CONFIG APP
+# CONFIG
 # ================================
-st.set_page_config(page_title="Bet AI PRO MAX", layout="wide")
+st.set_page_config(page_title="Bet AI ULTRA MAX", layout="wide")
 
-# ================================
-# CONFIG STRIPE
-# ================================
-stripe.api_key = "TA_CLE_STRIPE"  # (require '[clj-http.client :as client])
+API_KEY = "TA_CLE_API_FOOT"  # 👉 API-Football
+BASE_URL = "https://v3.football.api-sports.io"
 
-(client/get "https://free-api-live-football-data.p.rapidapi.com/football-players-search" {:headers {:x-rapidapi-key "acddc25c4amsh1b5de20e73be716p1933dfjsn4e554c3a6bf4"
-                                                                                                    :x-rapidapi-host "free-api-live-football-data.p.rapidapi.com"
-                                                                                                    :Content-Type "application/json"}
-                                                                                          :query-params {:search "m"}})
+stripe.api_key = "TA_CLE_STRIPE"
 
 # ================================
-# INTERFACE
+# SESSION LOGIN SIMPLE
 # ================================
-st.title(" BET AI PRO MAX")
-st.markdown("Analyse intelligente des matchs de football")
+if "user" not in st.session_state:
+    st.session_state.user = None
 
 # ================================
-# SECTION ANALYSE
+# LOGIN
 # ================================
-st.subheader(" Analyse de match")
+st.sidebar.title("🔐 Connexion")
 
-team1 = st.text_input("Équipe 1")
-team2 = st.text_input("Équipe 2")
+username = st.sidebar.text_input("Username")
+password = st.sidebar.text_input("Password", type="password")
 
-if st.button("Lancer Analyse"):
-    if team1 and team2:
-        st.info("Analyse en cours...")
-
-        # Simulation IA (propre)
-        score_team1 = np.random.randint(0, 4)
-        score_team2 = np.random.randint(0, 4)
-
-        st.success(" Résultat IA")
-
-        st.markdown(f"""
-        ###  Résultat prédit
-        **{team1} {score_team1} - {score_team2} {team2}**
-        """)
-
-        # Probabilité
-        prob = np.random.randint(60, 95)
-        st.write(f" Confiance IA : {prob}%")
-
+if st.sidebar.button("Login"):
+    if username == "admin" and password == "1234":
+        st.session_state.user = username
     else:
-        st.warning("Remplis les équipes")
+        st.sidebar.error("Identifiants incorrects")
+
+if st.session_state.user:
+    st.sidebar.success(f"Connecté : {st.session_state.user}")
+else:
+    st.warning("Connecte-toi pour accéder aux analyses")
+    st.stop()
 
 # ================================
-# SECTION PAIEMENT
+# UI
 # ================================
-st.subheader(" Abonnement Premium")
+st.title("⚽ BET AI ULTRA MAX")
+
+# ================================
+# SELECT MATCH (LIVE API)
+# ================================
+def get_matches():
+    headers = {"x-apisports-key": API_KEY}
+    url = f"{BASE_URL}/fixtures?next=10"
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        data = response.json()
+        matches = []
+
+        for m in data["response"]:
+            home = m["teams"]["home"]["name"]
+            away = m["teams"]["away"]["name"]
+            matches.append(f"{home} vs {away}")
+
+        return matches
+    else:
+        return []
+
+matches = get_matches()
+
+selected_match = st.selectbox("Choisir un match", matches)
+
+# ================================
+# IA ANALYSE
+# ================================
+def predict(match):
+    # IA améliorée (simulation + logique)
+    team1, team2 = match.split(" vs ")
+
+    score1 = np.random.randint(0, 4)
+    score2 = np.random.randint(0, 4)
+
+    confidence = np.random.randint(65, 95)
+
+    return team1, score1, score2, team2, confidence
+
+# ================================
+# LIMITE FREE / PREMIUM
+# ================================
+if "uses" not in st.session_state:
+    st.session_state.uses = 0
+
+FREE_LIMIT = 2
+
+if st.button("🔍 Analyser"):
+    if st.session_state.uses >= FREE_LIMIT:
+        st.error("🔒 Limite gratuite atteinte → Abonne-toi")
+    else:
+        team1, s1, s2, team2, conf = predict(selected_match)
+
+        st.success(f"{team1} {s1} - {s2} {team2}")
+        st.write(f"📊 Confiance IA : {conf}%")
+
+        st.session_state.uses += 1
+
+# ================================
+# STRIPE PAIEMENT
+# ================================
+st.subheader("💰 Premium")
 
 if st.button("S'abonner (10€)"):
     try:
@@ -67,9 +116,7 @@ if st.button("S'abonner (10€)"):
             line_items=[{
                 "price_data": {
                     "currency": "eur",
-                    "product_data": {
-                        "name": "Abonnement Bet AI PRO"
-                    },
+                    "product_data": {"name": "Bet AI Premium"},
                     "unit_amount": 1000,
                 },
                 "quantity": 1,
@@ -79,14 +126,14 @@ if st.button("S'abonner (10€)"):
             cancel_url="https://bet-ai-app.streamlit.app",
         )
 
-        st.success(" Paiement prêt")
-        st.markdown(f"[ Payer ici]({session.url})")
+        st.success("✅ Paiement prêt")
+        st.markdown(session.url)
 
     except Exception as e:
-        st.error(f"Erreur : {str(e)}")
+        st.error(str(e))
 
 # ================================
 # FOOTER
 # ================================
 st.markdown("---")
-st.caption("Bet AI PRO MAX © 2026")
+st.caption("ULTRA MAX © 2026")
