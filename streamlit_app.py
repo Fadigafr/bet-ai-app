@@ -1,7 +1,66 @@
 import streamlit as st
 import numpy as np
 import stripe
+import sqlite3
 
+def init_db():
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        username TEXT PRIMARY KEY,
+        password TEXT,
+        premium INTEGER DEFAULT 0
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+def add_user(username, password):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    try:
+        c.execute("INSERT INTO users VALUES (?, ?, 0)", (username, password))
+        conn.commit()
+    except:
+        pass
+
+    conn.close()
+
+def check_user(username, password):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
+    result = c.fetchone()
+
+    conn.close()
+    return result
+
+def is_premium(username):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute("SELECT premium FROM users WHERE username=?", (username,))
+    result = c.fetchone()
+
+    conn.close()
+
+    if result:
+        return result[0] == 1
+    return False
+
+def set_premium(username):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute("UPDATE users SET premium=1 WHERE username=?", (username,))
+    conn.commit()
+    conn.close()
+``
 # =====================
 # CONFIG
 # =====================
