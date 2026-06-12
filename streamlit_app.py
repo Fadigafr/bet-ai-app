@@ -3,12 +3,15 @@ import requests
 import numpy as np
 
 # ================= "1X"# ========================
-    elif s2 > s1:
-        winner = team2
-        double = "X2"
-    else:
-        winner = "Match nul"
-        double = "X"
+    if s1 > s2:
+    winner = team1
+    double = "1X"
+elif s2 > s1:
+    winner = team2
+    double = "X2"
+else:
+    winner = "Match nul"
+    double = "X"
 
     # ========================
     # AFFICHAGE
