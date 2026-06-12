@@ -119,4 +119,3 @@ else:
 # =====================
 st.markdown("---")
 st.caption("BET AI PRO © 2026 - Version Stable")
-``
