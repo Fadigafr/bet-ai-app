@@ -4,7 +4,7 @@ import numpy as np
 # =====================
 # CONFIG
 # =====================
-st.set_page_config(page_title="BET AI    xg2 = attack2 * (2 - defense1)st.set_page_config(page_title="BET AI ULTIMATE", layout="wide")
+st.set_page_config(page_title="BET AI xg2 = attack2 * (2 - defense1)st.set_page_config(page_title="BET AI ULTIMATE", layout="wide")
 
     # conversion en score
     score1 = max(0, round(xg1))
