@@ -10,7 +10,7 @@ import stripe
 st.set_page_config(page_title="Bet AI ULTRA MAX", layout="wide")
 
 API_KEY = "TA_CLE_API_FOOT"  # 👉 API-Football
-BASE_URL = "https://v3.football.api-sports.io"
+BASE_URL = "v3.football.api-sports.io"
 
 stripe.api_key = "TA_CLE_STRIPE"
 
