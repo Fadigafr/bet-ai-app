@@ -1,118 +1,83 @@
 import streamlit as st
-import requests
 import numpy as np
-import stripe
 
 # ========================
 # CONFIG
 # ========================
-st.set_page_config(page_title="BET AI GOD MODE", layout="wide")
-
-API_KEY = "TA_CLE_API"
-BASE_URL = "https://v3.football.api-sports.io"
-
-stripe.api_key = "TA_CLE_STRIPE"
-
-# ========================
-# LOGIN SIMPLE
-# ========================
-if "user" not in st.session_state:
-    st.session_state.user = None
-
-username = st.sidebar.text_input("Utilisateur")
-password = st.sidebar.text_input("Mot de passe", type="password")
-
-if st.sidebar.button("Connexion"):
-    if username and password:
-        st.session_state.user = username
-
-if not st.session_state.user:
-    st.warning("Connecte-toi")
-    st.stop()
+st.set_page_config(page_title="BET AI PRO", layout="wide")
 
 # ========================
 # UI
 # ========================
-st.title("⚽ BET AI GOD MODE")
+st.title(" BET AI PRO + OPTIONS PARIS")
 
 # ========================
-# API MATCHS
+# INPUT MATCH
 # ========================
-def get_matches():
-    headers = {"x-apisports-key": API_KEY}
-    url = BASE_URL + "/fixtures?next=5"
-
-    try:
-        r = requests.get(url, headers=headers)
-        data = r.json()
-
-        matches = []
-        for m in data.get("response", []):
-            home = m["teams"]["home"]["name"]
-            away = m["teams"]["away"]["name"]
-            matches.append(f"{home} vs {away}")
-
-        return matches
-    except:
-        return []
-
-matches = get_matches()
-
-if not matches:
-    matches = ["PSG vs Marseille", "Real Madrid vs Barca"]
-
-match = st.selectbox("Choisir match", matches)
+team1 = st.text_input("Équipe 1")
+team2 = st.text_input("Équipe 2")
 
 # ========================
-# IA SIMPLE
+# OPTIONS PARIS
 # ========================
-if "uses" not in st.session_state:
-    st.session_state.uses = 0
+st.subheader(" Options de paris")
 
-if "premium" not in st.session_state:
-    st.session_state.premium = False
+option_score = st.checkbox("Prédiction score exact")
+option_btts = st.checkbox("Les deux équipes marquent (BTTS)")
+option_over = st.checkbox("Plus de 2.5 buts")
 
-if st.button("Analyser"):
+# ========================
+# IA SIMPLIFIÉE
+# ========================
+if st.button(" Lancer Analyse"):
 
-    if not st.session_state.premium and st.session_state.uses >= 2:
-        st.error("Passe Premium")
+    if not team1 or not team2:
+        st.warning("Entre les deux équipes")
         st.stop()
 
-    s1 = np.random.randint(0, 4)
-    s2 = np.random.randint(0, 4)
-    conf = np.random.randint(65, 95)
+    # génération scores
+    score1 = np.random.randint(0, 4)
+    score2 = np.random.randint(0, 4)
 
-    team1, team2 = match.split(" vs ")
+    total_goals = score1 + score2
 
-    st.success(f"{team1} {s1} - {s2} {team2}")
-    st.write(f"Confiance : {conf}%")
+    st.subheader(" Résultat IA")
 
-    st.session_state.uses += 1
+    st.success(f"{team1} {score1} - {score2} {team2}")
+
+    # ========================
+    # SCORE EXACT
+    # ========================
+    if option_score:
+        st.write(" Score exact recommandé :")
+        st.markdown(f"**{team1} {score1} - {score2} {team2}**")
+
+    # ========================
+    # BTTS (les deux marquent)
+    # ========================
+    if option_btts:
+        if score1 > 0 and score2 > 0:
+            st.success(" BTTS : OUI (les deux équipes marquent)")
+        else:
+            st.error(" BTTS : NON")
+
+    # ========================
+    # OVER 2.5
+    # ========================
+    if option_over:
+        if total_goals > 2:
+            st.success(" +2.5 buts : OUI")
+        else:
+            st.error(" +2.5 buts : NON")
+
+    # ========================
+    # CONFIANCE
+    # ========================
+    confidence = np.random.randint(65, 95)
+    st.write(f" Confiance IA : {confidence}%")
 
 # ========================
-# PAIEMENT
+# FOOTER
 # ========================
-if st.button("S'abonner (10€)"):
-    try:
-        session = stripe.checkout.Session.create(
-            payment_method_types=["card"],
-            line_items=[{
-                "price_data": {
-                    "currency": "eur",
-                    "product_data": {"name": "Bet AI"},
-                    "unit_amount": 1000,
-                },
-                "quantity": 1,
-            }],
-            mode="payment",
-            success_url="https://bet-ai-app.streamlit.app",
-            cancel_url="https://bet-ai-app.streamlit.app",
-        )
-
-        st.success("Paiement prêt")
-        st.write(session.url)
-
-        st.session_state.premium = True
-
-    except Exception as e:
-        st.error(str(e))
+st.markdown("---")
+st.caption("BET AI PRO © 2026")
