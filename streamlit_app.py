@@ -1,6 +1,113 @@
 import streamlit as st
 import numpy as np
+import requests
+import schedule
+import time
+from auto_prono import generate_prono
 
+def job():
+    generate_prono()
+
+# envoi tous les jours à 10h
+schedule.every().day.at("10:00").do(job)
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)
+from telegram_bot import send_message
+
+def generate_prono():
+
+    team1 = "PSG"
+    team2 = "Marseille"
+
+    s1 = np.random.randint(1, 3)
+    s2 = np.random.randint(0, 2)
+
+    total = s1 + s2
+
+    btts = s1 > 0 and s2 > 0
+    over = total >= 3
+
+    message = f"""
+ PRONO DU JOUR 
+
+{team1} vs {team2}
+
+ Score : {s1}-{s2}
+ BTTS : {'OUI' if btts else 'NON'}
+ +2.5 buts : {'OUI' if over else 'NON'}
+
+ COMBINÉ :
+"""
+
+    combo = ["1X"]
+
+    if btts:
+        combo.append("BTTS")
+
+    if over:
+        combo.append("+2.5")
+
+    message += " + ".join(combo)
+
+    message += "\n Confiance : 85%"
+
+    send_message(message)
+
+generate_prono()
+
+from telegram_bot import send_message
+
+def generate_prono():
+
+    team1 = "PSG"
+    team2 = "Marseille"
+
+    s1 = np.random.randint(1, 3)
+    s2 = np.random.randint(0, 2)
+
+    total = s1 + s2
+
+    btts = s1 > 0 and s2 > 0
+    over = total >= 3
+
+    message = f"""
+  PRONO DU JOUR 
+
+{team1} vs {team2}
+
+  Score : {s1}-{s2}
+  BTTS : {'OUI' if btts else 'NON'}
+  +2.5 buts : {'OUI' if over else 'NON'}
+
+  COMBINÉ :
+"""
+
+    combo = ["1X"]
+
+    if btts:
+        combo.append("BTTS")
+
+    if over:
+        combo.append("+2.5")
+
+    message += " + ".join(combo)
+
+    message += "\n📈 Confiance : 85%"
+
+    send_message(message)
+
+generate_prono()
+TOKEN = "TON_TOKEN_BOT"
+CHAT_ID = "TON_CHAT_ID"
+
+def send_message(text):
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    requests.post(url, data={
+        "chat_id": CHAT_ID,
+        "text": text
+    })
 st.set_page_config(page_title="BET AI GOD FINAL", layout="wide")
 
 st.title(" BET AI")
