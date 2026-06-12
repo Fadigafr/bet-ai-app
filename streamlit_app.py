@@ -2,15 +2,12 @@ import streamlit as st
 import numpy as np
 
 # =====================
-# CONFIG APP
+# CONFIG
 # =====================
-st.set_page_config(
-    page_title="BET AI PRO",
-    layout="wide"
-)
+st.set_page_config(page_title="BET AI PRO MAX", layout="wide")
 
 # =====================
-# INIT SESSION
+# SESSION
 # =====================
 if "uses" not in st.session_state:
     st.session_state["uses"] = 0
@@ -21,8 +18,8 @@ if "premium" not in st.session_state:
 # =====================
 # HEADER
 # =====================
-st.title(" BET AI PRO")
-st.markdown("Analyse intelligente de paris sportifs")
+st.title(" BET AI PRO MAX")
+st.markdown(" Prédictions IA - Paris intelligents - Gains optimisés")
 
 # =====================
 # INPUT
@@ -31,91 +28,105 @@ team1 = st.text_input("Équipe 1")
 team2 = st.text_input("Équipe 2")
 
 # =====================
-# IA (SAFE)
+# IA PREDICTION
 # =====================
-def predict_scores():
-    score_home = int(np.random.randint(0, 4))
-    score_away = int(np.random.randint(0, 4))
-    return score_home, score_away
+def predict():
+    s1 = np.random.randint(0, 4)
+    s2 = np.random.randint(0, 4)
+    return s1, s2
 
 # =====================
-# ANALYSE BUTTON
+# ANALYSE
 # =====================
-analyse_clicked = st.button("🔍 Lancer Analyse")
+if st.button(" ANALYSE PRO"):
 
-if analyse_clicked:
-    #  Validation
     if team1.strip() == "" or team2.strip() == "":
-        st.warning(" Entre les deux équipes")
+        st.warning("Entre les équipes")
         st.stop()
 
-    #  Limite gratuite
+    # LIMITATION FREE
     if not st.session_state["premium"]:
         if st.session_state["uses"] >= 2:
-            st.error(" Limite gratuite atteinte (2 analyses max)")
-            st.info("Passe en Premium pour accès illimité")
+            st.error(" Limite gratuite atteinte")
+            st.info("Passe Premium ")
             st.stop()
 
-    #  IA
-    s1, s2 = predict_scores()
-    total_goals = s1 + s2
+    s1, s2 = predict()
+    total = s1 + s2
 
     st.success(f"{team1} {s1} - {s2} {team2}")
 
-    # =====================
     # LOGIQUE PARIS
-    # =====================
     if s1 > s2:
         winner = team1
+        double = "1X"
     elif s2 > s1:
         winner = team2
+        double = "X2"
     else:
         winner = "Match nul"
+        double = "X"
 
-    btts = (s1 > 0 and s2 > 0)
-    over25 = (total_goals >= 3)
+    btts = s1 > 0 and s2 > 0
+    over25 = total >= 3
 
-    # =====================
-    # AFFICHAGE RESULTATS
-    # =====================
-    st.subheader(" Paris recommandés")
+    # AFFICHAGE
+    st.subheader(" PRONOS IA")
 
     st.write(f" Gagnant : {winner}")
+    st.write(f" Double chance : {double}")
     st.write(f" BTTS : {'OUI' if btts else 'NON'}")
     st.write(f" +2.5 buts : {'OUI' if over25 else 'NON'}")
 
-    #  compteur usage
+    # MEILLEUR PARI
+    if btts and over25:
+        best = "BTTS + Over 2.5"
+    elif over25:
+        best = "Over 2.5"
+    elif btts:
+        best = "BTTS"
+    else:
+        best = f"Victoire {winner}"
+
+    st.success(f" Meilleur pari : {best}")
+
+    # COMBINÉ
+    combo = [double]
+    if btts:
+        combo.append("BTTS")
+    if over25:
+        combo.append("+2.5")
+
+    st.warning(" Combiné : " + " + ".join(combo))
+
+    # compteur
     if not st.session_state["premium"]:
         st.session_state["uses"] += 1
 
 # =====================
-# PREMIUM SECTION
+# PREMIUM
 # =====================
 st.markdown("---")
-st.subheader(" Pass Premium")
+st.subheader(" PASS PREMIUM")
 
 if not st.session_state["premium"]:
-    activate = st.button("Activer Premium (simulation)")
-
-    if activate:
+    if st.button("Activer Premium"):
         st.session_state["premium"] = True
-        st.success(" Compte Premium activé")
+        st.success(" Premium activé")
 
 # =====================
-# USER STATUS
+# STATUS
 # =====================
-st.markdown("---")
-
 if st.session_state["premium"]:
-    st.success(" Statut : PREMIUM (illimité)")
+    st.success(" Compte PREMIUM (illimité)")
 else:
-    remaining = 2 - st.session_state["uses"]
-    if remaining < 0:
-        remaining = 0
-    st.warning(f" Compte GRATUIT - Restant : {remaining} analyse(s)")
+    restant = 2 - st.session_state["uses"]
+    if restant < 0:
+        restant = 0
+    st.warning(f" Gratuit - {restant} essais restants")
 
 # =====================
 # FOOTER
 # =====================
 st.markdown("---")
-st.caption("BET AI PRO © 2026 - Version Stable")
+st.caption("BET AI PRO MAX © 2026")
