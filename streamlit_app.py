@@ -1,130 +1,117 @@
 import streamlit as st
 import numpy as np
-import requests
-import schedule
-import time
+import stripe
 
-def job():
-    generate_prono()
+# =====================
+# CONFIG
+# =====================
+st.set_page_config(page_title="BET AI PRO", layout="wide")
 
-# envoi tous les jours à 10h
-schedule.every().day.at("10:00").do(job)
+stripe.api_key = "TA_CLE_STRIPE"  #  mets ta vraie clé
 
-while True:
-    schedule.run_pending()
-    time.sleep(60)
-from telegram_bot import send_message
+st.title(" BET AI PRO (SaaS)")
 
-def generate_prono():
+# =====================
+# SESSION
+# =====================
+if "uses" not in st.session_state:
+    st.session_state.uses = 0
 
-    team1 = "PSG"
-    team2 = "Marseille"
+if "premium" not in st.session_state:
+    st.session_state.premium = False
 
-    s1 = np.random.randint(1, 3)
-    s2 = np.random.randint(0, 2)
-
-    total = s1 + s2
-
-    btts = s1 > 0 and s2 > 0
-    over = total >= 3
-
-    message = f"""
- PRONO DU JOUR 
-
-{team1} vs {team2}
-
- Score : {s1}-{s2}
- BTTS : {'OUI' if btts else 'NON'}
- +2.5 buts : {'OUI' if over else 'NON'}
-
- COMBINÉ :
-"""
-
-    combo = ["1X"]
-
-    if btts:
-        combo.append("BTTS")
-
-    if over:
-        combo.append("+2.5")
-
-    message += " + ".join(combo)
-
-    message += "\n Confiance : 85%"
-
-    send_message(message)
-
-generate_prono()
-
-from telegram_bot import send_message
-
-def generate_prono():
-
-    team1 = "PSG"
-    team2 = "Marseille"
-
-    s1 = np.random.randint(1, 3)
-    s2 = np.random.randint(0, 2)
-
-    total = s1 + s2
-
-    btts = s1 > 0 and s2 > 0
-    over = total >= 3
-
-    message = f"""
-  PRONO DU JOUR 
-
-{team1} vs {team2}
-
-  Score : {s1}-{s2}
-  BTTS : {'OUI' if btts else 'NON'}
-  +2.5 buts : {'OUI' if over else 'NON'}
-
-  COMBINÉ :
-"""
-
-    combo = ["1X"]
-
-    if btts:
-        combo.append("BTTS")
-
-    if over:
-        combo.append("+2.5")
-
-    message += " + ".join(combo)
-
-    message += "\n📈 Confiance : 85%"
-
-    send_message(message)
-
-generate_prono()
-TOKEN = "TON_TOKEN_BOT"
-CHAT_ID = "TON_CHAT_ID"
-
-def send_message(text):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    requests.post(url, data={
-        "chat_id": CHAT_ID,
-        "text": text
-    })
-st.set_page_config(page_title="BET AI GOD FINAL", layout="wide")
-
-st.title(" BET AI")
-
+# =====================
+# INPUT
+# =====================
 team1 = st.text_input("Équipe 1")
 team2 = st.text_input("Équipe 2")
 
+# =====================
+# IA
+# =====================
 def predict():
     s1 = np.random.randint(0, 4)
     s2 = np.random.randint(0, 4)
     return s1, s2
 
-if st.button("Analyse"):
+# =====================
+# ANALYSE
+# =====================
+if st.button(" Analyse premium"):
 
     if not team1 or not team2:
         st.warning("Entre les équipes")
         st.stop()
 
+    #  BLOCAGE FREE
+    if not st.session_state.premium:
+        if st.session_state.uses >= 2:
+            st.error(" Limite gratuite atteinte")
+            st.info("Passe Premium pour continuer")
+            st.stop()
+
     s1, s2 = predict()
 
+    total = s1 + s2
+
     st.success(f"{team1} {s1} - {s2} {team2}")
+
+    # logique paris
+    if s1 > s2:
+        winner = team1
+    elif s2 > s1:
+        winner = team2
+    else:
+        winner = "Match nul"
+
+    btts = s1 > 0 and s2 > 0
+    over = total >= 3
+
+    # affichage
+    st.subheader(" Paris recommandés")
+
+    st.write(f" Gagnant : {winner}")
+    st.write(f" BTTS : {'OUI' if btts else 'NON'}")
+    st.write(f" +2.5 : {'OUI' if over else 'NON'}")
+
+    # compteur free
+    st.session_state.uses += 1
+
+# =====================
+# STRIPE PAIEMENT
+# =====================
+st.subheader(" Pass Premium")
+
+if st.button("S'abonner (10€)"):
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{
+                "price_data": {
+                    "currency": "eur",
+                    "product_data": {"name": "Bet AI Premium"},
+                    "unit_amount": 1000,
+                },
+                "quantity": 1,
+            }],
+            mode="payment",
+            success_url="https://bet-ai-app.streamlit.app",
+            cancel_url="https://bet-ai-app.streamlit.app",
+        )
+
+        st.success(" Paiement prêt")
+        st.write(session.url)
+
+        #  simulation activation
+        st.session_state.premium = True
+
+    except Exception as e:
+        st.error(str(e))
+
+# =====================
+# STATUS UTILISATEUR
+# =====================
+if st.session_state.premium:
+    st.success(" Compte PREMIUM actif")
+else:
+    st.warning(" Compte GRATUIT (2 essais)")
