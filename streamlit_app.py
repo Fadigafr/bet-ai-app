@@ -84,3 +84,6 @@ if st.button(" Analyse"):
 st.subheader(" Pass Premium")
 
 if not st.session_state.premium:
+    if st.button("Activer Premium (simulation)"):
+        st.session_state.premium = True
+        st.success(" Premium activé")
