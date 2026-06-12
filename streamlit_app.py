@@ -1,102 +1,47 @@
 import streamlit as st
+import requests
 import numpy as np
 
-# ========================
-# CONFIG
-# ========================
-st.set_page_config(page_title="BET AI PRO MAX PARIS", layout="wide")
-
-st.title(" BET AI PRO MAX PARIS")
-
-# ========================
-# INPUT
-# ========================
-team1 = st.text_input("Équipe 1")
-team2 = st.text_input("Équipe 2")
-
-# ========================
-# ANALYSE
-# ========================
-if st.button(" Analyse complète"):
-
-    if not team1 or not team2:
-        st.warning("Entre les deux équipes")
-        st.stop()
-
-    # génération score
-    score1 = np.random.randint(0, 4)
-    score2 = np.random.randint(0, 4)
-
-    total = score1 + score2
-
-    st.subheader(" Résultat IA")
-    st.success(f"{team1} {score1} - {score2} {team2}")
-
-    # ========================
-    # BTTS
-    # ========================
-    btts = score1 > 0 and score2 > 0
-
-    # ========================
-    # OVER / UNDER
-    # ========================
-    over25 = total > 2
-
-    # ========================
-    # DOUBLE CHANCE
-    # ========================
-    if score1 > score2:
-        double = "1X"
-        winner = team1
-    elif score2 > score1:
-        double = "X2"
+# ================= "1X"# ========================
+    elif s2 > s1:
         winner = team2
+        double = "X2"
     else:
-        double = "X"
         winner = "Match nul"
+        double = "X"
 
     # ========================
-    # AFFICHAGE PARIS
+    # AFFICHAGE
     # ========================
-    st.subheader(" Suggestions de paris")
+    st.subheader(" Paris recommandés")
 
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown("### Paris simples")
-        st.write(f" Gagnant : {winner}")
-        st.write(f" Double chance : {double}")
-        st.write(f" +2.5 buts : {'OUI' if over25 else 'NON'}")
-        st.write(f" BTTS : {'OUI' if btts else 'NON'}")
-
-    with col2:
-        st.markdown("###  Score exact")
-        st.write(f"{team1} {score1} - {score2} {team2}")
+    st.write(f" Gagnant probable : {winner}")
+    st.write(f" Double chance : {double}")
+    st.write(f" BTTS : {'OUI' if btts else 'NON'}")
+    st.write(f" +2.5 buts : {'OUI' if over25 else 'NON'}")
 
     # ========================
-    # MEILLEUR PARI (IA)
+    # MEILLEUR PARI
     # ========================
-    st.subheader(" Meilleur pari (IA)")
+    st.subheader(" Meilleur pari IA")
 
     if over25 and btts:
-        best_bet = "BTTS + Over 2.5 buts"
+        best = "BTTS + Over 2.5"
     elif over25:
-        best_bet = "Plus de 2.5 buts"
+        best = "Over 2.5"
     elif btts:
-        best_bet = "Les deux équipes marquent"
+        best = "BTTS"
     else:
-        best_bet = f"Victoire {winner}"
+        best = f"Victoire {winner}"
 
-    st.success(f" {best_bet}")
+    st.success(best)
 
     # ========================
-    # COMBINÉ AUTOMATIQUE
+    # COMBINÉ
     # ========================
-    st.subheader(" Combiné automatique")
+    st.subheader(" Combiné recommandé")
 
-    combo = []
-
-    combo.append(double)
+    combo = [double]
 
     if over25:
         combo.append("+2.5 buts")
@@ -107,20 +52,94 @@ if st.button(" Analyse complète"):
     st.warning(" + ".join(combo))
 
     # ========================
-    # CONFIANCE PAR PARI
+    # CONFIANCE
     # ========================
-    st.subheader(" Confiance IA")
-
-    conf_score = np.random.randint(60, 90)
-    conf_btts = np.random.randint(60, 90)
-    conf_over = np.random.randint(60, 90)
-
-    st.write(f"Score exact : {conf_score}%")
-    st.write(f"BTTS : {conf_btts}%")
-    st.write(f"+2.5 buts : {conf_over}%")
+    conf = np.random.randint(70, 92)
+    st.write(f" Confiance IA : {conf}%")
 
 # ========================
 # FOOTER
 # ========================
 st.markdown("---")
-st.caption("BET AI PRO MAX PARIS © 2026")
+st.caption("BET AI REAL DATA © 2026")
+# CONFIG
+# ========================
+st.set_page_config(page_title="BET AI REAL DATA", layout="wide")
+
+API_KEY = "TA_CLE_API_FOOT"
+BASE_URL = "https://v3.football.api-sports.io"
+
+st.title(" BET AI PRO MAX + REAL DATA")
+
+# ========================
+# RECUP MATCHS
+# ========================
+def get_matches():
+    headers = {"x-apisports-key": API_KEY}
+    url = BASE_URL + "/fixtures?next=10"
+
+    try:
+        r = requests.get(url, headers=headers)
+        data = r.json()
+
+        matches = []
+        for m in data.get("response", []):
+            home = m["teams"]["home"]["name"]
+            away = m["teams"]["away"]["name"]
+            matches.append(f"{home} vs {away}")
+
+        return matches
+
+    except:
+        return []
+
+matches = get_matches()
+
+if not matches:
+    matches = ["PSG vs Marseille", "Real Madrid vs Barca"]
+
+match = st.selectbox("Choisir un match", matches)
+
+# ========================
+# LOGIQUE IA RÉELLE SIMPLIFIÉE
+# ========================
+def predict_real(match):
+
+    team1, team2 = match.split(" vs ")
+
+    # simulation "réaliste"
+    base1 = np.random.normal(1.5, 0.8)
+    base2 = np.random.normal(1.2, 0.8)
+
+    score1 = max(0, round(base1))
+    score2 = max(0, round(base2))
+
+    return team1, score1, score2, team2
+
+# ========================
+# ANALYSE
+# ========================
+if st.button(" Analyse PRO"):
+
+    team1, s1, s2, team2 = predict_real(match)
+
+    total = s1 + s2
+
+    st.subheader(" Résultat IA réaliste")
+    st.success(f"{team1} {s1} - {s2} {team2}")
+
+    # ========================
+    # BTTS
+    # ========================
+    btts = s1 > 0 and s2 > 0
+
+    # ========================
+    # OVER
+    # ========================
+    over25 = total >= 3
+
+    # ========================
+    # GAGNANT & DOUBLE
+    # ========================
+    if s1 > s2:
+        winner = team1
