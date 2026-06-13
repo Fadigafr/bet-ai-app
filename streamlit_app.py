@@ -15,27 +15,17 @@ BASE_URL = "https://v3.football.api-sports.io"
 # =====================
 st.markdown("""
 <style>
-.header {
-    background-color: #1f8c96;
-    padding: 15px;
-    color: white;
-    text-align: center;
-    font-size: 22px;
-    border-radius: 10px;
-}
 .card {
     background-color: white;
     padding: 15px;
     border-radius: 12px;
     margin-bottom: 10px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
 }
 .prob {
-    display:inline-block;
-    padding:5px 10px;
-    background:#eef2f7;
-    border-radius:6px;
-    margin-right:5px;
+    background: #eef2f7;
+    padding: 5px 10px;
+    border-radius: 6px;
+    margin-right: 5px;
 }
 .tip {
     color: green;
