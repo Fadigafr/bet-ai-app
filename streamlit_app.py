@@ -169,7 +169,6 @@ def value_bet(prob, odd):
     if prob > implied:
         return True
     return False
-``
 
 matches = get_odds()
 
