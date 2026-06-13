@@ -1,7 +1,42 @@
 import streamlit as st
 import numpy as np
+import requests
+import csv
 
-# =====================
+def save_result(team1, team2, result):
+    with open("data.csv", "a") as f:
+        writer = csv.writer(f)
+        writer.writerow([team1, team2, result])
+API_KEY = "TA_CLE_API"
+
+def get_odds():
+    url = "https://v3.football.api-sports.io/odds?league=39&season=2024"
+
+    headers = {
+        "x-apisports-key": API_KEY
+    }
+
+    r = requests.get(url, headers=headers)
+    data = r.json()
+
+    odds_data = []
+
+    for match in data["response"][:5]:
+        teams = match["teams"]
+        home = teams["home"]["name"]
+        away = teams["away"]["name"]
+
+        # exemple simple (structure API variable)
+        odds_data.append({
+            "home": home,
+            "away": away,
+            "odd1": 1.80,
+            "oddX": 3.20,
+            "odd2": 4.50
+        })
+
+    return odds_data
+``# =====================
 # CONFIG
 # =====================
 st.set_page_config(page_title="BET AI PRO", layout="wide")
@@ -110,3 +145,61 @@ def analyse(team1, team2):
     if prob1 > prob2:
         tip = "1"
         odd = round(1.3 + (100 - prob1)/100, 2)
+def predict_proba():
+
+    attack1 = np.random.uniform(1.2, 2.5)
+    attack2 = np.random.uniform(1.0, 2.2)
+
+    defense1 = np.random.uniform(0.8, 1.8)
+    defense2 = np.random.uniform(0.8, 1.8)
+
+    xg1 = attack1 * (2 - defense2)
+    xg2 = attack2 * (2 - defense1)
+
+    total = xg1 + xg2
+
+    prob1 = xg1 / total
+    prob2 = xg2 / total
+    probX = 1 - (prob1 + prob2)
+
+    return prob1, probX, prob2
+    def value_bet(prob, odd):
+
+    implied = 1 / odd
+
+    if prob > implied:
+        return True
+    return False
+``
+matches = get_odds()
+
+for m in matches:
+
+    prob1, probX, prob2 = predict_proba()
+
+    v1 = value_bet(prob1, m["odd1"])
+    vX = value_bet(probX, m["oddX"])
+    v2 = value_bet(prob2, m["odd2"])
+
+    best = None
+
+    if v1:
+        best = "1"
+    elif vX:
+        best = "X"
+    elif v2:
+        best = "2"
+    else:
+        best = "Aucune value"
+
+    st.markdown(f"""
+    <div class="card">
+        <b>{m["home"]} vs {m["away"]}</b><br><br>
+
+        Prob IA : {round(prob1*100)}% | {round(probX*100)}% | {round(prob2*100)}%<br>
+        Cotes : {m["odd1"]} / {m["oddX"]} / {m["odd2"]}<br><br>
+
+         VALUE : <b>{best}</b>
+    </div>
+    """, unsafe_allow_html=True)
+
