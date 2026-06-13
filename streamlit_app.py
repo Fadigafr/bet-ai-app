@@ -1,6 +1,14 @@
 import streamlit as st
 import numpy as np
+import requests 
 
+def send_message(message):
+    url = "https://api.telegram.org/botTON_TOKEN/sendMessage"
+
+    requests.post(url, data={
+        "chat_id": "TON_CHAT_ID",
+        "text": message
+    })
 st.set_page_config(page_title="BET AI", layout="wide")
 
 st.title("BET AI")
@@ -21,16 +29,6 @@ if st.button("Analyse"):
 TOKEN = "TON_TOKEN"
 CHAT_ID = "TON_CHAT_ID"
 
-def send_message(text):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-
-    requests.post(url, data={
-        "chat_id": CHAT_ID,
-        "text": text
-    })
-
-def generate_prono():
-
     team1 = "PSG"
     team2 = "OM"
 
@@ -43,8 +41,6 @@ def generate_prono():
 {team1} vs {team2}
 Score : {s1}-{s2}
 """
-
-    send_message(message)
     
 def generate_prono():
 
