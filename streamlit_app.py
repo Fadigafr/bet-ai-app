@@ -30,6 +30,7 @@ TOKEN = "TON_TOKEN"
 CHAT_ID = "TON_CHAT_ID"
 
 def generate_prono():
+    
 team1 = "PSG"
 team2 = "OM"
 
