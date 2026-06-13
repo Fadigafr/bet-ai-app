@@ -5,7 +5,8 @@ import csv
 import schedule
 import time
 
-from auto_prono import generate_prono
+def generate_prono():
+    return " PRONO IA"
 
 def job():
     generate_prono()
