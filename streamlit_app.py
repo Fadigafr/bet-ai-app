@@ -20,6 +20,7 @@ st.markdown("""
     padding: 15px;
     border-radius: 12px;
     margin-bottom: 10px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
 }
 .prob {
     background: #eef2f7;
@@ -102,7 +103,7 @@ for team1, team2 in matches:
 
     prob1, probX, prob2, odd, tip = analyse(team1, team2)
 
-    st.markdown(f"""
+    html = f"""
     <div class="card">
         <b>{team1} vs {team2}</b><br><br>
 
@@ -114,7 +115,9 @@ for team1, team2 in matches:
 
         Tip : <span class="tip">{tip}</span>
     </div>
-    """, unsafe_allow_html=True) 
+    """
+
+    st.markdown(html, unsafe_allow_html=True) 
 
 # =====================
 # ANALYSE MANUELLE
@@ -133,6 +136,6 @@ if st.button(" Analyse PRO"):
     prob1, probX, prob2, odd, tip = analyse(t1, t2)
 
     st.success(f"{t1} vs {t2}")
-    st.write(f"Probabilités : {prob1}% / {probX}% / {prob2}%")
-    st.write(f"Cote estimée : {odd}")
-    st.write(f"Meilleur pari : {tip}")
+    st.markdown(f"Probabilités : {prob1}% / {probX}% / {prob2}%")
+    st.mardown(f"Cote estimée : {odd}")
+    st.markdown(f"Meilleur pari : {tip}")
