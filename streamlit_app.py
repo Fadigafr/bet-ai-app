@@ -163,14 +163,14 @@ def predict_proba():
     probX = 1 - (prob1 + prob2)
 
     return prob1, probX, prob2
-    def value_bet(prob, odd):
-
+def value_bet(prob, odd):
     implied = 1 / odd
 
     if prob > implied:
         return True
     return False
 ``
+
 matches = get_odds()
 
 for m in matches:
