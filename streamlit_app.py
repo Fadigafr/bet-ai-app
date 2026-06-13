@@ -28,7 +28,8 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
-    st.markdown(f"""
+
+st.markdown(f"""
     <div class="card">
         <b>{team1} vs {team2}</b><br><br>
 
