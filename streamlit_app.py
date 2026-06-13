@@ -1,22 +1,45 @@
-import streamlit as st
-import numpy as np
-import requests
-import csv
 import schedule
 import time
+import numpy as np
+import requests
+
+TOKEN = "TON_TOKEN"
+CHAT_ID = "TON_CHAT_ID"
+
+def send_message(text):
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+
+    requests.post(url, data={
+        "chat_id": CHAT_ID,
+        "text": text
+    })
 
 def generate_prono():
-    return " PRONO IA"
+
+    team1 = "PSG"
+    team2 = "OM"
+
+    s1 = np.random.randint(1, 3)
+    s2 = np.random.randint(0, 2)
+
+    message = f"""
+ PRONO AUTO
+
+{team1} vs {team2}
+Score : {s1}-{s2}
+"""
+
+    send_message(message)
 
 def job():
     generate_prono()
 
-# envoie tous les jours à 10h
 schedule.every().day.at("10:00").do(job)
 
 while True:
     schedule.run_pending()
     time.sleep(60)
+``
 from telegram_bot import send_message
 
 def generate_prono():
