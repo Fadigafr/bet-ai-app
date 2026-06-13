@@ -269,3 +269,17 @@ for m in matches:
     </div>
     """, unsafe_allow_html=True)
 
+def generate_script():
+
+    return """
+ PRONO DU JOUR
+
+PSG vs OM
+
+ BTTS
+ +2.5 buts
+
+ Cote : 3.40
+
+ Clique lien en bio
+"""
