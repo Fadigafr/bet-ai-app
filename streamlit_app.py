@@ -1,3 +1,4 @@
+import streamlit as st
 import time
 import numpy as np
 import requests
@@ -118,7 +119,6 @@ def get_odds():
 # =====================
 # CONFIG
 # =====================
-st.set_page_config(page_title="BET AI PRO", layout="wide")
 
 # =====================
 # STYLE PREMIUM MOBILE
