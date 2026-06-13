@@ -1,3 +1,8 @@
+import streamlit as st
+import numpy as np
+
+st.set_page_config(page_title="BET AI PREMIUM", layout="wide")
+
 st.markdown(f"""
 <div class="card">
     <b>{team1} vs {team2}</b><br><br>
