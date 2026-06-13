@@ -45,19 +45,24 @@ st.markdown("""
 # =====================
 # HEADER
 # =====================
-st.markdown(f"""
-<div class="card">
-    <b>{team1} vs {team2}</b><br><br>
 
-    <span class="prob">{prob1}%</span>
-    <span class="prob">{probX}%</span>
-    <span class="prob">{prob2}%</span><br><br>
+for team1, team2 in matches:
 
-    <b>Cote :</b> {odd}<br><br>
+    prob1, probX, prob2, odd, tip = analyse(team1, team2)
 
-    Tip : <span class="tip">{tip}</span>
-</div>
-""", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="card">
+        <b>{team1} vs {team2}</b><br><br>
+
+        <span class="prob">{prob1}%</span>
+        <span class="prob">{probX}%</span>
+        <span class="prob">{prob2}%</span><br><br>
+
+        <b>Cote :</b> {odd}<br><br>
+
+        Tip : <span class="tip">{tip}</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
