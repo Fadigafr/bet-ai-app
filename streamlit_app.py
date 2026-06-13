@@ -124,7 +124,7 @@ for team1, team2 in matches:
 
         Tip : <span class="tip">{tip}</span>
     </div>
-    """, unsafe_allow_html=True)
+    """, unsafe_allow_html=True) 
 
 # =====================
 # ANALYSE MANUELLE
