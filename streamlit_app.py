@@ -63,14 +63,12 @@ generate_prono()
 TOKEN = "TON_TOKEN"
 CHAT_ID = "TON_CHAT_ID"
 
-bot_token = "TON_TOKEN"
-
-url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-bot = "ProbettingaiBot"
+def send():
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
 
     requests.post(url, data={
         "chat_id": CHAT_ID,
-        "text": text
+        "text": " PRONO DU JOUR"
     })
 def save_result(team1, team2, result):
     with open("data.csv", "a") as f:
