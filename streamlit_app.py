@@ -36,7 +36,7 @@ def get_odds():
         })
 
     return odds_data
-``# =====================
+# =====================
 # CONFIG
 # =====================
 st.set_page_config(page_title="BET AI PRO", layout="wide")
