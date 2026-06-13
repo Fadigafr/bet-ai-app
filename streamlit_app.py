@@ -2,7 +2,74 @@ import streamlit as st
 import numpy as np
 import requests
 import csv
+import schedule
+import time
 
+from auto_prono import generate_prono
+
+def job():
+    generate_prono()
+
+# envoie tous les jours à 10h
+schedule.every().day.at("10:00").do(job)
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)
+from telegram_bot import send_message
+
+def generate_prono():
+
+    team1 = "PSG"
+    team2 = "Marseille"
+
+    # IA simple
+    s1 = np.random.randint(1, 3)
+    s2 = np.random.randint(0, 2)
+
+    total = s1 + s2
+
+    btts = s1 > 0 and s2 > 0
+    over = total >= 3
+
+    # logique pari
+    combo = ["1X"]
+
+    if btts:
+        combo.append("BTTS")
+
+    if over:
+        combo.append("+2.5")
+
+    message = f"""
+ PRONO IA AUTOMATIQUE
+
+{team1} vs {team2}
+
+ Score : {s1}-{s2}
+ BTTS : {'OUI' if btts else 'NON'}
+ +2.5 : {'OUI' if over else 'NON'}
+
+ COMBINÉ :
+{" + ".join(combo)}
+
+ Confiance : 85%
+"""
+
+    send_message(message)
+
+generate_prono()
+
+TOKEN = "TON_TOKEN"
+CHAT_ID = "TON_CHAT_ID"
+
+def send_message(text):
+    url = f"https://api.telegram.org/bot{@ProbettingaiBot}/sendMessage"
+    
+    requests.post(url, data={
+        "chat_id": CHAT_ID,
+        "text": text
+    })
 def save_result(team1, team2, result):
     with open("data.csv", "a") as f:
         writer = csv.writer(f)
