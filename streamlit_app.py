@@ -29,8 +29,9 @@ if st.button("Analyse"):
 TOKEN = "TON_TOKEN"
 CHAT_ID = "TON_CHAT_ID"
 
- team1 = "PSG"
- team2 = "OM"
+def generate_prono():
+team1 = "PSG"
+team2 = "OM"
 
     s1 = np.random.randint(1, 3)
     s2 = np.random.randint(0, 2)
