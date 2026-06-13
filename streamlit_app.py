@@ -1,132 +1,99 @@
 import streamlit as st
 import numpy as np
 
-# =====================
-# CONFIG
-# =====================
-st.set_page_config(page_title="BET AI PRO MAX", layout="wide")
+st.set_page_config(page_title="BET AI PRO", layout="wide")
 
-# =====================
-# SESSION
-# =====================
-if "uses" not in st.session_state:
-    st.session_state["uses"] = 0
-
-if "premium" not in st.session_state:
-    st.session_state["premium"] = False
-
-# =====================
-# HEADER
-# =====================
 st.title(" BET AI PRO MAX")
-st.markdown(" Prédictions IA - Paris intelligents - Gains optimisés")
 
 # =====================
-# INPUT
+# MATCHS EXEMPLE
 # =====================
+matches = [
+    ("Atletico GO", "CRB"),
+    ("SalPa", "KUPS Akatemia"),
+    ("Dinamo Batumi", "Dila"),
+]
+
+# =====================
+# IA ANALYSE
+# =====================
+def analyse_match(team1, team2):
+
+    prob1 = np.random.randint(45, 75)
+    probX = np.random.randint(5, 25)
+    prob2 = 100 - prob1 - probX
+
+    if prob1 > prob2:
+        tip = "1"
+        odd = round(1.3 + (100 - prob1)/100, 2)
+    elif prob2 > prob1:
+        tip = "2"
+        odd = round(1.3 + (100 - prob2)/100, 2)
+    else:
+        tip = "X"
+        odd = 3.00
+
+    return prob1, probX, prob2, odd, tip
+
+# =====================
+# TABLE
+# =====================
+st.subheader(" Match Predictions")
+
+for team1, team2 in matches:
+
+    prob1, probX, prob2, odd, tip = analyse_match(team1, team2)
+
+    with st.container():
+        col1, col2, col3, col4 = st.columns([3,2,1,1])
+
+        with col1:
+            st.write(f"**{team1} vs {team2}**")
+            st.caption("Match du jour")
+
+        with col2:
+            st.write(f"{prob1}% | {probX}% | {prob2}%")
+
+        with col3:
+            st.write(f"{odd}")
+
+        with col4:
+            st.success(tip)
+
+# =====================
+# DETAIL MATCH
+# =====================
+st.markdown("---")
+st.subheader(" Analyse détaillée")
+
 team1 = st.text_input("Équipe 1")
 team2 = st.text_input("Équipe 2")
 
-# =====================
-# IA PREDICTION
-# =====================
-def predict():
-    s1 = np.random.randint(0, 4)
-    s2 = np.random.randint(0, 4)
-    return s1, s2
-
-# =====================
-# ANALYSE
-# =====================
-if st.button(" ANALYSE PRO"):
-
-    if team1.strip() == "" or team2.strip() == "":
+if st.button("Analyser (version PRO)"):
+    
+    if not team1 or not team2:
         st.warning("Entre les équipes")
         st.stop()
 
-    # LIMITATION FREE
-    if not st.session_state["premium"]:
-        if st.session_state["uses"] >= 2:
-            st.error(" Limite gratuite atteinte")
-            st.info("Passe Premium ")
-            st.stop()
+    prob1, probX, prob2, odd, tip = analyse_match(team1, team2)
 
-    s1, s2 = predict()
-    total = s1 + s2
+    st.write("### 1. Contexte")
+    st.write("Match de championnat, enjeu modéré")
 
-    st.success(f"{team1} {s1} - {s2} {team2}")
+    st.write("### 2. Forme récente")
+    st.write("Équipe 1 plus régulière")
 
-    # LOGIQUE PARIS
-    if s1 > s2:
-        winner = team1
-        double = "1X"
-    elif s2 > s1:
-        winner = team2
-        double = "X2"
-    else:
-        winner = "Match nul"
-        double = "X"
+    st.write("### 3. Match-up")
+    st.write("Match ouvert avec potentiel offensif")
 
-    btts = s1 > 0 and s2 > 0
-    over25 = total >= 3
+    st.write("### 4. Absences")
+    st.write("Effectif complet")
 
-    # AFFICHAGE
-    st.subheader(" PRONOS IA")
+    st.write("### 5. Statistiques")
+    st.write("Bonne production offensive")
 
-    st.write(f" Gagnant : {winner}")
-    st.write(f" Double chance : {double}")
-    st.write(f" BTTS : {'OUI' if btts else 'NON'}")
-    st.write(f" +2.5 buts : {'OUI' if over25 else 'NON'}")
+    st.write("### 6. Value")
+    st.write("La cote semble légèrement sous-évaluée")
 
-    # MEILLEUR PARI
-    if btts and over25:
-        best = "BTTS + Over 2.5"
-    elif over25:
-        best = "Over 2.5"
-    elif btts:
-        best = "BTTS"
-    else:
-        best = f"Victoire {winner}"
-
-    st.success(f" Meilleur pari : {best}")
-
-    # COMBINÉ
-    combo = [double]
-    if btts:
-        combo.append("BTTS")
-    if over25:
-        combo.append("+2.5")
-
-    st.warning(" Combiné : " + " + ".join(combo))
-
-    # compteur
-    if not st.session_state["premium"]:
-        st.session_state["uses"] += 1
-
-# =====================
-# PREMIUM
-# =====================
-st.markdown("---")
-st.subheader(" PASS PREMIUM")
-
-if not st.session_state["premium"]:
-    if st.button("Activer Premium"):
-        st.session_state["premium"] = True
-        st.success(" Premium activé")
-
-# =====================
-# STATUS
-# =====================
-if st.session_state["premium"]:
-    st.success(" Compte PREMIUM (illimité)")
-else:
-    restant = 2 - st.session_state["uses"]
-    if restant < 0:
-        restant = 0
-    st.warning(f" Gratuit - {restant} essais restants")
-
-# =====================
-# FOOTER
-# =====================
-st.markdown("---")
-st.caption("BET AI PRO MAX © 2026")
+    st.write("### 7. Paris recommandés")
+    st.success(f" {tip} @ {odd}")
