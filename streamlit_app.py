@@ -39,7 +39,7 @@ schedule.every().day.at("10:00").do(job)
 while True:
     schedule.run_pending()
     time.sleep(60)
-``
+    
 from telegram_bot import send_message
 
 def generate_prono():
