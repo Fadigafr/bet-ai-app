@@ -16,9 +16,9 @@ st.markdown("""
     margin-bottom: 10px;
 }
 </style>
-""", unsafe_allow_html=True))
+""", unsafe_allow_html=True)
 
-    st.markdown("""
+st.markdown("""
 <style>
 .card {
     background-color: #f0f2f6;
