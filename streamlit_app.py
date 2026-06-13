@@ -297,3 +297,28 @@ PSG vs OM
 
  Clique lien en bio
 """
+
+import schedule
+import time
+import numpy as np
+import requests
+
+TOKEN = "TON_TOKEN"
+CHAT_ID = "TON_CHAT_ID"
+
+def send_message(text):
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    requests.post(url, data={"chat_id": CHAT_ID, "text": text})
+
+def job():
+    s1 = np.random.randint(1, 3)
+    s2 = np.random.randint(0, 2)
+
+    msg = f" PRONO : {s1}-{s2}"
+    send_message(msg)
+
+schedule.every().day.at("10:00").do(job)
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)
