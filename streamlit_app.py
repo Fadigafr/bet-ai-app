@@ -46,6 +46,14 @@ st.markdown("""
 # HEADER
 # =====================
 
+# Liste des matchs
+matches = [
+    ("PSG", "Marseille"),
+    ("Real Madrid", "Barcelone"),
+    ("Chelsea", "Arsenal"),
+]
+
+# Boucle
 for team1, team2 in matches:
 
     prob1, probX, prob2, odd, tip = analyse(team1, team2)
