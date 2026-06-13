@@ -7,6 +7,16 @@ for team1, team2 in matches:
 
     prob1, probX, prob2, odd, tip = analyse(team1, team2)
 
+    st.markdown("""
+<style>
+.card {
+    background-color: #f0f2f6;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
     st.markdown(f"""
     <div class="card">
         <b>{team1} vs {team2}</b><br><br>
