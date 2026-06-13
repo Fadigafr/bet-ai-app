@@ -1,8 +1,23 @@
 import streamlit as st
-import time
 import numpy as np
-import requests
 
+st.set_page_config(page_title="BET AI", layout="wide")
+
+st.title("BET AI")
+
+team1 = st.text_input("Équipe 1")
+team2 = st.text_input("Équipe 2")
+
+if st.button("Analyse"):
+
+    if not team1 or not team2:
+        st.warning("Entre les équipes")
+        st.stop()
+
+    s1 = np.random.randint(0, 4)
+    s2 = np.random.randint(0, 4)
+
+    st.success(f"{team1} {s1} - {s2} {team2}")
 TOKEN = "TON_TOKEN"
 CHAT_ID = "TON_CHAT_ID"
 
@@ -309,9 +324,3 @@ def job():
 
     msg = f" PRONO : {s1}-{s2}"
     send_message(msg)
-
-schedule.every().day.at("10:00").do(job)
-
-while True:
-    schedule.run_pending()
-    time.sleep(60)
