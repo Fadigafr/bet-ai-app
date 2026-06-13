@@ -1,150 +1,16 @@
 import streamlit as st
 import numpy as np
-import requests 
-
-def send_message(message):
-    url = "https://api.telegram.org/botTON_TOKEN/sendMessage"
-
-    requests.post(url, data={
-        "chat_id": "TON_CHAT_ID",
-        "text": message
-    })
-st.set_page_config(page_title="BET AI", layout="wide")
-
-st.title("BET AI")
-
-team1 = st.text_input("Équipe 1")
-team2 = st.text_input("Équipe 2")
-
-if st.button("Analyse"):
-
-    if not team1 or not team2:
-        st.warning("Entre les équipes")
-        st.stop()
-
-    s1 = np.random.randint(0, 4)
-    s2 = np.random.randint(0, 4)
-
-    st.success(f"{team1} {s1} - {s2} {team2}")
-TOKEN = "TON_TOKEN"
-CHAT_ID = "TON_CHAT_ID"
-
-def generate_prono():
-    
-    team1 = "PSG"
-    team2 = "OM"
-
-    s1 = np.random.randint(1, 3)
-    s2 = np.random.randint(0, 2)
-
-    message = f"""
- PRONO AUTO
-
-{team1} vs {team2}
-Score : {s1}-{s2}
-"""
-    
-def generate_prono():
-
-team1 = "PSG"
-team2 = "Marseille"
-
-    # IA simple
-    s1 = np.random.randint(1, 3)
-    s2 = np.random.randint(0, 2)
-
-    total = s1 + s2
-
-    btts = s1 > 0 and s2 > 0
-    over = total >= 3
-
-    # logique pari
-    combo = ["1X"]
-
-    if btts:
-        combo.append("BTTS")
-
-    if over:
-        combo.append("+2.5")
-
-    message = f"""
- PRONO IA AUTOMATIQUE
-
-{team1} vs {team2}
-
- Score : {s1}-{s2}
- BTTS : {'OUI' if btts else 'NON'}
- +2.5 : {'OUI' if over else 'NON'}
-
- COMBINÉ :
-{" + ".join(combo)}
-
- Confiance : 85%
-"""
-
-    send_message(message)
-
-generate_prono()
-
-TOKEN = "TON_TOKEN"
-CHAT_ID = "TON_CHAT_ID"
-
-def send():
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-
-    requests.post(url, data={
-        "chat_id": CHAT_ID,
-        "text": " PRONO DU JOUR"
-    })
-def save_result(team1, team2, result):
-    with open("data.csv", "a") as f:
-        writer = csv.writer(f)
-        writer.writerow([team1, team2, result])
-API_KEY = "TA_CLE_API"
-
-def get_odds():
-    url = "https://v3.football.api-sports.io/odds?league=39&season=2024"
-
-    headers = {
-        "x-apisports-key": API_KEY
-    }
-
-    r = requests.get(url, headers=headers)
-    data = r.json()
-
-    odds_data = []
-
-    for match in data["response"][:5]:
-        teams = match["teams"]
-        home = teams["home"]["name"]
-        away = teams["away"]["name"]
-
-        # exemple simple (structure API variable)
-        odds_data.append({
-            "home": home,
-            "away": away,
-            "odd1": 1.80,
-            "oddX": 3.20,
-            "odd2": 4.50
-        })
-
-    return odds_data
-# =====================
-# CONFIG
-# =====================
 
 # =====================
-# STYLE PREMIUM MOBILE
+# CONFIG (TOUJOURS EN HAUT)
+# =====================
+st.set_page_config(page_title="BET AI PRO", layout="wide")
+
+# =====================
+# STYLE (CSS PROPRE)
 # =====================
 st.markdown("""
 <style>
-
-/* Background */
-body {
-    background-color: #f5f7fa;
-}
-
-/* Header */
 .header {
     background-color: #1f8c96;
     padding: 15px;
@@ -152,173 +18,110 @@ body {
     font-size: 22px;
     font-weight: bold;
     text-align: center;
-    border-radius: 10px;
+    border-radius: 12px;
 }
-
-/* Tabs */
-.tab {
-    display: inline-block;
-    padding: 10px 15px;
-    margin-right: 5px;
-    background: #e0e0e0;
-    border-radius: 8px;
-    font-weight: bold;
-}
-
-/* Active tab */
-.active-tab {
-    background: #f4c542;
-}
-
-/* Card */
 .card {
     background-color: white;
     padding: 15px;
     border-radius: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
 }
-
-/* Tip */
+.prob {
+    display: inline-block;
+    background: #eef2f7;
+    padding: 5px 10px;
+    border-radius: 6px;
+    margin-right: 5px;
+}
 .tip {
     color: green;
     font-weight: bold;
     font-size: 18px;
 }
-
-/* Probability */
-.prob {
-    display: inline-block;
-    padding: 5px 10px;
-    background: #eef2f7;
-    border-radius: 6px;
-    margin-right: 5px;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
 # =====================
 # HEADER
 # =====================
-st.markdown('<div class="header"> BET AI PREMIUM</div>', unsafe_allow_html=True)
-
-# =====================
-# NAVIGATION TABS
-# =====================
-st.markdown("""
-<div>
-    <span class="tab active-tab">1X2</span>
-    <span class="tab">Over/Under</span>
-    <span class="tab">BTTS</span>
-    <span class="tab">Score</span>
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="header">⚽ BET AI PRO MAX</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
 # =====================
-# MATCHS (SIMULATION)
+# MATCHS (EXEMPLE)
 # =====================
 matches = [
-    ("Atletico GO", "CRB"),
-    ("SalPa", "KUPS Akatemia"),
-    ("Dinamo Batumi", "Dila"),
+    ("PSG", "Marseille"),
+    ("Real Madrid", "Barcelone"),
+    ("Chelsea", "Arsenal"),
 ]
 
 # =====================
-# IA SIMPLE
+# IA ANALYSE SIMPLE
 # =====================
 def analyse(team1, team2):
-    prob1 = np.random.randint(45, 75)
+    prob1 = np.random.randint(40, 70)
     probX = np.random.randint(10, 25)
     prob2 = 100 - prob1 - probX
 
     if prob1 > prob2:
         tip = "1"
-        odd = round(1.3 + (100 - prob1)/100, 2)
-def predict_proba():
-
-    attack1 = np.random.uniform(1.2, 2.5)
-    attack2 = np.random.uniform(1.0, 2.2)
-
-    defense1 = np.random.uniform(0.8, 1.8)
-    defense2 = np.random.uniform(0.8, 1.8)
-
-    xg1 = attack1 * (2 - defense2)
-    xg2 = attack2 * (2 - defense1)
-
-    total = xg1 + xg2
-
-    prob1 = xg1 / total
-    prob2 = xg2 / total
-    probX = 1 - (prob1 + prob2)
-
-    return prob1, probX, prob2
-def value_bet(prob, odd):
-    implied = 1 / odd
-
-    if prob > implied:
-        return True
-    return False
-
-matches = get_odds()
-
-for m in matches:
-
-    prob1, probX, prob2 = predict_proba()
-
-    v1 = value_bet(prob1, m["odd1"])
-    vX = value_bet(probX, m["oddX"])
-    v2 = value_bet(prob2, m["odd2"])
-
-    best = None
-
-    if v1:
-        best = "1"
-    elif vX:
-        best = "X"
-    elif v2:
-        best = "2"
+        odd = round(1.4 + (100 - prob1)/100, 2)
+    elif prob2 > prob1:
+        tip = "2"
+        odd = round(1.4 + (100 - prob2)/100, 2)
     else:
-        best = "Aucune value"
+        tip = "X"
+        odd = 3.0
+
+    return prob1, probX, prob2, odd, tip
+
+# =====================
+# AFFICHAGE MATCHS
+# =====================
+st.subheader("📊 Matchs du jour")
+
+for team1, team2 in matches:
+
+    prob1, probX, prob2, odd, tip = analyse(team1, team2)
 
     st.markdown(f"""
     <div class="card">
-        <b>{m["home"]} vs {m["away"]}</b><br><br>
+        <b>{team1} vs {team2}</b><br><br>
 
-        Prob IA : {round(prob1*100)}% | {round(probX*100)}% | {round(prob2*100)}%<br>
-        Cotes : {m["odd1"]} / {m["oddX"]} / {m["odd2"]}<br><br>
+        <span class="prob">{prob1}%</span>
+        <span class="prob">{probX}%</span>
+        <span class="prob">{prob2}%</span><br><br>
 
-         VALUE : <b>{best}</b>
+        <b>Cote :</b> {odd}<br><br>
+
+        Tip : <span class="tip">{tip}</span>
     </div>
     """, unsafe_allow_html=True)
 
-def generate_script():
+# =====================
+# ANALYSE PERSONNALISÉE
+# =====================
+st.markdown("---")
+st.subheader(" Analyse avancée")
 
-    return """
- PRONO DU JOUR
+team1_input = st.text_input("Équipe 1")
+team2_input = st.text_input("Équipe 2")
 
-PSG vs OM
+if st.button(" Analyse PRO"):
 
- BTTS
- +2.5 buts
+    if not team1_input or not team2_input:
+        st.warning(" Entre les équipes")
+        st.stop()
 
- Cote : 3.40
+    prob1, probX, prob2, odd, tip = analyse(team1_input, team2_input)
 
- Clique lien en bio
-"""
+    st.markdown("### Résultat IA")
 
-TOKEN = "TON_TOKEN"
-CHAT_ID = "TON_CHAT_ID"
+    st.success(f"{team1_input} vs {team2_input}")
 
-def send_message(text):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    requests.post(url, data={"chat_id": CHAT_ID, "text": text})
-
-def job():
-    s1 = np.random.randint(1, 3)
-    s2 = np.random.randint(0, 2)
-
-    msg = f" PRONO : {s1}-{s2}"
-    send_message(msg)
+    st.write(f" Prob : {prob1}% / {probX}% / {prob2}%")
+    st.write(f" Cote estimée : {odd}")
+    st.write(f" Tip : {tip}")
