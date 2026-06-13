@@ -29,8 +29,8 @@ if st.button("Analyse"):
 TOKEN = "TON_TOKEN"
 CHAT_ID = "TON_CHAT_ID"
 
-    team1 = "PSG"
-    team2 = "OM"
+ team1 = "PSG"
+ team2 = "OM"
 
     s1 = np.random.randint(1, 3)
     s2 = np.random.randint(0, 2)
@@ -44,8 +44,8 @@ Score : {s1}-{s2}
     
 def generate_prono():
 
-    team1 = "PSG"
-    team2 = "Marseille"
+team1 = "PSG"
+team2 = "Marseille"
 
     # IA simple
     s1 = np.random.randint(1, 3)
