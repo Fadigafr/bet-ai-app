@@ -30,8 +30,6 @@ Score : {s1}-{s2}
 
     send_message(message)
     
-from telegram_bot import send_message
-
 def generate_prono():
 
     team1 = "PSG"
@@ -297,11 +295,6 @@ PSG vs OM
 
  Clique lien en bio
 """
-
-import schedule
-import time
-import numpy as np
-import requests
 
 TOKEN = "TON_TOKEN"
 CHAT_ID = "TON_CHAT_ID"
