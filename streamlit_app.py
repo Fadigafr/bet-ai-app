@@ -45,7 +45,19 @@ st.markdown("""
 # =====================
 # HEADER
 # =====================
-st.markdown('<div class="header">⚽ BET AI PRO MAX</div>', unsafe_allow_html=True)
+st.markdown(f"""
+<div class="card">
+    <b>{team1} vs {team2}</b><br><br>
+
+    <span class="prob">{prob1}%</span>
+    <span class="prob">{probX}%</span>
+    <span class="prob">{prob2}%</span><br><br>
+
+    <b>Cote :</b> {odd}<br><br>
+
+    Tip : <span class="tip">{tip}</span>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -81,7 +93,7 @@ def analyse(team1, team2):
 # =====================
 # AFFICHAGE MATCHS
 # =====================
-st.subheader("📊 Matchs du jour")
+st.subheader(" Matchs du jour")
 
 for team1, team2 in matches:
 
