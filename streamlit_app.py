@@ -1,4 +1,3 @@
-import schedule
 import time
 import numpy as np
 import requests
@@ -30,15 +29,6 @@ Score : {s1}-{s2}
 """
 
     send_message(message)
-
-def job():
-    generate_prono()
-
-schedule.every().day.at("10:00").do(job)
-
-while True:
-    schedule.run_pending()
-    time.sleep(60)
     
 from telegram_bot import send_message
 
