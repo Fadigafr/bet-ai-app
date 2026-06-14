@@ -3,6 +3,69 @@ import requests
 import numpy as np
 import time
 import streamlit.components.v1 as components
+import json
+
+def load_users():
+    try:
+        with open("users.json", "r") as f:
+            return json.load(f)
+    except:
+        return {}
+
+def save_users(users):
+    with open("users.json", "w") as f:
+        json.dump(users, f)
+
+st.subheader("Créer un compte")
+
+new_user = st.text_input("Nom utilisateur")
+new_pass = st.text_input("Mot de passe", type="password")
+
+if st.button("S'inscrire"):
+    users = load_users()
+
+    if new_user in users:
+        st.warning("Utilisateur déjà existant")
+    else:
+        users[new_user] = {
+            "password": new_pass,
+            "vip": False
+        }
+        save_users(users)
+        st.success("Compte créé ")
+
+st.subheader("Connexion")
+
+username = st.text_input("Username")
+password = st.text_input("Password", type="password")
+
+users = load_users()
+
+if st.button("Se connecter"):
+    if username in users and users[username]["password"] == password:
+        st.session_state.logged = True
+        st.session_state.user = username
+        st.success("Connecté ")
+    else:
+        st.error("Erreur login")
+
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    data = request.json
+
+    email = data["customer_email"]
+
+    users = load_users()
+
+    if email in users:
+        users[email]["vip"] = True
+        save_users(users)
+
+    return "OK"
 
 # =========================
 # CONFIG
@@ -40,6 +103,26 @@ password = st.text_input("Mot de passe VIP", type="password")
 if password == "VIP123":
     st.session_state.logged = True
 
+st.markdown("""
+##  Devenir VIP
+
+Accès complet + alert Telegram 
+
+ Clique ici pour payer :
+https://buy.stripe.com/TON_LIEN
+""")
+users = load_users()
+
+if st.session_state.logged:
+    user = st.session_state.user
+
+    if not users[user]["vip"]:
+        st.warning(" VIP requis")
+
+        st.markdown(" https://buy.stripe.com/TON_LIEN")
+
+        st.stop()
+
 # =========================
 # MATCHS (FAKE + TEST)
 # =========================
@@ -63,6 +146,10 @@ if not st.session_state.logged:
         st.write(f"{team1} vs {team2}")
 
     st.stop()
+    if st.session_state.user == "fred":
+    users = load_users()
+    users["fred"]["vip"] = True
+    save_users(users)
 
 # =========================
 # IA ANALYSE VALUE
