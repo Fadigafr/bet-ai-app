@@ -211,6 +211,12 @@ if st.button("Analyser"):
     else:
         st.warning("Entre les deux équipes")
 
+team1 = "CÔTE D'IVOIRE"
+team2 = "EQUATEUR"
+
+html_block = f"<b>{team1} vs {team2}</b>"
+components.html(html_block, height=50)
+
 components.html("<span style='color:red'>TEST</span>", height=50)
 
 # =====================
