@@ -35,6 +35,27 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+.card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.prob {
+    background: #eef2f7;
+    padding: 5px 10px;
+    border-radius: 6px;
+    margin-right: 5px;
+}
+.tip {
+    color: green;
+    font-weight: bold;
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.markdown('<div class="header"> BET AI LIVE</div>', unsafe_allow_html=True)
 
 # =====================
@@ -103,21 +124,26 @@ for team1, team2 in matches:
 
     prob1, probX, prob2, odd, tip = analyse(team1, team2)
 
-    html = f"""
-    <div class="card">
-        <b>{team1} vs {team2}</b><br><br>
+    st.markdown(f"""
+<div class="card">
+<b>{team1} vs {team2}</b>
 
-        <span class="prob">{prob1}%</span>
-        <span class="prob">{probX}%</span>
-        <span class="prob">{prob2}%</span><br><br>
+<div>
+<span class="prob">1: {prob1}%</span>
+<span class="prob">X: {probX}%</span>
+<span class="prob">2: {prob2}%</span>
+</div>
 
-        <b>Cote estimée :</b> {odd}<br><br>
+<br>
 
-        Tip : <span class="tip">{tip}</span>
-    </div>
-    """
+<b>Cote :</b> {odd}
 
-    st.markdown(html, unsafe_allow_html=True) 
+<br>
+
+<span class="tip">Tip : {tip}</span>
+
+</div>
+""", unsafe_allow_html=True) 
 
 # =====================
 # ANALYSE MANUELLE
@@ -139,3 +165,5 @@ if st.button(" Analyse PRO"):
     st.markdown(f"Probabilités : {prob1}% / {probX}% / {prob2}%")
     st.mardown(f"Cote estimée : {odd}")
     st.markdown(f"Meilleur pari : {tip}")
+
+st.markdown(html, unsafe_allow_html=True)
