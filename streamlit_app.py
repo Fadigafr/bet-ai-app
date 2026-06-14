@@ -128,7 +128,6 @@ for team1, team2 in matches:
         <span class="tip">Tip : {tip}</span>
     </div>
     """, unsafe_allow_html=True)
-
 # =====================
 # ANALYSE MANUELLE
 # =====================
@@ -164,6 +163,7 @@ if st.button("Analyser"):
     else:
         st.warning("Entre les deux équipes")
 
+st.markdown("<span style='color:red'>TEST OK</span>", unsafe_allow_html=True)
 # =====================
 # CONFIG
 # =====================
