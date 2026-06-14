@@ -1,11 +1,6 @@
 import streamlit as st
 import requests
-import numpy as np
-
-# =====================
-# CONFIG
-# =====================
-st.set_page_config(page_title="BET AI LIVE", layout="wide")
+import numpy as LIVE", layout="wide")import numpy as np
 
 API_KEY = "TA_CLE_API"
 BASE_URL = "https://v3.football.api-sports.io"
@@ -15,10 +10,21 @@ BASE_URL = "https://v3.football.api-sports.io"
 # =====================
 st.markdown("""
 <style>
+body {
+    background-color: #f5f7fb;
+}
+.header {
+    background-color: #1f8c96;
+    padding: 15px;
+    color: white;
+    text-align: center;
+    font-size: 22px;
+    border-radius: 10px;
+}
 .card {
     background-color: white;
     padding: 15px;
-    border-radius: 12px;
+    border-radius: 10px;
     margin-bottom: 10px;
     box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
 }
@@ -35,35 +41,15 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<style>
-.card {
-    background-color: white;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-.prob {
-    background: #eef2f7;
-    padding: 5px 10px;
-    border-radius: 6px;
-    margin-right: 5px;
-}
-.tip {
-    color: green;
-    font-weight: bold;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown('<div class="header"> BET AI LIVE</div>', unsafe_allow_html=True)
+# HEADER
+st.markdown('<div class="header">BET AI LIVE</div>', unsafe_allow_html=True)
 
 # =====================
 # API MATCHS
 # =====================
 def get_matches():
     headers = {"x-apisports-key": API_KEY}
-    url = BASE_URL + "/fixtures?next=10"
+    url = BASE_URL + "/fixtures?next=5"
 
     try:
         r = requests.get(url, headers=headers)
@@ -71,11 +57,10 @@ def get_matches():
 
         matches = []
 
-        for m in data["response"]:
-            home = m["teams"]["home"]["name"]
-            away = m["teams"]["away"]["name"]
-
-            matches.append((home, away))
+        for m in data.get("response", []):
+            team1 = m["teams"]["home"]["name"]
+            team2 = m["teams"]["away"]["name"]
+            matches.append((team1, team2))
 
         return matches
 
@@ -83,10 +68,9 @@ def get_matches():
         return []
 
 # =====================
-# IA + PROBA
+# IA ANALYSE
 # =====================
 def analyse(team1, team2):
-
     prob1 = np.random.randint(45, 70)
     probX = np.random.randint(10, 25)
     prob2 = 100 - prob1 - probX
@@ -104,21 +88,21 @@ def analyse(team1, team2):
     return prob1, probX, prob2, odd, tip
 
 # =====================
-# RÉCUP MATCHS
+# MATCHS
 # =====================
 matches = get_matches()
 
 if not matches:
     matches = [
         ("PSG", "Marseille"),
-        ("Real Madrid", "Barca"),
+        ("Real Madrid", "Barcelone"),
         ("Chelsea", "Arsenal"),
     ]
 
 # =====================
 # AFFICHAGE
 # =====================
-st.subheader(" Matchs LIVE")
+st.subheader("Matchs LIVE")
 
 for team1, team2 in matches:
 
@@ -148,25 +132,37 @@ for team1, team2 in matches:
 # ANALYSE MANUELLE
 # =====================
 st.markdown("---")
-st.subheader(" Analyse personnalisée")
+st.subheader("Analyse personnalisée")
 
-t1 = st.text_input("Équipe 1")
-t2 = st.text_input("Équipe 2")
+team1_input = st.text_input("Équipe 1")
+team2_input = st.text_input("Équipe 2")
 
-if st.button(" Analyse PRO"):
-    if not t1 or not t2:
-        st.warning("Entre les équipes")
-        st.stop()
+if st.button("Analyser"):
+    if team1_input and team2_input:
+        prob1, probX, prob2, odd, tip = analyse(team1_input, team2_input)
 
-    prob1, probX, prob2, odd, tip = analyse(t1, t2)
+        st.markdown(f"""
+        <div class="card">
+            <b>{team1_input} vs {team2_input}</b>
 
-    st.success(f"{t1} vs {t2}")
-    st.markdown(f"Probabilités : {prob1}% / {probX}% / {prob2}%")
-    st.mardown(f"Cote estimée : {odd}")
-    st.markdown(f"Meilleur pari : {tip}")
+            <div style="margin-top:10px;">
+                <span class="prob">1: {prob1}%</span>
+                <span class="prob">X: {probX}%</span>
+                <span class="prob">2: {prob2}%</span>
+            </div>
 
-st.markdown(html, unsafe_allow_html=True)
+            <br>
 
-st.markdown("""
-<span style="color:red">TEST</span>
-""", unsafe_allow_html=True)
+            <b>Cote estimée :</b> {odd}
+
+            <br><br>
+
+            <span class="tip">Tip : {tip}</span>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.warning("Entre les deux équipes")
+
+# =====================
+# CONFIG
+# =====================
