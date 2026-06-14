@@ -20,8 +20,17 @@ password = st.text_input("Mot de passe VIP", type="password")
 if password == "VIP123":
     st.session_state.logged = True
 
+
 if not st.session_state.logged:
-    st.warning("Accès réservé VIP")
+    st.write("Version gratuite limitée")
+
+    for i, (team1, team2) in enumerate(matches):
+        if i > 1:
+            st.warning(" Réservé VIP")
+            break
+
+        st.write(f"{team1} vs {team2}")
+
     st.stop()
 st.markdown("""
 ##  Accès VIP
