@@ -57,7 +57,7 @@ if username in users and users[username] == password:
 if not st.session_state.logged:
     st.stop()
 if not st.session_state.logged:
-    st.write("Version gratuite limitée"))
+    st.write("Version gratuite limitée")
 if "logged" not in st.session_state:
     st.session_state.logged = False
 
@@ -67,17 +67,16 @@ if password == "VIP123":
     st.session_state.logged = True
 
 if not st.session_state.logged:
-    st.write("Version gratuite limitée")
-
-    for i, (team1, team2) in enumerate(matches):
-        if i > 1:
-            st.warning(" Réservé VIP")
+            st.warning(" Réservé VIP")    st.write("Version gratuite limitée")
             break
 
         st.write(f"{team1} vs {team2}")
 
-    st.stop()    
+    st.stop()
 
+    for i, (team1, team2) in enumerate(matches):
+        if i > 1:
+  
     for i, (team1, team2, odd1, oddX, odd2) in enumerate(matches):
         if i > 1:
             st.warning(" Réservé VIP")
