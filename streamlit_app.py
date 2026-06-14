@@ -67,10 +67,11 @@ if password == "VIP123":
     st.session_state.logged = True
 
 if not st.session_state.logged:
-            st.warning(" Réservé VIP")    st.write("Version gratuite limitée")
+            st.warning(" Réservé VIP")    
+    st.write("Version gratuite limitée")
             break
 
-        st.write(f"{team1} vs {team2}")
+    st.write(f"{team1} vs {team2}")
 
     st.stop()
 
