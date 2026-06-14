@@ -152,29 +152,33 @@ if not matches:
 # =====================
 st.subheader("Matchs LIVE")
 
-import streamlit.components.v1 as components
+for team1, team2 in matches:
 
-html = f"""
-<div style="background:white;padding:15px;border-radius:10px;margin-bottom:10px;">
-    <b>{team1} vs {team2}</b>
+    prob1, probX, prob2, odd, tip = analyse(team1, team2)
 
-    <div style="margin-top:10px;">
-        <span style="background:#eef2f7;padding:5px;border-radius:5px;">1: {prob1}%</span>
-        <span style="background:#eef2f7;padding:5px;border-radius:5px;">X: {probX}%</span>
-        <span style="background:#eef2f7;padding:5px;border-radius:5px;">2: {prob2}%</span>
+    import streamlit.components.v1 as components
+
+    html_block = f"""
+    <div style="background:white;padding:15px;border-radius:10px;margin-bottom:10px;">
+        <b>{team1} vs {team2}</b>
+
+        <div style="margin-top:10px;">
+            <span>1: {prob1}%</span>
+            <span>X: {probX}%</span>
+            <span>2: {prob2}%</span>
+        </div>
+
+        <br>
+
+        <b>Cote estimée :</b> {odd}
+
+        <br><br>
+
+        <b>Tip : {tip}</b>
     </div>
+    """
 
-    <br>
-
-    <b>Cote estimée :</b> {odd}
-
-    <br><br>
-
-    <span style="color:green;font-weight:bold;">Tip : {tip}</span>
-</div>
-"""
-
-components.html(html, height=180)
+    components.html(html_block, height=180)
     
 # =====================
 # ANALYSE MANUELLE
