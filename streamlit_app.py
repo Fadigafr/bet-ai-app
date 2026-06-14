@@ -167,3 +167,7 @@ if st.button(" Analyse PRO"):
     st.markdown(f"Meilleur pari : {tip}")
 
 st.markdown(html, unsafe_allow_html=True)
+
+st.markdown("""
+<span style="color:red">TEST</span>
+""", unsafe_allow_html=True)
