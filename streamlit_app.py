@@ -124,26 +124,27 @@ for team1, team2 in matches:
 
     prob1, probX, prob2, odd, tip = analyse(team1, team2)
 
-    st.markdown(f"""
-<div class="card">
-<b>{team1} vs {team2}</b>
+    html = f"""
+    <div class="card">
+        <b>{team1} vs {team2}</b>
 
-<div>
-<span class="prob">1: {prob1}%</span>
-<span class="prob">X: {probX}%</span>
-<span class="prob">2: {prob2}%</span>
-</div>
+        <div style="margin-top:10px;">
+            <span class="prob">{prob1}%</span>
+            <span class="prob">{probX}%</span>
+            <span class="prob">{prob2}%</span>
+        </div>
 
-<br>
+        <br>
 
-<b>Cote :</b> {odd}
+        <b>Cote estimée :</b> {odd}
 
-<br>
+        <br><br>
 
-<span class="tip">Tip : {tip}</span>
+        <span class="tip">Tip : {tip}</span>
+    </div>
+    """
 
-</div>
-""", unsafe_allow_html=True) 
+    st.markdown(html, unsafe_allow_html=True)
 
 # =====================
 # ANALYSE MANUELLE
