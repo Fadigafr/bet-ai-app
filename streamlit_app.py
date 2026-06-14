@@ -4,12 +4,56 @@ import numpy as np
 import html
 import time
 
+
 st.set_page_config(page_title="BET AI LIVE", layout="wide")
 API_KEY = "TA_CLE_API"
 BASE_URL = "https://v3.football.api-sports.io"
 
 # =====================
-# STYLE
+# STYLEimport streamlit as st
+
+if "logged" not in st.session_state:
+    st.session_state.logged = False
+
+password = st.text_input("Mot de passe VIP", type="password")
+
+if password == "VIP123":
+    st.session_state.logged = True
+
+if not st.session_state.logged:
+    st.warning("Accès réservé VIP")
+    st.stop()
+st.markdown("""
+##  Accès VIP
+
+ 5€/mois  
+ Paiement via lien :
+
+https://buy.stripe.com/test_xxxxxxxxx
+
+Après paiement → recevoir mot de passe
+""")
+users = {
+    "fred": "VIP123",
+    "client1": "VIP456",
+    "client2": "VIP789"
+}
+
+username = st.text_input("Utilisateur")
+password = st.text_input("Mot de passe", type="password")
+
+if username in users and users[username] == password:
+    st.session_state.logged = True
+
+if not st.session_state.logged:
+    st.stop()
+if not st.session_state.logged:if not    st.write("Version gratuite limitée")
+
+    for i, (team1, team2, odd1, oddX, odd2) in enumerate(matches):
+        if i > 1:
+            st.warning(" Réservé VIP")
+            break
+
 # =====================
 st.markdown("""
 <style>
