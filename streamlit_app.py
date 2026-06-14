@@ -154,49 +154,31 @@ st.subheader("Matchs LIVE")
 
 import streamlit.components.v1 as components
 
-matches = get_matches_and_odds()
+for team1, team2 in matches:
 
-if not matches:
-    matches = [
-        ("PSG", "Marseille", 1.75, 3.5, 4.2),
-        ("Real Madrid", "Barcelone", 1.9, 3.2, 3.8),
-    ]
-
-st.subheader("Matchs LIVE + VALUE BET")
-
-for team1, team2, odd1, oddX, odd2 in matches:
-
-    prob1, probX, prob2, v1, vX, v2 = analyse_value(
-        team1, team2, odd1, oddX, odd2
-    )
-
-    # détection meilleur value
-    values = {"1": v1, "X": vX, "2": v2}
-    best = max(values, key=values.get)
-    best_value = values[best]
-
-    color = "green" if best_value > 0 else "red"
+    prob1, probX, prob2, odd, tip = analyse(team1, team2)
 
     html = f"""
     <div style="background:white;padding:15px;border-radius:10px;margin-bottom:10px;">
         <b>{team1} vs {team2}</b>
 
         <div style="margin-top:10px;">
-            <span style="background:#eef2f7;padding:5px;border-radius:5px;">1: {prob1}% | {odd1}</span>
-            <span style="background:#eef2f7;padding:5px;border-radius:5px;">X: {probX}% | {oddX}</span>
-            <span style="background:#eef2f7;padding:5px;border-radius:5px;">2: {prob2}% | {odd2}</span>
+            <span style="background:#eef2f7;padding:5px;border-radius:5px;">1: {prob1}%</span>
+            <span style="background:#eef2f7;padding:5px;border-radius:5px;">X: {probX}%</span>
+            <span style="background:#eef2f7;padding:5px;border-radius:5px;">2: {prob2}%</span>
         </div>
 
         <br>
 
-        <b>VALUE BET :</b>
-        <span style="color:{color};font-weight:bold;">
-            {best} ({best_value})
-        </span>
+        <b>Cote estimée :</b> {odd}
+
+        <br><br>
+
+        <span style="color:green;font-weight:bold;">Tip : {tip}</span>
     </div>
     """
 
-    components.html(html, height=180)
+    components.html(html, height=170)
     
 # =====================
 # ANALYSE MANUELLE
@@ -233,7 +215,8 @@ if st.button("Analyser"):
     else:
         st.warning("Entre les deux équipes")
 
-st.markdown("<span style='color:red'>TEST OK</span>", unsafe_allow_html=True)
+components.html("<span style='color:red'>TEST</span>", height=50)
+
 # =====================
 # CONFIG
 # =====================
