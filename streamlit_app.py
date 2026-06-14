@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import numpy as np
+import html
 
 st.set_page_config(page_title="BET AI LIVE", layout="wide")
 API_KEY = "TA_CLE_API"
@@ -105,29 +106,29 @@ if not matches:
 # =====================
 st.subheader("Matchs LIVE")
 
-for team1, team2 in matches:
+html_content = f"""
+<div class="card">
+    <b>{team1} vs {team2}</b>
 
-    prob1, probX, prob2, odd, tip = analyse(team1, team2)
-
-    st.markdown(f"""
-    <div class="card">
-        <b>{team1} vs {team2}</b>
-
-        <div style="margin-top:10px;">
-            <span class="prob">1: {prob1}%</span>
-            <span class="prob">X: {probX}%</span>
-            <span class="prob">2: {prob2}%</span>
-        </div>
-
-        <br>
-
-        <b>Cote estimée :</b> {odd}
-
-        <br><br>
-
-        <span class="tip">Tip : {tip}</span>
+    <div style="margin-top:10px;">
+        <span class="prob">1: {prob1}%</span>
+        <span class="prob">X: {probX}%</span>
+        <span class="prob">2: {prob2}%</span>
     </div>
-    """, unsafe_allow_html=True)
+
+    <br>
+
+    <b>Cote estimée :</b> {odd}
+
+    <br><br>
+
+    <span class="tip">Tip : {tip}</span>
+</div>
+"""
+
+#  DÉCODE ICI
+st.markdown(html.unescape(html_content), unsafe_allow_html=True)
+
 # =====================
 # ANALYSE MANUELLE
 # =====================
