@@ -69,6 +69,52 @@ def get_matches():
     except:
         return []
 
+def get_matches_and_odds():
+    headers = {"x-apisports-key": API_KEY}
+
+    url = BASE_URL + "/odds?league=61&season=2023"
+
+    try:
+        r = requests.get(url, headers=headers)
+        data = r.json()
+
+        matches = []
+
+        for m in data.get("response", [])[:5]:
+
+            teams = m["teams"]
+            team1 = teams["home"]["name"]
+            team2 = teams["away"]["name"]
+
+            # récupération des cotes
+            odds = m["bookmakers"][0]["bets"][0]["values"]
+
+            odd1 = float(odds[0]["odd"])
+            oddX = float(odds[1]["odd"])
+            odd2 = float(odds[2]["odd"])
+
+            matches.append((team1, team2, odd1, oddX, odd2))
+
+        return matches
+
+    except:
+        return []
+
+def analyse_value(team1, team2, odd1, oddX, odd2):
+
+    prob1 = np.random.randint(45, 70)
+    probX = np.random.randint(10, 25)
+    prob2 = 100 - prob1 - probX
+
+    p1 = prob1 / 100
+    pX = probX / 100
+    p2 = prob2 / 100
+
+    value1 = round((p1 * odd1) - 1, 2)
+    valueX = round((pX * oddX) - 1, 2)
+    value2 = round((p2 * odd2) - 1, 2)
+
+    return prob1, probX, prob2, value1, valueX, value2
 # =====================
 # IA ANALYSE
 # =====================
@@ -108,27 +154,45 @@ st.subheader("Matchs LIVE")
 
 import streamlit.components.v1 as components
 
-for team1, team2 in matches:
+matches = get_matches_and_odds()
 
-    prob1, probX, prob2, odd, tip = analyse(team1, team2)
+if not matches:
+    matches = [
+        ("PSG", "Marseille", 1.75, 3.5, 4.2),
+        ("Real Madrid", "Barcelone", 1.9, 3.2, 3.8),
+    ]
+
+st.subheader("Matchs LIVE + VALUE BET")
+
+for team1, team2, odd1, oddX, odd2 in matches:
+
+    prob1, probX, prob2, v1, vX, v2 = analyse_value(
+        team1, team2, odd1, oddX, odd2
+    )
+
+    # détection meilleur value
+    values = {"1": v1, "X": vX, "2": v2}
+    best = max(values, key=values.get)
+    best_value = values[best]
+
+    color = "green" if best_value > 0 else "red"
 
     html = f"""
     <div style="background:white;padding:15px;border-radius:10px;margin-bottom:10px;">
         <b>{team1} vs {team2}</b>
 
         <div style="margin-top:10px;">
-            <span style="background:#eef2f7;padding:5px 10px;border-radius:6px;">1: {prob1}%</span>
-            <span style="background:#eef2f7;padding:5px 10px;border-radius:6px;">X: {probX}%</span>
-            <span style="background:#eef2f7;padding:5px 10px;border-radius:6px;">2: {prob2}%</span>
+            <span style="background:#eef2f7;padding:5px;border-radius:5px;">1: {prob1}% | {odd1}</span>
+            <span style="background:#eef2f7;padding:5px;border-radius:5px;">X: {probX}% | {oddX}</span>
+            <span style="background:#eef2f7;padding:5px;border-radius:5px;">2: {prob2}% | {odd2}</span>
         </div>
 
         <br>
 
-        <b>Cote estimée :</b> {odd}
-
-        <br><br>
-
-        <span style="color:green;font-weight:bold;">Tip : {tip}</span>
+        <b>VALUE BET :</b>
+        <span style="color:{color};font-weight:bold;">
+            {best} ({best_value})
+        </span>
     </div>
     """
 
