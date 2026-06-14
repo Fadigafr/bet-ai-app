@@ -1,7 +1,8 @@
 import streamlit as st
 import requests
-import numpy as LIVE", layout="wide")import numpy as np
+import numpy as np
 
+st.set_page_config(page_title="BET AI LIVE", layout="wide")
 API_KEY = "TA_CLE_API"
 BASE_URL = "https://v3.football.api-sports.io"
 
