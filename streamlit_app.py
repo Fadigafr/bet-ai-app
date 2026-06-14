@@ -146,7 +146,7 @@ if not st.session_state.logged:
         st.write(f"{team1} vs {team2}")
 
     st.stop()
-    if st.session_state.user == "fred":
+if st.session_state.user == "fred":
     users = load_users()
     users["fred"]["vip"] = True
     save_users(users)
