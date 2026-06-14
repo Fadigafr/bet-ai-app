@@ -66,8 +66,8 @@ password = st.text_input("Mot de passe VIP", type="password")
 if password == "VIP123":
     st.session_state.logged = True
 
-if not st.session_state.logged:if not 
-    st.session.write("Version gratuite limitée")
+if not st.session_state.logged:
+    st.write("Version gratuite limitée")
 
     for i, (team1, team2, odd1, oddX, odd2) in enumerate(matches):
         if i > 1:
