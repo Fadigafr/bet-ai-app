@@ -59,8 +59,6 @@ if st.button("Se connecter"):
         users[email]["vip"] = True
         save_users(users)
 
-    return "OK"
-
 # =========================
 # CONFIG
 # =========================
