@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import numpy as np
 import html
+import time
 
 st.set_page_config(page_title="BET AI LIVE", layout="wide")
 API_KEY = "TA_CLE_API"
@@ -152,33 +153,47 @@ if not matches:
 # =====================
 st.subheader("Matchs LIVE")
 
-for team1, team2 in matches:
+sent_alerts = set()
+last_sent_time = 0
+COOLDOWN = 300  # 5 minutes
 
-    prob1, probX, prob2, odd, tip = analyse(team1, team2)
+for team1, team2, odd1, oddX, odd2 in matches:
 
-    import streamlit.components.v1 as components
+    prob1, probX, prob2, v1, vX, v2 = analyse_value(
+        team1, team2, odd1, oddX, odd2
+    )
 
-    html_block = f"""
-    <div style="background:white;padding:15px;border-radius:10px;margin-bottom:10px;">
-        <b>{team1} vs {team2}</b>
+    values = {"1": v1, "X": vX, "2": v2}
+    best = max(values, key=values.get)
+    best_value = values[best]
 
-        <div style="margin-top:10px;">
-            <span>1: {prob1}%</span>
-            <span>X: {probX}%</span>
-            <span>2: {prob2}%</span>
-        </div>
+    match_id = f"{team1}-{team2}-{best}"
 
-        <br>
+    current_time = time.time()
 
-        <b>Cote estimée :</b> {odd}
+    #  CONDITIONS PRO
+    if (
+        best_value > 0.20               # VALUE forte
+        and match_id not in sent_alerts  # pas déjà envoyé
+        and current_time - last_sent_time > COOLDOWN  # anti-spam
+    ):
 
-        <br><br>
+        message = f"""
+ VALUE BET VIP
 
-        <b>Tip : {tip}</b>
-    </div>
-    """
+ {team1} vs {team2}
 
-    components.html(html_block, height=180)
+ Choix : {best}
+ Value : {best_value}
+
+ Cotes :
+1={odd1}  X={oddX}  2={odd2}
+"""
+
+        send_telegram(message)
+
+        sent_alerts.add(match_id)
+        last_sent_time = current_time
     
 # =====================
 # ANALYSE MANUELLE
