@@ -106,18 +106,20 @@ if not matches:
 # =====================
 st.subheader("Matchs LIVE")
 
+import streamlit.components.v1 as components
+
 for team1, team2 in matches:
 
     prob1, probX, prob2, odd, tip = analyse(team1, team2)
 
-    st.markdown(f"""
-    <div class="card">
+    html = f"""
+    <div style="background:white;padding:15px;border-radius:10px;margin-bottom:10px;">
         <b>{team1} vs {team2}</b>
 
         <div style="margin-top:10px;">
-            <span class="prob">1: {prob1}%</span>
-            <span class="prob">X: {probX}%</span>
-            <span class="prob">2: {prob2}%</span>
+            <span style="background:#eef2f7;padding:5px 10px;border-radius:6px;">1: {prob1}%</span>
+            <span style="background:#eef2f7;padding:5px 10px;border-radius:6px;">X: {probX}%</span>
+            <span style="background:#eef2f7;padding:5px 10px;border-radius:6px;">2: {prob2}%</span>
         </div>
 
         <br>
@@ -126,9 +128,12 @@ for team1, team2 in matches:
 
         <br><br>
 
-        <span class="tip">Tip : {tip}</span>
+        <span style="color:green;font-weight:bold;">Tip : {tip}</span>
     </div>
-    """, unsafe_allow_html=True)
+    """
+
+    components.html(html, height=180)
+    
 # =====================
 # ANALYSE MANUELLE
 # =====================
