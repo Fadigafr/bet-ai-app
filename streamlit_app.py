@@ -106,29 +106,29 @@ if not matches:
 # =====================
 st.subheader("Matchs LIVE")
 
-html_content = f"""
-<div class="card">
-    <b>{team1} vs {team2}</b>
+for team1, team2 in matches:
 
-    <div style="margin-top:10px;">
-        <span class="prob">1: {prob1}%</span>
-        <span class="prob">X: {probX}%</span>
-        <span class="prob">2: {prob2}%</span>
+    prob1, probX, prob2, odd, tip = analyse(team1, team2)
+
+    st.markdown(f"""
+    <div class="card">
+        <b>{team1} vs {team2}</b>
+
+        <div style="margin-top:10px;">
+            <span class="prob">1: {prob1}%</span>
+            <span class="prob">X: {probX}%</span>
+            <span class="prob">2: {prob2}%</span>
+        </div>
+
+        <br>
+
+        <b>Cote estimée :</b> {odd}
+
+        <br><br>
+
+        <span class="tip">Tip : {tip}</span>
     </div>
-
-    <br>
-
-    <b>Cote estimée :</b> {odd}
-
-    <br><br>
-
-    <span class="tip">Tip : {tip}</span>
-</div>
-"""
-
-#  DÉCODE ICI
-st.markdown(html.unescape(html_content), unsafe_allow_html=True)
-
+    """, unsafe_allow_html=True)
 # =====================
 # ANALYSE MANUELLE
 # =====================
