@@ -49,12 +49,6 @@ if st.button("Se connecter"):
     else:
         st.error("Erreur login")
 
-from flask import Flask, request
-
-app = Flask(__name__)
-
-@app.route('/webhook', methods=['POST'])
-def webhook():
     data = request.json
 
     email = data["customer_email"]
