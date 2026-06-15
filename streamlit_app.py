@@ -224,7 +224,6 @@ for team1, team2, odd1, oddX, odd2 in matches:
     padding: 15px;
     border-radius: 12px;
     background: #1e293b;
-    margin-bottom: 10px;
 }
 </style>
 """, unsafe_allow_html=True)
