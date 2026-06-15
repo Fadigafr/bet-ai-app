@@ -198,14 +198,40 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
         <br>
 
-        <b>VALUE BET :</b>
-        <span style="color:{color}; font-weight:bold;">
-            {best} ({best_value})
-        </span>
-    </div>
-    """
+ st.markdown("""
+<style>
+body {
+    background-color: #0f172a;
+    color: white;
+}
 
-    components.html(html, height=180)
+.card {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #22c55e;
+}
+
+.badge {
+    background: #22c55e;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.value {
+    font-size: 18px;
+    font-weight: bold;
+}
+</style>
+""", unsafe_allow_html=True)
 
     # =========================
     # TELEGRAM ALERT
