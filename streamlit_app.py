@@ -58,6 +58,7 @@ if st.button("Se connecter"):
     if email in users:
         users[email]["vip"] = True
         save_users(users)
+new_user = st.text_input("fadigafr2000@yahoo.fr")
 
 # =========================
 # CONFIG
