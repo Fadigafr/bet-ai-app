@@ -219,7 +219,8 @@ for team1, team2, odd1, oddX, odd2 in matches:
 st.markdown("""
 <style>
 .card {
-    background: #1e293b;
+    padding: 15px;
+    border-radius: 12px;
 }
 </style>
 """, unsafe_allow_html=True)
