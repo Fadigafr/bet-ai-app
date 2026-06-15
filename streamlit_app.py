@@ -64,6 +64,26 @@ new_user = st.text_input("fadigafr2000@yahoo.fr")
 # CONFIG
 # =========================
 st.set_page_config(page_title="BET AI PRO", layout="wide")
+st.set_page_config(
+    page_title="BET AI PRO",
+    layout="centered"
+)
+st.markdown("""
+<meta name="viewport" content="width=device-width, initial-scale=1">
+""", unsafe_allow_html=True)
+st.markdown("""
+<link rel="manifest" href="manifest.json">
+""", unsafe_allow_html=True)
+st.markdown("""
+<h1 style='text-align:center;color:#22c55e;'>
+ BET AI PRO
+</h1>
+""", unsafe_allow_html=True)
+st.markdown("""
+<div style="background:#22c55e;padding:10px;border-radius:10px;text-align:center;color:black;">
+ ACCÈS VIP - SIGNES PREMIUM
+</div>
+""", unsafe_allow_html=True)
 
 API_KEY = "TA_API_KEY"
 
@@ -232,6 +252,29 @@ body {
 }
 </style>
 """, unsafe_allow_html=True)
+html = f"""
+<div class="card">
+    <div class="title">{team1} vs {team2}</div>
+
+    <br>
+
+    <div>
+        1: {prob1}% | {odd1} <br>
+        X: {probX}% | {oddX} <br>
+        2: {prob2}% | {odd2}
+    </div>
+
+    <br>
+
+    <div class="value">
+        VALUE : {best} ({best_value})
+    </div>
+
+    <br>
+
+    <span class="badge">VIP SIGNAL</span>
+</div>
+"""
 
     # =========================
     # TELEGRAM ALERT
