@@ -233,48 +233,11 @@ body {
 }
 
 .title {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 22px;
     color: #22c55e;
-}
-
-.badge {
-    background: #22c55e;
-    color: black;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-weight: bold;
-}
-
-.value {
-    font-size: 18px;
-    font-weight: bold;
 }
 </style>
 """, unsafe_allow_html=True)
-html = f"""
-<div class="card">
-    <div class="title">{team1} vs {team2}</div>
-
-    <br>
-
-    <div>
-        1: {prob1}% | {odd1} <br>
-        X: {probX}% | {oddX} <br>
-        2: {prob2}% | {odd2}
-    </div>
-
-    <br>
-
-    <div class="value">
-        VALUE : {best} ({best_value})
-    </div>
-
-    <br>
-
-    <span class="badge">VIP SIGNAL</span>
-</div>
-"""
 
     # =========================
     # TELEGRAM ALERT
