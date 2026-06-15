@@ -227,7 +227,6 @@ body {
 
 .card {
     background: #1e293b;
-    padding: 15px;
     border-radius: 12px;
     margin-bottom: 10px;
 }
