@@ -98,11 +98,13 @@ if password == "VIP123":
 st.markdown("""
 ##  Devenir VIP
 
-Accès complet + alert Telegram 
+ Paiement sécurisé
 
- Clique ici pour payer :
-https://buy.stripe.com/TON_LIEN
+ Clique ici :
+https://paystack.com/pay/TON_LIEN
 """)
+users = load_users()
+
 users = load_users()
 
 if st.session_state.logged:
@@ -111,7 +113,7 @@ if st.session_state.logged:
     if not users[user]["vip"]:
         st.warning(" VIP requis")
 
-        st.markdown(" https://buy.stripe.com/TON_LIEN")
+        st.markdown(" https://paystack.com/pay/TON_LIEN")
 
         st.stop()
 
