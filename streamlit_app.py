@@ -183,7 +183,7 @@ def analyse_real(team1_stats, team2_stats):
         return "1"
     else:
         return "2"
- confidence = max(prob1, probX, prob2)
+confidence = max(prob1, probX, prob2)
 
 st.progress(confidence / 100)
 
