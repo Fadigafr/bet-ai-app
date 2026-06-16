@@ -392,7 +392,17 @@ for team1, team2, odd1, oddX, odd2 in matches:
     best = max(values, key=values.get)
     best_value = values[best]
 
-    color = "#22c55e" if best_value > 0 else "red"
+    #  BON ALIGNEMENT
+    match_id = f"{team1}-{team2}-{best}"
+
+    #  MEME NIVEAU
+    if best_value > 0.20:
+
+        message = f"{team1} vs {team2} → {best} ({best_value})"
+
+        send_telegram(message)
+
+        sent_alerts.add(match_id)
 
     # SCORE
     score = predict_score(prob1, probX, prob2)
