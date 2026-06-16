@@ -15,24 +15,50 @@ users = {
 st.set_page_config(page_title="BET AI PRO", layout="centered")
 
 # =========================
-# LOGIN
+# LOGIN PRO
 # =========================
 if "logged" not in st.session_state:
     st.session_state.logged = False
+    st.session_state.user = None
 
 st.markdown("##  Connexion BET AI PRO")
 
-password = st.text_input("Mot de passe", type="password", key="vip")
+username = st.text_input("Utilisateur", key="user_input")
+password = st.text_input("Mot de passe", type="password", key="pass_input")
 
 if st.button(" Se connecter"):
-    if password == "VIP123":
+
+    if username in users and users[username]["password"] == password:
         st.session_state.logged = True
-        st.success(" Accès autorisé")
+        st.session_state.user = username
+        st.success(f" Bienvenue {username}")
     else:
         st.error(" Accès refusé")
 
+#  BLOCAGE
 if not st.session_state.logged:
+    st.warning(" Connecte-toi pour accéder à l'application")
     st.stop()
+
+# =========================
+# CONTROLE VIP
+# =========================
+current_user = st.session_state.user
+
+if not users[current_user]["vip"]:
+    st.warning(" Accès VIP requis")
+
+    st.markdown(" Paiement : https://paystack.com/pay/TON_LIEN")
+
+    st.stop()
+
+# =========================
+# LOGOUT
+# =========================
+if st.button(" Se déconnecter"):
+    st.session_state.logged = False
+    st.session_state.user = None
+    st.rerun()
 
 # =========================
 # MATCH DATA
