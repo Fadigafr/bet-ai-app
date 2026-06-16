@@ -183,28 +183,24 @@ def analyse_real(odd1, oddX, odd2):
 
     return prob1, probX, prob2, v1, vX, v2
 
-league = st.selectbox(
+league_dict = {
+    "Premier League": 39,
+    "La Liga": 140,
+    "Ligue 1": 61
+}
+
+league_name = st.selectbox(
     "Choisir une ligue",
-    {
-        "Premier League": 39,
-        "La Liga": 140,
-        "Ligue 1": 61
-    },
-    key="league_selector"
+    list(league_dict.keys()),
+    key="league_select_1"
 )
 
+market_type = st.selectbox(
+    "Type de pari",
+    ["1X2", "Over/Under", "BTTS"],
+    key="market_select"
+)
 
-league = st.selectbox("Choisir une ligue", {
-    "Premier League": 39,
-    "La Liga": 140,
-    "Ligue 1": 61
-})
-
-league = st.selectbox("Choisir une ligue", {
-    "Premier League": 39,
-    "La Liga": 140,
-    "Ligue 1": 61
-})
 league = st.selectbox("Choisir une ligue", {...}, key="league")
 
 team = st.selectbox("Choisir équipe", [...], key="team")
