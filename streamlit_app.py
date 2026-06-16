@@ -3,14 +3,19 @@ import numpy as np
 import requests
 import streamlit.components.v1 as components
 
-#  INIT SESSION PROPRE
+st.set_page_config(page_title="BET AI PRO", layout="centered")
+
+# =========================
+# INIT SESSION (OBLIGATOIRE)
+# =========================
 if "logged" not in st.session_state:
     st.session_state.logged = False
 
 if "user" not in st.session_state:
     st.session_state.user = None
 
-st.set_page_config(page_title="BET AI PRO", layout="centered")
+if "history" not in st.session_state:
+    st.session_state.history = []
 
 # =========================
 # USERS
@@ -23,10 +28,6 @@ users = {
 # =========================
 # LOGIN
 # =========================
-if "logged" not in st.session_state:
-    st.session_state.logged = False
-    st.session_state.user = None
-
 st.markdown("##  BET AI PRO LOGIN")
 
 username = st.text_input("Utilisateur", key="input_user")
@@ -43,38 +44,37 @@ if st.button("Se connecter"):
 if not st.session_state.logged:
     st.stop()
 
-# =========================
-# VIP CONTROL
-# =========================
-current_user = st.session_state.get("user", None)
+current_user = st.session_state.user
 
-if current_user is None:
-    st.stop()
-
+# =========================
+# VIP ACCESS
+# =========================
 if not users[current_user]["vip"]:
     st.warning(" Accès VIP requis")
     st.markdown(" https://paystack.com/pay/TON-LIEN")
     st.stop()
 
 # =========================
-# SELECT LEAGUE
+# COMPETITIONS
 # =========================
-league_dict = {
-    "Premier League": 39,
-    "La Liga": 140,
-    "Ligue 1": 61
+competitions = {
+    "🏴 Premier League": 39,
+    "🇪🇸 La Liga": 140,
+    "🇫🇷 Ligue 1": 61,
+    "🇩🇪 Bundesliga": 78,
+    "🇮🇹 Serie A": 135,
+    "🏆 Ligue des Champions": 2,
+    "🏆 Ligue Europa": 3
 }
 
-league_name = st.selectbox(
-    "Choisir une ligue",
-    list(league_dict.keys()),
-    key="league_main"
+competition_name = st.selectbox(
+    " Choisir une compétition",
+    list(competitions.keys()),
+    key="competition_select"
 )
 
-league = league_dict[league_name]
-
 # =========================
-# SAFE MATCH DATA
+# MATCH DATA (SAFE)
 # =========================
 def get_matches():
     return [
@@ -84,97 +84,6 @@ def get_matches():
     ]
 
 matches = get_matches()
-
-def get_live_matches(api_key, competition_id):
-
-    url = "https://v3.football.api-sports.io/fixtures"
-
-    headers = {"x-apisports-key": api_key}
-
-    params = {
-        "league": competition_id,
-        "live": "all"
-    }
-
-    res = requests.get(url, headers=headers, params=params)
-    data = res.json()
-
-    live_matches = []
-
-    if "response" in data:
-        for match in data["response"]:
-
-            team1 = match["teams"]["home"]["name"]
-            team2 = match["teams"]["away"]["name"]
-            score1 = match["goals"]["home"]
-            score2 = match["goals"]["away"]
-            minute = match["fixture"]["status"]["elapsed"]
-
-            live_matches.append((team1, team2, score1, score2, minute))
-
-    return live_matches
-
-def get_top_matches(api_key, competition_id):
-
-    url = "https://v3.football.api-sports.io/fixtures"
-
-    headers = {"x-apisports-key": api_key}
-
-    params = {
-        "league": competition_id,
-        "season": 2024,
-        "next": 10
-    }
-
-    res = requests.get(url, headers=headers, params=params)
-    data = res.json()
-
-    matches = []
-
-    if "response" in data:
-        for match in data["response"]:
-
-            team1 = match["teams"]["home"]["name"]
-            team2 = match["teams"]["away"]["name"]
-
-            # simulation importance
-            importance = np.random.rand()
-
-            if importance > 0.5:
-                matches.append((team1, team2))
-
-    return matches
-
-st.markdown("https://v3.football.api-sports.io")
-
-def get_calendar(api_key, competition_id):
-          
-          url = "https://v3.football.api-sports
-      for match in data["response"]:    
-          url = "https://v3.football.api-sports.io/fixtures"
-
-            date = match["fixture"]["date"][:10]
-            team1 = match["teams"]["home"]["name"]
-            team2 = match["teams"]["away"]["name"]
-
-            calendar.append((date, team1, team2))
-
-    return calendar
-
-    headers = {"x-apisports-key": api_key}
-
-    params = {
-        "league": competition_id,
-        "season": 2024,
-        "next": 15
-    }
-
-    res = requests.get(url, headers=headers, params=params)
-    data = res.json()
-
-    calendar = []
-
-    if "response" in data:
 
 # =========================
 # IA PRO
@@ -221,35 +130,15 @@ def send_telegram(message):
     TOKEN = "TON_TOKEN"
     CHAT_ID = "TON_CHAT_ID"
     try:
-        requests.post(
-            f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-            data={"chat_id": CHAT_ID, "text": message}
-        )
+        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+        requests.post(url, data={"chat_id": CHAT_ID, "text": message})
     except:
         pass
 
 # =========================
 # DASHBOARD
 # =========================
-st.markdown("##  BET AI PRO DASHBOARD")
-
-total_matches = len(matches)
-
-# =========================
-# PERFORMANCE
-# =========================
-if "history" not in st.session_state:
-    st.session_state.history = []
-
-st.markdown("##  MATCHS LIVE")
-
-live_data = get_live_matches(API_KEY, competition_id)
-
-if len(live_data) == 0:
-    st.info("Aucun match en direct")
-else:
-    for t1, t2, s1, s2, min in live_data:
-        st.write(f" {t1} vs {t2} | {s1}-{s2} |  {min}'")
+st.markdown(f"##  {competition_name}")
 
 # =========================
 # LOOP MATCHES
@@ -270,7 +159,7 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
     html = f"""
     <div style="
-    background: linear-gradient(135deg,#020617,#0f172a);
+    background:#020617;
     padding:20px;
     border-radius:15px;
     margin-bottom:15px;
@@ -278,15 +167,13 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
     <h3> {team1} vs {team2}</h3>
 
-    <p> Probabilités : {prob1}% | {probX}% | {prob2}%</p>
+    <p> {prob1}% | {probX}% | {prob2}%</p>
 
     <p style="color:{color};font-size:18px;">
-     VALUE BET : {best} ({best_value})
+      VALUE BET : {best} ({best_value})
     </p>
 
-    <hr>
-
-    <p> Score : <b>{score}</b></p>
+    <p> Score : {score}</p>
     <p> {over25}</p>
     <p> {btts}</p>
 
@@ -312,44 +199,14 @@ for team1, team2, odd1, oddX, odd2 in matches:
         sent_alerts.add(match_id)
 
 # =========================
-# STATS
+# ANALYTICS
 # =========================
 st.markdown("##  ANALYTICS")
 
 col1, col2 = st.columns(2)
 
-col1.metric("Matchs", total_matches)
-col2.metric("Signaux", len(st.session_state.history))
+col1.metric("Matchs", len(matches))
+col2.metric("Signals", len(st.session_state.history))
 
 if len(st.session_state.history) > 2:
     st.line_chart(st.session_state.history)
-
-st.markdown("##  TOP MATCHS")
-
-top_matches = get_top_matches(API_KEY, competition_id)
-
-for t1, t2 in top_matches:
-    st.write(f" {t1} vs {t2}")
-
-st.markdown("##  CALENDRIER")
-
-calendar = get_calendar(API_KEY, competition_id)
-
-for date, t1, t2 in calendar:
-    st.write(f" {date} → {t1} vs {t2}")
-mode = st.selectbox(
-    " Mode affichage",
-    ["IA PRONO", "LIVE", "TOP MATCHS", "CALENDRIER"],
-    key="mode_select"
-)
-if mode == "LIVE":
-    # afficher live
-
-elif mode == "TOP MATCHS":
-    # afficher top matchs
-
-elif mode == "CALENDRIER":
-    # calendrier
-
-else:
-    # IA classique
