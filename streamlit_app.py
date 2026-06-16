@@ -167,27 +167,84 @@ def send_telegram(message):
         pass
 
 # =========================
-# LOGIN VIP PRO
+# LOGIN DESIGN PREMIUM
 # =========================
-# LOGIN
-password = st.text_input("Mot de passe VIP", type="password", key="vip")
+if "logged" not in st.session_state:
+    st.session_state.logged = False
 
-if st.button("Se connecter"):
+#  STYLE PREMIUM
+st.markdown("""
+<style>
+.main-box {
+    background: #0f172a;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+}
+
+.title {
+    font-size: 26px;
+    color: #22c55e;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #94a3b8;
+    margin-bottom: 20px;
+}
+
+.stTextInput > div > div > input {
+    background-color: #1e293b;
+    color: white;
+    border-radius: 8px;
+}
+
+.stButton button {
+    background-color: #22c55e;
+    color: black;
+    border-radius: 10px;
+    font-weight: bold;
+    width: 100%;
+}
+</style>
+""", unsafe_allow_html=True)
+
+#  UI BOX
+st.markdown('<div class="main-box">', unsafe_allow_html=True)
+
+st.markdown('<div class="title"> BET AI PRO</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Connexion VIP</div>', unsafe_allow_html=True)
+
+password = st.text_input(
+    "Mot de passe",
+    type="password",
+    key="vip_password"
+)
+
+if st.button(" Se connecter"):
     if password == "VIP123":
         st.session_state.logged = True
+        st.success(" Bienvenue VIP")
     else:
-        st.error("Mot de passe incorrect")
+        st.error(" Mot de passe incorrect")
 
-# LOGOUT
+st.markdown('</div>', unsafe_allow_html=True)
+
+# =========================
+# BLOQUAGE
+# =========================
+if not st.session_state.logged:
+    st.stop()
+
+# =========================
+# LOGOUT BUTTON
+# =========================
 if st.session_state.logged:
-    if st.button("Se déconnecter"):
+    if st.button(" Se déconnecter"):
         st.session_state.logged = False
         st.rerun()
-
-# BLOQUAGE
-if not st.session_state.logged:
-    st.warning("🔒 Connecte-toi pour accéder à l'application")
-    st.stop()
     
 
 
