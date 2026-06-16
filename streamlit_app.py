@@ -441,7 +441,7 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
     # UI
     
-    for team1, team2, odd1, oddX, odd2 in matches:for team1
+    for team1, team2, odd1, oddX, odd2 in matches:
 
     html = f"""
     <div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
