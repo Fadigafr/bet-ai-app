@@ -229,7 +229,7 @@ for team1, team2, odd1, oddX, odd2 in matches:
     ):
         
 message = f"""
- VALUE BET
+ "VALUE BET"
 
 {team1} vs {team2}
 Choix : {best}
