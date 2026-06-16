@@ -169,32 +169,25 @@ def send_telegram(message):
 # =========================
 # LOGIN VIP PRO
 # =========================
-if "logged" not in st.session_state:
-    st.session_state.logged = False
+# LOGIN
+password = st.text_input("Mot de passe VIP", type="password", key="vip")
 
-st.markdown("###  Connexion VIP")
-
-password = st.text_input(
-    "Mot de passe VIP",
-    type="password",
-    key="vip_password"
-)
-
-#  bouton connexion
 if st.button("Se connecter"):
-
     if password == "VIP123":
         st.session_state.logged = True
-        st.success(" Connexion réussie")
     else:
-        st.error(" Mot de passe incorrect")
-if not st.session_state.logged:
-    st.warning(" Connecte-toi pour accéder à l'application")
-    st.stop()
+        st.error("Mot de passe incorrect")
+
+# LOGOUT
 if st.session_state.logged:
-if st.button("Se déconnecter"):
+    if st.button("Se déconnecter"):
         st.session_state.logged = False
-        st.experimental_rerun()
+        st.rerun()
+
+# BLOQUAGE
+if not st.session_state.logged:
+    st.warning("🔒 Connecte-toi pour accéder à l'application")
+    st.stop()
     
 
 
