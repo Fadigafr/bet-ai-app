@@ -26,6 +26,10 @@ if not st.session_state.logged:
     st.warning(" Connecte-toi pour accéder à l'application")
     st.stop()
 
+if not users[current_user]["vip"]:
+    st.warning(" Accès VIP requis")
+    st.stop()
+
 # =========================
 # MATCH DATA
 # =========================
