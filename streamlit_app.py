@@ -207,7 +207,6 @@ team = st.selectbox("Choisir équipe", [...], key="team")
 
 market = st.selectbox("Type pari", [...], key="market")
 
-
 params = {
     "league": league,
     "season": 2023,
@@ -298,7 +297,6 @@ standings = get_standings("TA_CLE_API", league)
 for team in standings[:10]:
     st.write(f"{team['position']} - {team['team']} ({team['points']} pts)")
 
-
 # =========================
 # IA ADVANCED
 # =========================
@@ -385,9 +383,9 @@ btts_count = 0
 # =========================
 # LOOP MATCH
 # =========================
+
 for team1, team2, odd1, oddX, odd2 in matches:
 
-    # IA PRO
     prob1, probX, prob2, v1, vX, v2 = analyse_pro(odd1, oddX, odd2)
 
     values = {"1": v1, "X": vX, "2": v2}
@@ -422,9 +420,11 @@ for team1, team2, odd1, oddX, odd2 in matches:
 components.html(html, height=240)
 
     # TELEGRAM
-    match_id = f"{team1}-{team2}-{best}"
+ 
+match_id = f"{team1}-{team2}-{best}"
 
-    if best_value > 0.20 and match_id not in sent_alerts:
+    if best_value > 0.20:
+        st.write(match_id)
 
         message = f"""
  BET AI PRO
