@@ -440,7 +440,7 @@ for team1, team2, odd1, oddX, odd2 in matches:
     scorer = predict_scorer(team1)
 
     # UI
-    
+
 for team1, team2, odd1, oddX, odd2 in matches:for team1,, "X": vX, "2": v2}
     best = max(values, key=values.get)
     best_value = values[best]
