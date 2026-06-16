@@ -4,6 +4,87 @@ import numpy as np
 import time
 import streamlit.components.v1 as components
 
+st.markdown("""
+<style>
+
+body {
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color: white;
+}
+
+/* TITRE */
+.title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: #22c55e;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #94a3b8;
+    margin-bottom: 30px;
+}
+
+/* CARD */
+.card {
+    background: #0f172a;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    box-shadow: 0px 0px 15px rgba(34, 197, 94, 0.1);
+}
+
+/* MATCH TITLE */
+.match {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* BADGE */
+.badge {
+    background: #22c55e;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* VALUE */
+.value-positive {
+    color: #22c55e;
+    font-weight: bold;
+}
+
+.value-negative {
+    color: red;
+    font-weight: bold;
+}
+
+/* INPUT */
+.stTextInput > div > div > input {
+    background-color: #1e293b;
+    color: white;
+    border-radius: 8px;
+}
+
+/* BUTTON */
+.stButton button {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+    color: black;
+    border-radius: 10px;
+    font-weight: bold;
+    width: 100%;
+}
+
+</style>
+""", unsafe_allow_html=True)
+st.markdown('<div class="title">⚽ BET AI PRO</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Prédiction intelligente & Value Bet</div>', unsafe_allow_html=True)
+
+
 st.text_input(" Mot de passe VIP", type="password")
 password = st.text_input(" Mot de passe VIP", type="password", key="vip_password")
 username = st.text_input("Utilisateur", key="username")
@@ -93,29 +174,37 @@ for team1, team2, odd1, oddX, odd2 in matches:
     best = max(values, key=values.get)
     best_value = values[best]
 
-    color = "green" if best_value > 0 else "red"
+    color_class = "value-positive" if best_value > 0 else "value-negative"
 
-    #  HTML PRO PROPRE
-    html = f"""
-    <div style="background:#1e293b;padding:15px;border-radius:10px;margin-bottom:10px;color:white;">
-        <b>{team1} vs {team2}</b>
+html = f"""
+<div class="card">
 
-        <div style="margin-top:10px;">
-            <span style="background:#334155;padding:5px;">1: {prob1}% | {odd1}</span><br>
-            <span style="background:#334155;padding:5px;">X: {probX}% | {oddX}</span><br>
-            <span style="background:#334155;padding:5px;">2: {prob2}% | {odd2}</span>
-        </div>
+    <div class="match"> {team1} vs {team2}</div>
 
-        <br>
+    <br>
 
-        <b>VALUE BET :</b>
-        <span style="color:{color};font-weight:bold;">
-            {best} ({best_value})
-        </span>
+    <div>
+        <b>Probabilités :</b><br>
+        1️ {prob1}% | {odd1}<br>
+          {probX}% | {oddX}<br>
+        2️ {prob2}% | {odd2}
     </div>
-    """
 
-    components.html(html, height=200)
+    <br>
+
+    <div class="{color_class}">
+          VALUE BET : {best} ({best_value})
+    </div>
+
+    <br>
+
+    <span class="badge"> SIGNAL IA</span>
+
+</div>
+"""
+
+components.html(html, height=230)
+
 
     # =========================
     # TELEGRAM ALERT
@@ -169,6 +258,16 @@ def send_telegram(message):
 # =========================
 # LOGIN DESIGN PREMIUM
 # =========================
+st.markdown("###  Connexion VIP")
+
+password = st.text_input("Mot de passe", type="password", key="vip_password")
+
+if st.button(" Accéder à BET AI PRO"):
+    if password == "VIP123":
+        st.session_state.logged = True
+        st.success(" Connexion réussie")
+    else:
+        st.error(" Accès refusé")
 if "logged" not in st.session_state:
     st.session_state.logged = False
 
