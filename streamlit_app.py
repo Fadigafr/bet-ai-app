@@ -227,18 +227,14 @@ for team1, team2, odd1, oddX, odd2 in matches:
         and match_id not in sent_alerts
         and current_time - last_sent_time > COOLDOWN
     ):
-
-        message = f"""
         
+message = f"""
  VALUE BET
 
 {team1} vs {team2}
 
 Choix : {best}
 Value : {best_value}
-
-Cotes :
-1={odd1} X={oddX} 2={odd2}
 """
 
         send_telegram(message)
