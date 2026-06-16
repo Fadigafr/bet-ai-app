@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 import numpy as np
 import time
-import streamlit.components.v 
 import streamlit.components.v1 as components
 
 st.text_input(" Mot de passe VIP", type="password")
