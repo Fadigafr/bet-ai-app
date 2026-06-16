@@ -269,11 +269,13 @@ def get_standings(api_key, league_id):
 
     url = "https://v3.football.api-sports.io/standings"
 
-    headers = {"x-apisports-key": api_key}
+    headers = {
+        "x-apisports-key": api_key
+    }
 
     params = {
         "league": league_id,
-        "season": 2023
+        "season": 2024
     }
 
     res = requests.get(url, headers=headers, params=params)
@@ -281,12 +283,20 @@ def get_standings(api_key, league_id):
 
     table = []
 
-    for team in data["response"][0]["league"]["standings"][0]:
-        table.append({
-            "position": team["rank"],
-            "team": team["team"]["name"],
-            "points": team["points"]
-        })
+    #  sécurité anti-erreur
+    if "response" in data and len(data["response"]) > 0:
+
+        standings_data = data["response"][0]["league"]["standings"][0]
+
+        for team in standings_data:
+            table.append({
+                "position": team["rank"],
+                "team": team["team"]["name"],
+                "points": team["points"]
+            })
+
+    else:
+        st.error(" Impossible de charger le classement (API vide)")
 
     return table
 
