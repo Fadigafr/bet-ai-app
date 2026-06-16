@@ -90,12 +90,51 @@ def analyse_value(odd1, oddX, odd2):
     v2 = round((p2 * odd2) - 1, 2)
 
     return prob1, probX, prob2, v1, vX, v2
+    def analyse_advanced(team1, team2):
+
+    #  simulation buts
+    goals_home = np.random.randint(0, 4)
+    goals_away = np.random.randint(0, 4)
+
+    total_goals = goals_home + goals_away
+
+    #  OVER / UNDER
+    over25 = "OVER 2.5 " if total_goals >= 3 else "UNDER 2.5 "
+
+    #  BTTS
+    btts = "OUI " if goals_home > 0 and goals_away > 0 else "NON "
+
+    #  score exact
+    score = f"{goals_home} - {goals_away}"
+
+    #  buteur simple (simulation)
+    scorers = ["Mbappé", "Haaland", "Benzema", "Vinicius", "Salah"]
+    scorer = np.random.choice(scorers)
+
+    return over25, btts, score, scorer
+    if "OVER" in over25:
+    over_count += 1
+
+if "OUI" in btts:
+    btts_count += 1
+
+st.markdown("##  STATISTIQUES IA")
+
+c1, c2, c3 = st.columns(3)
+
+c1.metric("Matchs", total_matches)
+c2.metric("Over 2.5", over_count)
+c3.metric("BTTS Oui", btts_count)
+``
 
 # =========================
 # DASHBOARD
 # =========================
 st.markdown("##  DASHBOARD BET AI PRO")
 
+total_matches = len(matches)
+over_count = 0
+btts_count = 0
 col1, col2, col3 = st.columns(3)
 
 col1.metric("Matchs", len(matches))
@@ -133,28 +172,36 @@ for team1, team2, odd1, oddX, odd2 in matches:
     color = "#22c55e" if best_value > 0 else "red"
 
     confidence = max(prob1, probX, prob2)
+    over25, btts, score, scorer = analyse_advanced(team1, team
 
     # =========================
     # CARD UI ELITE
     # =========================
     html = f"""
-    <div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
+<div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
 
-        <h3> {team1} vs {team2}</h3>
+    <h3> {team1} vs {team2}</h3>
 
-        <p> Probabilités</p>
-        <p>1: {prob1}% | X: {probX}% | 2: {prob2}%</p>
+    <p> Probabilités</p>
+    <p>1: {prob1}% | X: {probX}% | 2: {prob2}%</p>
 
-        <p> Confiance IA : {confidence}%</p>
+    <p> Confiance IA : {max(prob1, probX, prob2)}%</p>
 
-        <p style="color:{color};font-size:18px;">
-          VALUE BET : {best} ({best_value})
-        </p>
+    <p style="color:{color};font-size:18px;">
+         VALUE BET : {best} ({best_value})
+    </p>
 
-        <p style="color:#22c55e;"> SIGNAL PREMIUM</p>
+    <hr>
 
-    </div>
-    """
+    <p> <b>Score Exact :</b> {score}</p>
+    <p> <b>Over/Under :</b> {over25}</p>
+    <p> <b>BTTS :</b> {btts}</p>
+    <p> <b>Buteur probable :</b> {scorer}</p>
+
+    <p style="color:#22c55e;"> SIGNAL IA PREMIUM</p>
+
+</div>
+"""
 
     components.html(html, height=230)
 
