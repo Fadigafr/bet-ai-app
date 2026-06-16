@@ -431,21 +431,26 @@ components.html(html, height=240)
 
     # TELEGRAM
  
-match_id = f"{team1}-{team2}-{best}"
-
+for team1, team2, odd1, oddX, odd2 in matches:for team1,2}-{best}"
+    
     if best_value > 0.20:
-        st.write(match_id)
 
         message = f"""
- BET AI PRO
+  BET AI PRO
 
- {team1} vs {team2}
- Choix : {best}
- Value : {best_value}
+  {team1} vs {team2}
+  Choix : {best}
+  Value : {best_value}
 """
 
         send_telegram(message)
         sent_alerts.add(match_id)
+
+    prob1, probX, prob2, v1, vX, v2 = analyse_pro(odd1, oddX, odd2)
+
+    values = {"1": v1, "X": vX, "2": v2}
+    best = max(values, key=values.get)
+    best_value = values[best]
 
 # =========================
 # STATS
