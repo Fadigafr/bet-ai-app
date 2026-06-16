@@ -3,6 +3,13 @@ import numpy as np
 import requests
 import streamlit.components.v1 as components
 
+#  INIT SESSION STATE (OBLIGATOIRE)#  INIT SESSION STATE (OBLlogged" not in st.session_state:
+    st.session_state.logged = False
+
+if "user" not in st.session_state:
+    st.session_state.user = None
+
+
 st.set_page_config(page_title="BET AI PRO", layout="centered")
 
 # =========================
@@ -39,7 +46,10 @@ if not st.session_state.logged:
 # =========================
 # VIP CONTROL
 # =========================
-current_user = st.session_state.user
+current_user = st.session_state.get("user", None)
+
+if current_user is None:
+    st.stop()
 
 if not users[current_user]["vip"]:
     st.warning(" Accès VIP requis")
