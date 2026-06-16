@@ -18,6 +18,19 @@ if password == "VIP123":
 # =========================
 # MATCH DATA (test)
 # =========================
+def get_team_stats(team_id):
+    url = "https://v3.football.api-sports.io/teams/statistics"
+    
+    headers = {"x-apisports-key": API_KEY}
+
+    params = {
+        "team": team_id,
+        "season": 2023,
+        "league": 39
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    return res.json()
 matches = [
     ("PSG", "Marseille", 1.8, 3.3, 4.2),
     ("Real Madrid", "Barcelone", 1.9, 3.1, 3.7),
@@ -42,20 +55,15 @@ if not st.session_state.logged:
 # =========================
 # IA ANALYSE
 # =========================
-def analyse_value(odd1, oddX, odd2):
-    prob1 = np.random.randint(45, 70)
-    probX = np.random.randint(10, 25)
-    prob2 = 100 - prob1 - probX
+def analyse_real(team1_stats, team2_stats):
 
-    p1 = prob1 / 100
-    pX = probX / 100
-    p2 = prob2 / 100
+    win_rate1 = team1_stats["wins"]["total"]
+    win_rate2 = team2_stats["wins"]["total"]
 
-    v1 = round((p1 * odd1) - 1, 2)
-    vX = round((pX * oddX) - 1, 2)
-    v2 = round((p2 * odd2) - 1, 2)
-
-    return prob1, probX, prob2, v1, vX, v2
+    if win_rate1 > win_rate2:
+        return "1"
+    else:
+        return "2"
 
 # =========================
 # ANTI-SPAM
