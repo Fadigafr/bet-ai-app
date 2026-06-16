@@ -440,20 +440,26 @@ for team1, team2, odd1, oddX, odd2 in matches:
     scorer = predict_scorer(team1)
 
     # UI
+    for team1, team2, odd1, oddX, odd2 in matches:for team1
+    )
+
     html = f"""
-<div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
+    <div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
+        <h3> {team1} vs {team2}</h3>
 
-    <h3> {team1} vs {team2}</h3>
+        <p> {prob1}% | {probX}% | {prob2}%</p>
 
-    <p> {prob1}% | {probX}% | {prob2}%</p>
+        <p> Score : <b>{score}</b></p>
+        <p> {over25}</p>
+        <p> {btts}</p>
+    </div>
+    """
 
-    <p> Score : <b>{score}</b></p>
-    <p> {over25}</p>
-    <p> {btts}</p>
+    if "html" in locals():
+    components.html(html, height=240)
 
-</div>
-"""
-components.html(html, height=240)
+    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_super_pro(
+
 
     # TELEGRAM
  
