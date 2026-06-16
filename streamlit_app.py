@@ -1,64 +1,30 @@
 import streamlit as st
 import numpy as np
-import time
-import requests
 import streamlit.components.v1 as components
-
-# =========================
-# UTILISATEURS
-# =========================
-users = {
-    "admin": {"password": "VIP123", "vip": True},
-    "test": {"password": "1234", "vip": False}
-}
+import requests
 
 st.set_page_config(page_title="BET AI PRO", layout="centered")
 
 # =========================
-# LOGIN PRO
+# LOGIN
 # =========================
 if "logged" not in st.session_state:
     st.session_state.logged = False
-    st.session_state.user = None
 
 st.markdown("##  Connexion BET AI PRO")
 
-username = st.text_input("Utilisateur", key="user_input")
-password = st.text_input("Mot de passe", type="password", key="pass_input")
+password = st.text_input("Mot de passe", type="password", key="vip")
 
-if st.button(" Se connecter"):
-
-    if username in users and users[username]["password"] == password:
+if st.button("Se connecter"):
+    if password == "VIP123":
         st.session_state.logged = True
-        st.session_state.user = username
-        st.success(f" Bienvenue {username}")
+        st.success(" Connexion réussie")
     else:
-        st.error(" Accès refusé")
+        st.error(" Mot de passe incorrect")
 
-#  BLOCAGE
 if not st.session_state.logged:
     st.warning(" Connecte-toi pour accéder à l'application")
     st.stop()
-
-# =========================
-# CONTROLE VIP
-# =========================
-current_user = st.session_state.user
-
-if not users[current_user]["vip"]:
-    st.warning(" Accès VIP requis")
-
-    st.markdown(" Paiement : https://paystack.com/pay/TON_LIEN")
-
-    st.stop()
-
-# =========================
-# LOGOUT
-# =========================
-if st.button(" Se déconnecter"):
-    st.session_state.logged = False
-    st.session_state.user = None
-    st.rerun()
 
 # =========================
 # MATCH DATA
@@ -70,91 +36,50 @@ matches = [
 ]
 
 # =========================
-# IA ELITE LOGIQUE
+# IA VALUE
 # =========================
-def analyse_advanced(team1, team2):def analyse_advanced(team1 goals_home > 0 and goals_away > 0 else "NON "
+def analyse_value(odd1, oddX, odd2):
+    prob1 = np.random.randint(45, 70)
+    probX = np.random.randint(10, 25)
+    prob2 = 100 - prob1 - probX
 
-    #  score exact
-    score = f"{goals_home} - {goals_away}"
+    p1 = prob1 / 100
+    pX = probX / 100
+    p2 = prob2 / 100
 
-    #  buteur simulé
-    scorers = ["Mbappé", "Haaland", "Benzema", "Vinicius", "Salah"]
-    scorer = np.random.choice(scorers)
-
-    return over25, btts, score, scorer
-
-    #  simulation buts
-    goals_home = np.random.randint(0, 4)
-    goals_away = np.random.randint(0, 4)
-
-    total_goals = goals_home + goals_away
-
-    #  OVER / UNDER
-    over25 = "OVER 2.5 " if total_goals >= 3 else "UNDER 2.5 "
-
-    #  BTTS
-
+    v1 = round((p1 * odd1) - 1, 2)
+    vX = round((pX * oddX) - 1, 2)
+    v2 = round((p2 * odd2) - 1, 2)
 
     return prob1, probX, prob2, v1, vX, v2
-    def analyse_advanced(team1, team2):
 
-    #  simulation buts
+# =========================
+# IA ADVANCED
+# =========================
+def analyse_advanced(team1, team2):
     goals_home = np.random.randint(0, 4)
     goals_away = np.random.randint(0, 4)
 
     total_goals = goals_home + goals_away
 
-    #  OVER / UNDER
     over25 = "OVER 2.5 " if total_goals >= 3 else "UNDER 2.5 "
-
-    #  BTTS
     btts = "OUI " if goals_home > 0 and goals_away > 0 else "NON "
-
-    #  score exact
     score = f"{goals_home} - {goals_away}"
 
-    #  buteur simple (simulation)
     scorers = ["Mbappé", "Haaland", "Benzema", "Vinicius", "Salah"]
     scorer = np.random.choice(scorers)
 
     return over25, btts, score, scorer
-    if "OVER" in over25:
-    over_count += 1
-
-if "OUI" in btts:
-    btts_count += 1
-
-st.markdown("##  STATISTIQUES IA")
-
-c1, c2, c3 = st.columns(3)
-
-c1.metric("Matchs", total_matches)
-c2.metric("Over 2.5", over_count)
-c3.metric("BTTS Oui", btts_count)
-``
 
 # =========================
-# DASHBOARD
-# =========================
-st.markdown("##  DASHBOARD BET AI PRO")
-
-total_matches = len(matches)
-over_count = 0
-btts_count = 0
-col1, col2, col3 = st.columns(3)
-
-col1.metric("Matchs", len(matches))
-col2.metric("Mode", "IA ACTIVE")
-col3.metric("Statut", "LIVE")
-
-# =========================
-# TELEGRAM (optionnel)
+# TELEGRAM
 # =========================
 sent_alerts = set()
 
 def send_telegram(message):
     TOKEN = "TON_TOKEN"
     CHAT_ID = "TON_CHAT_ID"
+
     try:
         requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
@@ -164,11 +89,20 @@ def send_telegram(message):
         pass
 
 # =========================
+# DASHBOARD
+# =========================
+st.markdown("##  DASHBOARD BET AI PRO")
+
+total_matches = len(matches)
+over_count = 0
+btts_count = 0
+
+# =========================
 # LOOP MATCH
 # =========================
 for team1, team2, odd1, oddX, odd2 in matches:
 
-    #  IA
+    # IA VALUE
     prob1, probX, prob2, v1, vX, v2 = analyse_value(odd1, oddX, odd2)
 
     values = {"1": v1, "X": vX, "2": v2}
@@ -177,57 +111,62 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
     color = "#22c55e" if best_value > 0 else "red"
 
-    confidence = max(prob1, probX, prob2)
-    over25, btts, score, scorer = analyse_advanced(team1, team
+    # IA ADVANCED
+    over25, btts, score, scorer = analyse_advanced(team1, team2)
 
-    # =========================
-    # CARD UI ELITE
-    # =========================
+    if "OVER" in over25:
+        over_count += 1
+    if "OUI" in btts:
+        btts_count += 1
+
+    # UI
     html = f"""
-<div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
+    <div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
 
-    <h3> {team1} vs {team2}</h3>
+        <h3> {team1} vs {team2}</h3>
 
-    <p> Probabilités</p>
-    <p>1: {prob1}% | X: {probX}% | 2: {prob2}%</p>
+        <p> Probabilités</p>
+        <p>1: {prob1}% | X: {probX}% | 2: {prob2}%</p>
 
-    <p> Confiance IA : {max(prob1, probX, prob2)}%</p>
+        <p style="color:{color};font-size:18px;">
+             VALUE BET : {best} ({best_value})
+        </p>
 
-    <p style="color:{color};font-size:18px;">
-         VALUE BET : {best} ({best_value})
-    </p>
+        <hr>
 
-    <hr>
+        <p> Score : {score}</p>
+        <p> {over25}</p>
+        <p> BTTS : {btts}</p>
+        <p> Buteur : {scorer}</p>
 
-    <p> <b>Score Exact :</b> {score}</p>
-    <p> <b>Over/Under :</b> {over25}</p>
-    <p> <b>BTTS :</b> {btts}</p>
-    <p> <b>Buteur probable :</b> {scorer}</p>
+    </div>
+    """
 
-    <p style="color:#22c55e;"> SIGNAL IA PREMIUM</p>
+    components.html(html, height=280)
 
-</div>
-"""
-
-    components.html(html, height=230)
-
-    # =========================
-    # ALERT TELEGRAM
-    # =========================
+    # TELEGRAM
     match_id = f"{team1}-{team2}-{best}"
 
     if best_value > 0.20 and match_id not in sent_alerts:
 
         message = f"""
-  BET AI PRO SIGNAL
+ BET AI PRO
 
-  {team1} vs {team2}
-
-  Choix : {best}
-  Value : {best_value}
-  Confiance : {confidence}%
+ {team1} vs {team2}
+ Choix : {best}
+ Value : {best_value}
 """
 
         send_telegram(message)
-
         sent_alerts.add(match_id)
+
+# =========================
+# STATS
+# =========================
+st.markdown("##  STATISTIQUES")
+
+c1, c2, c3 = st.columns(3)
+
+c1.metric("Matchs", total_matches)
+c2.metric("Over 2.5", over_count)
+c3.metric("BTTS", btts_count)
