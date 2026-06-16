@@ -28,6 +28,24 @@ ax.set_title("Historique performance AI")
 
 st.pyplot(fig)
 
+# =========================
+# IA ANALYSE VALUE
+# =========================
+def analyse_value(odd1, oddX, odd2):
+
+    prob1 = np.random.randint(45, 70)
+    probX = np.random.randint(10, 25)
+    prob2 = 100 - prob1 - probX
+
+    p1 = prob1 / 100
+    pX = probX / 100
+    p2 = prob2 / 100
+
+    v1 = round((p1 * odd1) - 1, 2)
+    vX = round((pX * oddX) - 1, 2)
+    v2 = round((p2 * odd2) - 1, 2)
+
+    return prob1, probX, prob2, v1, vX, v2
 for team1, team2, odd1, oddX, odd2 in matches:
 
     #  calcul IA
