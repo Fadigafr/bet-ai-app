@@ -1,206 +1,54 @@
 import streamlit as st
 import numpy as np
-import streamlit.components.v1 as components
 import requests
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="BET AI PRO", layout="centered")
+
+# =========================
+# USERS
+# =========================
+users = {
+    "admin": {"password": "VIP123", "vip": True},
+    "user": {"password": "1234", "vip": False}
+}
 
 # =========================
 # LOGIN
 # =========================
 if "logged" not in st.session_state:
     st.session_state.logged = False
+    st.session_state.user = None
 
-st.markdown("##  Connexion BET AI PRO")
+st.markdown("##  BET AI PRO LOGIN")
 
-password = st.text_input("Mot de passe", type="password", key="vip")
+username = st.text_input("Utilisateur", key="user")
+password = st.text_input("Mot de passe", type="password", key="pass")
 
 if st.button("Se connecter"):
-    if password == "VIP123":
+    if username in users and users[username]["password"] == password:
         st.session_state.logged = True
+        st.session_state.user = username
         st.success(" Connexion réussie")
     else:
-        st.error(" Mot de passe incorrect")
+        st.error(" Accès refusé")
 
 if not st.session_state.logged:
-    st.warning(" Connecte-toi pour accéder à l'application")
     st.stop()
+
+# =========================
+# VIP CONTROL
+# =========================
+current_user = st.session_state.user
 
 if not users[current_user]["vip"]:
     st.warning(" Accès VIP requis")
+    st.markdown(" https://paystack.com/pay/TON-LIEN")
     st.stop()
 
-users = {
-    "admin": {"password": "VIP123", "vip": True},
-    "user1": {"password": "1234", "vip": False}
-}
-st.sidebar.write(f" {st.session_state.user}")
-
-if not users[st.session_state.user]["vip"]:
-    st.warning(" Accès limité FREE")
-
-st.markdown("##  Devenir VIP")
-
-st.markdown(" https://paystack.com/pay/ton-lien")
-if users[user]["vip"] == False:
-    st.stop()
 # =========================
-# MATCH DATA
+# SELECT LEAGUE
 # =========================
-def get_matches():
-
-    url = "https://v3.football.api-sports.io/fixtures"
-
-    headers = {
-        "x-apisports-key": "TA_CLE_API"
-    }
-
-    params = {
-        "league": 39,
-        "season": 2023,
-        "next": 5
-    }
-
-    response = requests.get(url, headers=headers, params=params)
-    data = response.json()
-
-    matches = []
-
-    for match in data["response"]:
-        team1 = match["teams"]["home"]["name"]
-        team2 = match["teams"]["away"]["name"]
-
-        # simulation odds
-        odd1 = round(np.random.uniform(1.5, 2.5), 2)
-        oddX = round(np.random.uniform(2.5, 3.5), 2)
-        odd2 = round(np.random.uniform(2.0, 4.0), 2)
-
-        matches.append((team1, team2, odd1, oddX, odd2))
-
-    return matches
-
-matches = get_matches()
-
-def get_team_stats(team_id):
-
-    url = "https://v3.football.api-sports.io/teams/statistics"
-
-    headers = {
-        "x-apisports-key": "TA_CLE_API"
-    }
-
-    params = {
-        "team": team_id,
-        "season": 2023,
-        "league": 39
-    }
-
-    return requests.get(url, headers=headers, params=params).json()
-    
-def get_matches():
-
-    url = "https://v3.football.api-sports.io/fixtures"
-
-    headers = {
-        "x-apisports-key": "TA_CLE_API"
-    }
-
-    params = {
-        "league": 39,   # Premier League
-        "season": 2023,
-        "next": 5       # prochains matchs
-    }
-
-    response = requests.get(url, headers=headers, params=params)
-    data = response.json()
-
-    matches = []
-
-    for match in data["response"]:
-        team1 = match["teams"]["home"]["name"]
-        team2 = match["teams"]["away"]["name"]
-
-        #  cotes non incluses ici → on simule
-        odd1 = round(np.random.uniform(1.5, 2.5), 2)
-        oddX = round(np.random.uniform(2.5, 3.5), 2)
-        odd2 = round(np.random.uniform(2.0, 4.0), 2)
-
-        matches.append((team1, team2, odd1, oddX, odd2))
-
-    return matches
-# =========================
-# IA VALUE
-# =========================
-def analyse_pro(odd1, oddX, odd2):
-
-    #  convertir cotes en probabilités implicites
-    p1 = 1 / odd1
-    pX = 1 / oddX
-    p2 = 1 / odd2
-
-    total = p1 + pX + p2
-
-    prob1 = int(p1 / total * 100)
-    probX = int(pX / total * 100)
-    prob2 = 100 - prob1 - probX
-
-    #  calcul value
-    v1 = round((prob1/100 * odd1) - 1, 2)
-    vX = round((probX/100 * oddX) - 1, 2)
-    v2 = round((prob2/100 * odd2) - 1, 2)
-
-    return prob1, probX, prob2, v1, vX, v2
-
-def predict_score(prob1, probX, prob2):
-
-    if prob1 > 50:
-        return "2-0"
-    elif prob2 > 50:
-        return "0-2"
-    elif probX > 35:
-        return "1-1"
-    else:
-        return "2-1"
-
-def analyse_market(prob1, probX, prob2):
-
-    goals_expect = (prob1 + prob2) / 2
-
-    over25 = "OVER 2.5 " if goals_expect > 50 else "UNDER 2.5 "
-    btts = "OUI " if prob1 > 40 and prob2 > 40 else "NON "
-
-    return over25, btts
-
-def predict_scorer(team1):
-
-    scorers_db = {
-        "PSG": ["Mbappé"],
-        "Real Madrid": ["Vinicius"],
-        "Chelsea": ["Jackson"],
-        "Arsenal": ["Saka"]
-    }
-
-    return np.random.choice(scorers_db.get(team1, ["Top Player"]))
-
-def analyse_real(odd1, oddX, odd2):
-
-    #  base logique réelle
-    prob1 = int(100 / odd1)
-    probX = int(100 / oddX)
-    prob2 = int(100 / odd2)
-
-    total = prob1 + probX + prob2
-
-    prob1 = int(prob1 / total * 100)
-    probX = int(probX / total * 100)
-    prob2 = 100 - prob1 - probX
-
-    v1 = round((prob1/100 * odd1) - 1, 2)
-    vX = round((probX/100 * oddX) - 1, 2)
-    v2 = round((prob2/100 * odd2) - 1, 2)
-
-    return prob1, probX, prob2, v1, vX, v2
-
 league_dict = {
     "Premier League": 39,
     "La Liga": 140,
@@ -210,156 +58,28 @@ league_dict = {
 league_name = st.selectbox(
     "Choisir une ligue",
     list(league_dict.keys()),
-    key="league_select_1"
+    key="league_main"
 )
 
-market_type = st.selectbox(
-    "Type de pari",
-    ["1X2", "Over/Under", "BTTS"],
-    key="market_select"
-)
+league = league_dict[league_name]
 
-league = st.selectbox("Choisir une ligue", {...}, key="league")
-
-team = st.selectbox("Choisir équipe", [...], key="team")
-
-market = st.selectbox("Type pari", [...], key="market")
-
-params = {
-    "league": league,
-    "season": 2023,
-    "next": 5
-}
-
-def get_live_matches(api_key, league_id):
-
-    url = "https://v3.football.api-sports.io/fixtures"
-
-    headers = {
-        "x-apisports-key": api_key
-    }
-
-    params = {
-        "league": league_id,
-        "live": "all"
-    }
-
-    res = requests.get(url, headers=headers, params=params)
-    data = res.json()
-
-    live_matches = []
-
-    for match in data["response"]:
-        team1 = match["teams"]["home"]["name"]
-        team2 = match["teams"]["away"]["name"]
-
-        score1 = match["goals"]["home"]
-        score2 = match["goals"]["away"]
-
-        minute = match["fixture"]["status"]["elapsed"]
-
-        live_matches.append((team1, team2, score1, score2, minute))
-
-    return live_matches
-
-    url = "https://v3.football.api-sports.io/fixtures"
-
-    headers = {"x-apisports-key": api_key}
-
-    params = {
-        "league": league_id,
-        "live": "all"
-}
-    
-st.markdown("##  MATCHS LIVE")
-
-live_data = get_live_matches("TA_CLE_API", league)
-
-for team1, team2, s1, s2, minute in live_data:
-
-    st.markdown(f"""
-     {team1} vs {team2}  
-     Score : {s1} - {s2}  
-     {minute}'
-    """)
-
-def get_standings_safe():
-
+# =========================
+# SAFE MATCH DATA
+# =========================
+def get_matches():
     return [
-        {"position": 1, "team": "Manchester City", "points": 89},
-        {"position": 2, "team": "Arsenal", "points": 84},
-        {"position": 3, "team": "Liverpool", "points": 80},
-        {"position": 4, "team": "Chelsea", "points": 70},
+        ("PSG", "Marseille", 1.8, 3.3, 4.2),
+        ("Real Madrid", "Barcelone", 1.9, 3.1, 3.7),
+        ("Chelsea", "Arsenal", 2.0, 3.2, 3.5),
     ]
 
-def analyse_ultra_pro(odd1, oddX, odd2):
-
-    # probas implicites
-    p1 = 1 / odd1
-    pX = 1 / oddX
-    p2 = 1 / odd2
-
-    total = p1 + pX + p2
-
-    prob1 = (p1 / total) * 100
-    probX = (pX / total) * 100
-    prob2 = 100 - prob1 - probX
-
-    #  pondération (boost value)
-    prob1 *= 1.05
-    prob2 *= 1.05
-
-    # normalisation finale
-    total2 = prob1 + probX + prob2
-    prob1 = int(prob1 / total2 * 100)
-    probX = int(probX / total2 * 100)
-    prob2 = 100 - prob1 - probX
-
-    #  value bet
-    v1 = round((prob1/100 * odd1) - 1, 2)
-    vX = round((probX/100 * oddX) - 1, 2)
-    v2 = round((prob2/100 * odd2) - 1, 2)
-
-    return prob1, probX, prob2, v1, vX, v2
-    
-st.markdown("##  CLASSEMENT")
-
-standings = get_standings_safe()
-
-for team in standings[:10]:
-    st.write(f"{team['position']} - {team['team']} ({team['points']} pts)")
-
-st.markdown("""
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {
-    zoom: 0.9;
-}
-</style>
-""", unsafe_allow_html=True)
-
+matches = get_matches()
 
 # =========================
-# IA ADVANCED
+# IA PRO
 # =========================
-def analyse_advanced(team1, team2):
-    goals_home = np.random.randint(0, 4)
-    goals_away = np.random.randint(0, 4)
-
-    total_goals = goals_home + goals_away
-
-    over25 = "OVER 2.5 " if total_goals >= 3 else "UNDER 2.5 "
-    btts = "OUI " if goals_home > 0 and goals_away > 0 else "NON "
-    score = f"{goals_home} - {goals_away}"
-
-    scorers = ["Mbappé", "Haaland", "Benzema", "Vinicius", "Salah"]
-    scorer = np.random.choice(scorers)
-
-    return over25, btts, score, scorer
-
 def analyse_super_pro(odd1, oddX, odd2):
 
-    #  probabilités implicites
     p1 = 1 / odd1
     pX = 1 / oddX
     p2 = 1 / odd2
@@ -370,7 +90,7 @@ def analyse_super_pro(odd1, oddX, odd2):
     probX = round((pX / total) * 100)
     prob2 = 100 - prob1 - probX
 
-    #  score
+    # SCORE
     if prob1 > 55:
         score = "2-0"
     elif prob2 > 55:
@@ -380,30 +100,16 @@ def analyse_super_pro(odd1, oddX, odd2):
     else:
         score = "2-1"
 
-    #  over / under
-    expected_goals = (prob1 + prob2) / 2
-    over25 = "OVER 2.5 " if expected_goals > 50 else "UNDER 2.5 "
-
-    #  BTTS
+    # MARKETS
+    over25 = "OVER 2.5 " if (prob1 + prob2) > 60 else "UNDER 2.5 "
     btts = "OUI " if prob1 > 40 and prob2 > 40 else "NON "
 
-    #  value
+    # VALUE
     v1 = round((prob1/100 * odd1) - 1, 2)
     vX = round((probX/100 * oddX) - 1, 2)
     v2 = round((prob2/100 * odd2) - 1, 2)
 
     return prob1, probX, prob2, v1, vX, v2, score, over25, btts
-
-for match in matches:
-
-    if len(match) == 5:
-        team1, team2, odd1, oddX, odd2 = match
-    else:
-        continue
-
-    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_super_pro(
-        odd1, oddX, odd2
-    )
 
 # =========================
 # TELEGRAM
@@ -413,7 +119,6 @@ sent_alerts = set()
 def send_telegram(message):
     TOKEN = "TON_TOKEN"
     CHAT_ID = "TON_CHAT_ID"
-
     try:
         requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
@@ -425,139 +130,64 @@ def send_telegram(message):
 # =========================
 # DASHBOARD
 # =========================
-st.markdown("##  DASHBOARD BET AI PRO")
+st.markdown("##  BET AI PRO DASHBOARD")
 
 total_matches = len(matches)
-over_count = 0
-btts_count = 0
-
-st.markdown("##  ADMIN DASHBOARD")
-
-col1, col2, col3 = st.columns(3)
-
-col1.metric("Utilisateurs", len(users))
-col2.metric("Matchs analysés", len(matches))
-col3.metric("Signaux détectés", len(st.session_state.history))
-
-st.set_page_config(
-    page_title="BET AI PRO",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
 
 # =========================
-# LOOP MATCH
+# PERFORMANCE
 # =========================
+if "history" not in st.session_state:
+    st.session_state.history = []
 
-def analyse_super_pro(odd1, oddX, odd2):
-
-    p1 = 1 / odd1
-    pX = 1 / oddX
-    p2 = 1 / odd2
-
-    total = p1 + pX + p2
-
-    prob1 = round((p1 / total) * 100)
-    probX = round((pX / total) * 100)
-    prob2 = 100 - prob1 - probX
-
-    #  score intelligent
-    if prob1 > 55:
-        score = "2-0"
-    elif prob2 > 55:
-        score = "0-2"
-    elif probX > 35:
-        score = "1-1"
-    else:
-        score = "2-1"
-
-    #  markets
-    expected_goals = (prob1 + prob2) / 2
-    over25 = "OVER 2.5 " if expected_goals > 50 else "UNDER 2.5 "
-    btts = "OUI " if prob1 > 40 and prob2 > 40 else "NON "
-
-    #  value
-    v1 = round((prob1/100 * odd1) - 1, 2)
-    vX = round((probX/100 * oddX) - 1, 2)
-    v2 = round((prob2/100 * odd2) - 1, 2)
-
-    return prob1, probX, prob2, v1, vX, v2, score, over25, btts
+# =========================
+# LOOP MATCHES
+# =========================
 for team1, team2, odd1, oddX, odd2 in matches:
 
-    prob1, probX, prob2, v1, vX, v2 = analyse_pro(odd1, oddX, odd2)
-
-    values = {"1": v1, "X": vX, "2": v2}
-    best = max(values, key=values.get)
-    best_value = values[best]
-
-    #  BON ALIGNEMENT
-    match_id = f"{team1}-{team2}-{best}"
-
-    #  MEME NIVEAU
-    if best_value > 0.20:
-
-        message = f"{team1} vs {team2} → {best} ({best_value})"
-
-        send_telegram(message)
-
-        sent_alerts.add(match_id)
-
-    # SCORE
-    score = predict_score(prob1, probX, prob2)
-
-    # OVER / BTTS
-    over25, btts = analyse_market(prob1, probX, prob2)
-
-    # BUTEUR
-    scorer = predict_scorer(team1)
-
-    # UI
-
-html = f"""
-<div style="
-background: linear-gradient(135deg,#020617,#0f172a);
-padding:20px;
-border-radius:20px;
-margin-bottom:15px;
-box-shadow:0 0 20px rgba(34,197,94,0.2);
-color:white">
-
-<h3> {team1} vs {team2}</h3>
-
-<p>  {prob1}% | {probX}% | {prob2}%</p>
-
-<p style="color:#22c55e;font-size:20px;">
-  VALUE BET : {best} ({best_value})
-</p>
-
-<p> Score : {score}</p>
-<p> {over25}</p>
-<p> {btts}</p>
-
-</div>
-"""
-
-    components.html(html, height=240)
-
-    #  indentation obligatoire
     prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_super_pro(
         odd1, oddX, odd2
     )
 
-    # TELEGRAM
- 
-for team1, team2, odd1, oddX, odd2 in matches:
-
-    prob1, probX, prob2, v1, vX, v2 = analyse_pro(odd1, oddX, odd2)
-
     values = {"1": v1, "X": vX, "2": v2}
     best = max(values, key=values.get)
     best_value = values[best]
 
+    st.session_state.history.append(best_value)
+
+    color = "#22c55e" if best_value > 0 else "red"
+
+    html = f"""
+    <div style="
+    background: linear-gradient(135deg,#020617,#0f172a);
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:15px;
+    color:white">
+
+    <h3> {team1} vs {team2}</h3>
+
+    <p> Probabilités : {prob1}% | {probX}% | {prob2}%</p>
+
+    <p style="color:{color};font-size:18px;">
+     VALUE BET : {best} ({best_value})
+    </p>
+
+    <hr>
+
+    <p> Score : <b>{score}</b></p>
+    <p> {over25}</p>
+    <p> {btts}</p>
+
+    </div>
+    """
+
+    components.html(html, height=260)
+
+    # TELEGRAM ALERT
     match_id = f"{team1}-{team2}-{best}"
 
-    if best_value > 0.20:
-        st.write(match_id)
+    if best_value > 0.20 and match_id not in sent_alerts:
 
         message = f"""
   BET AI PRO
@@ -570,29 +200,15 @@ for team1, team2, odd1, oddX, odd2 in matches:
         send_telegram(message)
         sent_alerts.add(match_id)
 
-    prob1, probX, prob2, v1, vX, v2 = analyse_pro(odd1, oddX, odd2)
-
-    values = {"1": v1, "X": vX, "2": v2}
-    best = max(values, key=values.get)
-    best_value = values[best]
-
 # =========================
 # STATS
 # =========================
-st.markdown("##  STATISTIQUES")
+st.markdown("##  ANALYTICS")
 
-c1, c2, c3 = st.columns(3)
+col1, col2 = st.columns(2)
 
-c1.metric("Matchs", total_matches)
-c2.metric("Over 2.5", over_count)
-c3.metric("BTTS", btts_count)
-
-if "history" not in st.session_state:
-    st.session_state.history = []
-
-st.session_state.history.append(best_value)
-
-st.markdown("##  Performance IA")
+col1.metric("Matchs", total_matches)
+col2.metric("Signaux", len(st.session_state.history))
 
 if len(st.session_state.history) > 2:
     st.line_chart(st.session_state.history)
