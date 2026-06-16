@@ -85,6 +85,95 @@ def get_matches():
 
 matches = get_matches()
 
+def get_live_matches(api_key, competition_id):
+
+    url = "https://v3.football.api-sports.io/fixtures"
+
+    headers = {"x-apisports-key": api_key}
+
+    params = {
+        "league": competition_id,
+        "live": "all"
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    live_matches = []
+
+    if "response" in data:
+        for match in data["response"]:
+
+            team1 = match["teams"]["home"]["name"]
+            team2 = match["teams"]["away"]["name"]
+            score1 = match["goals"]["home"]
+            score2 = match["goals"]["away"]
+            minute = match["fixture"]["status"]["elapsed"]
+
+            live_matches.append((team1, team2, score1, score2, minute))
+
+    return live_matches
+
+def get_top_matches(api_key, competition_id):
+
+    url = "https://v3.football.api-sports.io/fixtures"
+
+    headers = {"x-apisports-key": api_key}
+
+    params = {
+        "league": competition_id,
+        "season": 2024,
+        "next": 10
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    matches = []
+
+    if "response" in data:
+        for match in data["response"]:
+
+            team1 = match["teams"]["home"]["name"]
+            team2 = match["teams"]["away"]["name"]
+
+            # simulation importance
+            importance = np.random.rand()
+
+            if importance > 0.5:
+                matches.append((team1, team2))
+
+    return matches
+
+def get_calendar(api_key, competition_id):
+
+    url = "https://v3        f
+      for match in data["response"]:    
+          url = "https://v3.football.api-sports.io/fixtures"
+
+            date = match["fixture"]["date"][:10]
+            team1 = match["teams"]["home"]["name"]
+            team2 = match["teams"]["away"]["name"]
+
+            calendar.append((date, team1, team2))
+
+    return calendar
+
+    headers = {"x-apisports-key": api_key}
+
+    params = {
+        "league": competition_id,
+        "season": 2024,
+        "next": 15
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    calendar = []
+
+    if "response" in data:
+
 # =========================
 # IA PRO
 # =========================
@@ -149,6 +238,16 @@ total_matches = len(matches)
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = []
+
+st.markdown("##  MATCHS LIVE")
+
+live_data = get_live_matches(API_KEY, competition_id)
+
+if len(live_data) == 0:
+    st.info("Aucun match en direct")
+else:
+    for t1, t2, s1, s2, min in live_data:
+        st.write(f" {t1} vs {t2} | {s1}-{s2} |  {min}'")
 
 # =========================
 # LOOP MATCHES
@@ -222,3 +321,33 @@ col2.metric("Signaux", len(st.session_state.history))
 
 if len(st.session_state.history) > 2:
     st.line_chart(st.session_state.history)
+
+st.markdown("##  TOP MATCHS")
+
+top_matches = get_top_matches(API_KEY, competition_id)
+
+for t1, t2 in top_matches:
+    st.write(f" {t1} vs {t2}")
+
+st.markdown("##  CALENDRIER")
+
+calendar = get_calendar(API_KEY, competition_id)
+
+for date, t1, t2 in calendar:
+    st.write(f" {date} → {t1} vs {t2}")
+mode = st.selectbox(
+    " Mode affichage",
+    ["IA PRONO", "LIVE", "TOP MATCHS", "CALENDRIER"],
+    key="mode_select"
+)
+if mode == "LIVE":
+    # afficher live
+
+elif mode == "TOP MATCHS":
+    # afficher top matchs
+
+elif mode == "CALENDRIER":
+    # calendrier
+
+else:
+    # IA classique
