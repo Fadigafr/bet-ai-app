@@ -5,13 +5,21 @@ import time
 import streamlit.components.v1 as components
 import matplotlib.pyplot as plt
 
+#  1. DÉFINIR MATCHES AVANT TOUT
+matches = [
+    ("PSG", "Marseille", 1.8, 3.3, 4.2),
+    ("Real Madrid", "Barcelone", 1.9, 3.1, 3.7),
+    ("Chelsea", "Arsenal", 2.0, 3.2, 3.5),
+]
+
+#  2. DASHBOARD
 st.markdown("##  Dashboard BET AI PRO")
 
 col1, col2, col3 = st.columns(3)
 
 col1.metric("Matchs analysés", len(matches))
-col2.metric("Top Value", f"{round(best_value,2)}")
-col3.metric("Signal", best)
+col2.metric("Top Value", "0.25")
+col3.metric("Signal", "1")
 history = np.random.randint(-10, 20, 10)
 
 fig, ax = plt.subplots()
