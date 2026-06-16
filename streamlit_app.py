@@ -29,6 +29,21 @@ if not st.session_state.logged:
 if not users[current_user]["vip"]:
     st.warning(" Accès VIP requis")
     st.stop()
+
+users = {
+    "admin": {"password": "VIP123", "vip": True},
+    "user1": {"password": "1234", "vip": False}
+}
+st.sidebar.write(f" {st.session_state.user}")
+
+if not users[st.session_state.user]["vip"]:
+    st.warning(" Accès limité FREE")
+
+st.markdown("##  Devenir VIP")
+
+st.markdown(" https://paystack.com/pay/ton-lien")
+if users[user]["vip"] == False:
+    st.stop()
 # =========================
 # MATCH DATA
 # =========================
@@ -277,6 +292,36 @@ def get_standings_safe():
         {"position": 4, "team": "Chelsea", "points": 70},
     ]
 
+def analyse_ultra_pro(odd1, oddX, odd2):
+
+    # probas implicites
+    p1 = 1 / odd1
+    pX = 1 / oddX
+    p2 = 1 / odd2
+
+    total = p1 + pX + p2
+
+    prob1 = (p1 / total) * 100
+    probX = (pX / total) * 100
+    prob2 = 100 - prob1 - probX
+
+    #  pondération (boost value)
+    prob1 *= 1.05
+    prob2 *= 1.05
+
+    # normalisation finale
+    total2 = prob1 + probX + prob2
+    prob1 = int(prob1 / total2 * 100)
+    probX = int(probX / total2 * 100)
+    prob2 = 100 - prob1 - probX
+
+    #  value bet
+    v1 = round((prob1/100 * odd1) - 1, 2)
+    vX = round((probX/100 * oddX) - 1, 2)
+    v2 = round((prob2/100 * odd2) - 1, 2)
+
+    return prob1, probX, prob2, v1, vX, v2
+    
 st.markdown("##  CLASSEMENT")
 
 standings = get_standings_safe()
@@ -386,6 +431,20 @@ total_matches = len(matches)
 over_count = 0
 btts_count = 0
 
+st.markdown("##  ADMIN DASHBOARD")
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Utilisateurs", len(users))
+col2.metric("Matchs analysés", len(matches))
+col3.metric("Signaux détectés", len(st.session_state.history))
+
+st.set_page_config(
+    page_title="BET AI PRO",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
+
 # =========================
 # LOOP MATCH
 # =========================
@@ -454,31 +513,29 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
     # UI
 
-for team1, team2, odd1, oddX, odd2 in matches:
+html = f"""
+<div style="
+background: linear-gradient(135deg,#020617,#0f172a);
+padding:20px;
+border-radius:20px;
+margin-bottom:15px;
+box-shadow:0 0 20px rgba(34,197,94,0.2);
+color:white">
 
-    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_super_pro(
-        odd1, oddX, odd2
-    )
+<h3> {team1} vs {team2}</h3>
 
-    #  dictionnaire valeurs correct
-    values = {
-        "1": v1,
-        "X": vX,
-        "2": v2
-    }
+<p>  {prob1}% | {probX}% | {prob2}%</p>
 
-    best = max(values, key=values.get)
-    best_value = values[best]
+<p style="color:#22c55e;font-size:20px;">
+  VALUE BET : {best} ({best_value})
+</p>
 
-    html = f"""
-    <div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
-        <h3 {team1} vs {team2}</h3>
-        <p> {prob1}% | {probX}% | {prob2}%</p>
-        <p> Score : <b>{score}</b></p>
-        <p> {over25}</p>
-        <p> {btts}</p>
-    </div>
-    """
+<p> Score : {score}</p>
+<p> {over25}</p>
+<p> {btts}</p>
+
+</div>
+"""
 
     components.html(html, height=240)
 
@@ -529,3 +586,13 @@ c1, c2, c3 = st.columns(3)
 c1.metric("Matchs", total_matches)
 c2.metric("Over 2.5", over_count)
 c3.metric("BTTS", btts_count)
+
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+st.session_state.history.append(best_value)
+
+st.markdown("##  Performance IA")
+
+if len(st.session_state.history) > 2:
+    st.line_chart(st.session_state.history)
