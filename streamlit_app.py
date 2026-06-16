@@ -278,10 +278,10 @@ Cotes :
 1={odd1} X={oddX} 2={odd2}
 """
 
-    send_telegram(message)
+send_telegram(message)
 
-        sent_alerts.add(match_id)
-        last_sent_time = current_time
+    sent_alerts.add(match_id)
+    last_sent_time = current_time
 
 # =========================
 # CONFIG
