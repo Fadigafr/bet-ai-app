@@ -3,8 +3,11 @@ import numpy as np
 import requests
 import streamlit.components.v1 as components
 
-#  INIT SESSION STATE (OBLIGATOIRE)#  INIT SESSION STATE (OBLlogged" not in st.session_state:
+#  INIT SESSION
+if "logged" not in st.session_state:
     st.session_state.logged = False
+
+if "user" not in st
 
 if "user" not in st.session_state:
     st.session_state.user = None
