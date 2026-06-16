@@ -336,7 +336,16 @@ def analyse_super_pro(odd1, oddX, odd2):
 
     return prob1, probX, prob2, v1, vX, v2, score, over25, btts
 
-prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_super_pro(odd1, oddX, odd2)
+for match in matches:
+
+    if len(match) == 5:
+        team1, team2, odd1, oddX, odd2 = match
+    else:
+        continue
+
+    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_super_pro(
+        odd1, oddX, odd2
+    )
 
 # =========================
 # TELEGRAM
