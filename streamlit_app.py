@@ -29,12 +29,55 @@ if not st.session_state.logged:
 # =========================
 # MATCH DATA
 # =========================
-matches = [
-    ("PSG", "Marseille", 1.8, 3.3, 4.2),
-    ("Real Madrid", "Barcelone", 1.9, 3.1, 3.7),
-    ("Chelsea", "Arsenal", 2.0, 3.2, 3.5),
-]
+matches = get_matches()
 
+def get_team_stats(team_id):
+
+    url = "https://v3.football.api-sports.io/teams/statistics"
+
+    headers = {
+        "x-apisports-key": "TA_CLE_API"
+    }
+
+    params = {
+        "team": team_id,
+        "season": 2023,
+        "league": 39
+    }
+
+    return requests.get(url, headers=headers, params=params).json()
+    
+def get_matches():
+
+    url = "https://v3.football.api-sports.io/fixtures"
+
+    headers = {
+        "x-apisports-key": "TA_CLE_API"
+    }
+
+    params = {
+        "league": 39,   # Premier League
+        "season": 2023,
+        "next": 5       # prochains matchs
+    }
+
+    response = requests.get(url, headers=headers, params=params)
+    data = response.json()
+
+    matches = []
+
+    for match in data["response"]:
+        team1 = match["teams"]["home"]["name"]
+        team2 = match["teams"]["away"]["name"]
+
+        #  cotes non incluses ici → on simule
+        odd1 = round(np.random.uniform(1.5, 2.5), 2)
+        oddX = round(np.random.uniform(2.5, 3.5), 2)
+        odd2 = round(np.random.uniform(2.0, 4.0), 2)
+
+        matches.append((team1, team2, odd1, oddX, odd2))
+
+    return matches
 # =========================
 # IA VALUE
 # =========================
@@ -52,6 +95,44 @@ def analyse_value(odd1, oddX, odd2):
     v2 = round((p2 * odd2) - 1, 2)
 
     return prob1, probX, prob2, v1, vX, v2
+
+def analyse_real(odd1, oddX, odd2):
+
+    #  base logique réelle
+    prob1 = int(100 / odd1)
+    probX = int(100 / oddX)
+    prob2 = int(100 / odd2)
+
+    total = prob1 + probX + prob2
+
+    prob1 = int(prob1 / total * 100)
+    probX = int(probX / total * 100)
+    prob2 = 100 - prob1 - probX
+
+    v1 = round((prob1/100 * odd1) - 1, 2)
+    vX = round((probX/100 * oddX) - 1, 2)
+    v2 = round((prob2/100 * odd2) - 1, 2)
+
+    return prob1, probX, prob2, v1, vX, v2
+
+league = st.selectbox("Choisir une ligue", {
+    "Premier League": 39,
+    "La Liga": 140,
+    "Ligue 1": 61
+})
+
+league = st.selectbox("Choisir une ligue", {
+    "Premier League": 39,
+    "La Liga": 140,
+    "Ligue 1": 61
+})
+
+params = {
+    "league": league,
+    "season": 2023,
+    "next": 5
+}
+
 
 # =========================
 # IA ADVANCED
