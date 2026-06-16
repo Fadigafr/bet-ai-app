@@ -6,6 +6,11 @@ import streamlit.components.v1 as components
 
 st.text_input(" Mot de passe VIP", type="password")
 
+if "logged" not in st.session_state:
+    st.session_state.logged = False
+
+password = st.text_input(" Mot de passe VIP", type="password")
+
 if password == "VIP123":
     st.session_state.logged = True
 
