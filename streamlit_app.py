@@ -72,22 +72,28 @@ matches = [
 # =========================
 # IA ELITE LOGIQUE
 # =========================
-def analyse_value(odd1, oddX, odd2):
+def analyse_advanced(team1, team2):def analyse_advanced(team1 goals_home > 0 and goals_away > 0 else "NON "
 
-    #  probabilités réalistes (pas trop aléatoire)
-    base = np.random.uniform(0.4, 0.6)
+    #  score exact
+    score = f"{goals_home} - {goals_away}"
 
-    prob1 = round(base * 100)
-    probX = round(np.random.uniform(0.15, 0.25) * 100)
-    prob2 = 100 - prob1 - probX
+    #  buteur simulé
+    scorers = ["Mbappé", "Haaland", "Benzema", "Vinicius", "Salah"]
+    scorer = np.random.choice(scorers)
 
-    #  probas normalisées
-    p1, pX, p2 = prob1/100, probX/100, prob2/100
+    return over25, btts, score, scorer
 
-    #  value bet réelle
-    v1 = round((p1 * odd1) - 1, 2)
-    vX = round((pX * oddX) - 1, 2)
-    v2 = round((p2 * odd2) - 1, 2)
+    #  simulation buts
+    goals_home = np.random.randint(0, 4)
+    goals_away = np.random.randint(0, 4)
+
+    total_goals = goals_home + goals_away
+
+    #  OVER / UNDER
+    over25 = "OVER 2.5 " if total_goals >= 3 else "UNDER 2.5 "
+
+    #  BTTS
+
 
     return prob1, probX, prob2, v1, vX, v2
     def analyse_advanced(team1, team2):
