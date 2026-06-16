@@ -265,44 +265,18 @@ for team1, team2, s1, s2, minute in live_data:
      {minute}'
     """)
 
-def get_standings(api_key, league_id):
+def get_standings_safe():
 
-    url = "https://v3.football.api-sports.io/standings"
-
-    headers = {
-        "x-apisports-key": api_key
-    }
-
-    params = {
-        "league": league_id,
-        "season": 2024
-    }
-
-    res = requests.get(url, headers=headers, params=params)
-    data = res.json()
-
-    table = []
-
-    #  sécurité anti-erreur
-    if "response" in data and len(data["response"]) > 0:
-
-        standings_data = data["response"][0]["league"]["standings"][0]
-
-        for team in standings_data:
-            table.append({
-                "position": team["rank"],
-                "team": team["team"]["name"],
-                "points": team["points"]
-            })
-
-    else:
-        st.error(" Impossible de charger le classement (API vide)")
-
-    return table
+    return [
+        {"position": 1, "team": "Manchester City", "points": 89},
+        {"position": 2, "team": "Arsenal", "points": 84},
+        {"position": 3, "team": "Liverpool", "points": 80},
+        {"position": 4, "team": "Chelsea", "points": 70},
+    ]
 
 st.markdown("##  CLASSEMENT")
 
-standings = get_standings("TA_CLE_API", league)
+standings = get_standings_safe()
 
 for team in standings[:10]:
     st.write(f"{team['position']} - {team['team']} ({team['points']} pts)")
@@ -394,6 +368,39 @@ btts_count = 0
 # LOOP MATCH
 # =========================
 
+def analyse_super_pro(odd1, oddX, odd2):
+
+    p1 = 1 / odd1
+    pX = 1 / oddX
+    p2 = 1 / odd2
+
+    total = p1 + pX + p2
+
+    prob1 = round((p1 / total) * 100)
+    probX = round((pX / total) * 100)
+    prob2 = 100 - prob1 - probX
+
+    #  score intelligent
+    if prob1 > 55:
+        score = "2-0"
+    elif prob2 > 55:
+        score = "0-2"
+    elif probX > 35:
+        score = "1-1"
+    else:
+        score = "2-1"
+
+    #  markets
+    expected_goals = (prob1 + prob2) / 2
+    over25 = "OVER 2.5 " if expected_goals > 50 else "UNDER 2.5 "
+    btts = "OUI " if prob1 > 40 and prob2 > 40 else "NON "
+
+    #  value
+    v1 = round((prob1/100 * odd1) - 1, 2)
+    vX = round((probX/100 * oddX) - 1, 2)
+    v2 = round((prob2/100 * odd2) - 1, 2)
+
+    return prob1, probX, prob2, v1, vX, v2, score, over25, btts
 for team1, team2, odd1, oddX, odd2 in matches:
 
     prob1, probX, prob2, v1, vX, v2 = analyse_pro(odd1, oddX, odd2)
