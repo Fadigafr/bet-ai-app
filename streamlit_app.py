@@ -81,20 +81,56 @@ def get_matches():
 # =========================
 # IA VALUE
 # =========================
-def analyse_value(odd1, oddX, odd2):
-    prob1 = np.random.randint(45, 70)
-    probX = np.random.randint(10, 25)
+def analyse_pro(odd1, oddX, odd2):
+
+    #  convertir cotes en probabilités implicites
+    p1 = 1 / odd1
+    pX = 1 / oddX
+    p2 = 1 / odd2
+
+    total = p1 + pX + p2
+
+    prob1 = int(p1 / total * 100)
+    probX = int(pX / total * 100)
     prob2 = 100 - prob1 - probX
 
-    p1 = prob1 / 100
-    pX = probX / 100
-    p2 = prob2 / 100
-
-    v1 = round((p1 * odd1) - 1, 2)
-    vX = round((pX * oddX) - 1, 2)
-    v2 = round((p2 * odd2) - 1, 2)
+    #  calcul value
+    v1 = round((prob1/100 * odd1) - 1, 2)
+    vX = round((probX/100 * oddX) - 1, 2)
+    v2 = round((prob2/100 * odd2) - 1, 2)
 
     return prob1, probX, prob2, v1, vX, v2
+
+def predict_score(prob1, probX, prob2):
+
+    if prob1 > 50:
+        return "2-0"
+    elif prob2 > 50:
+        return "0-2"
+    elif probX > 35:
+        return "1-1"
+    else:
+        return "2-1"
+
+def analyse_market(prob1, probX, prob2):
+
+    goals_expect = (prob1 + prob2) / 2
+
+    over25 = "OVER 2.5 " if goals_expect > 50 else "UNDER 2.5 "
+    btts = "OUI " if prob1 > 40 and prob2 > 40 else "NON "
+
+    return over25, btts
+
+def predict_scorer(team1):
+
+    scorers_db = {
+        "PSG": ["Mbappé"],
+        "Real Madrid": ["Vinicius"],
+        "Chelsea": ["Jackson"],
+        "Arsenal": ["Saka"]
+    }
+
+    return np.random.choice(scorers_db.get(team1, ["Top Player"]))
 
 def analyse_real(odd1, oddX, odd2):
 
@@ -183,8 +219,8 @@ btts_count = 0
 # =========================
 for team1, team2, odd1, oddX, odd2 in matches:
 
-    # IA VALUE
-    prob1, probX, prob2, v1, vX, v2 = analyse_value(odd1, oddX, odd2)
+    # IA PRO
+    prob1, probX, prob2, v1, vX, v2 = analyse_pro(odd1, oddX, odd2)
 
     values = {"1": v1, "X": vX, "2": v2}
     best = max(values, key=values.get)
@@ -192,13 +228,14 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
     color = "#22c55e" if best_value > 0 else "red"
 
-    # IA ADVANCED
-    over25, btts, score, scorer = analyse_advanced(team1, team2)
+    # SCORE
+    score = predict_score(prob1, probX, prob2)
 
-    if "OVER" in over25:
-        over_count += 1
-    if "OUI" in btts:
-        btts_count += 1
+    # OVER / BTTS
+    over25, btts = analyse_market(prob1, probX, prob2)
+
+    # BUTEUR
+    scorer = predict_scorer(team1)
 
     # UI
     html = f"""
@@ -215,10 +252,12 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
         <hr>
 
-        <p> Score : {score}</p>
+        <p> Score prédit : <b>{score}</b></p>
         <p> {over25}</p>
         <p> BTTS : {btts}</p>
         <p> Buteur : {scorer}</p>
+
+        <p style="color:#22c55e;"> IA FOOT PRO MAX</p>
 
     </div>
     """
