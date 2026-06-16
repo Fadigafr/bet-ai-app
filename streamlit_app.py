@@ -28,6 +28,11 @@ ax.set_title("Historique performance AI")
 
 st.pyplot(fig)
 
+values = {"1": v1, "X": vX, "2": v2}
+
+best = max(values, key=values.get)
+best_value = values[best]
+
 color = "#22c55e" if best_value > 0 else "red"
 
 html = f"""
