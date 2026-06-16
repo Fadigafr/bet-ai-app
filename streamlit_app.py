@@ -3,14 +3,51 @@ import requests
 import numpy as np
 import time
 import streamlit.components.v1 as components
+import matplotlib.pyplot as plt
+
+st.markdown("##  Dashboard BET AI PRO")
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Matchs analysés", len(matches))
+col2.metric("Top Value", f"{round(best_value,2)}")
+col3.metric("Signal", best)
+history = np.random.randint(-10, 20, 10)
+
+fig, ax = plt.subplots()
+ax.plot(history)
+ax.set_title("Historique performance AI")
+
+st.pyplot(fig)
+
+color = "#22c55e" if best_value > 0 else "red"
+
+html = f"""
+<div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
+
+    <h3> {team1} vs {team2}</h3>
+
+    <p> Probabilités</p>
+    <p>1: {prob1}% | X: {probX}% | 2: {prob2}%</p>
+
+    <p> Value :</p>
+    <p style="color:{color};font-size:18px;">
+        {best} ({best_value})
+    </p>
+
+    <p style="color:#22c55e;"> SIGNAL IA PREMIUM</p>
+
+</div>
+"""
+
+components.html(html, height=200)
 
 st.markdown("""
 <style>
 
 body {
     background: linear-gradient(135deg, #020617, #0f172a);
-    color: white;
-}
+    color: white;}
 
 /* TITRE */
 .title {
@@ -95,6 +132,7 @@ if "logged" not in st.session_state:
 
 if password == "VIP123":
     st.session_state.logged = True
+    
 
 # =========================
 # MATCH DATA (test)
@@ -145,6 +183,11 @@ def analyse_real(team1_stats, team2_stats):
         return "1"
     else:
         return "2"
+ confidence = max(prob1, probX, prob2)
+
+st.progress(confidence / 100)
+
+st.write(f" Confiance IA : {confidence}%")       
 
 # =========================
 # ANTI-SPAM
@@ -209,19 +252,18 @@ components.html(html, height=230)
     # =========================
     # TELEGRAM ALERT
     # =========================
-for team1, team2, odd1, oddX, odd2 in matches:
+def plot_probs(prob1, probX, prob2, team1, team2):
 
-    prob1, probX, prob2, v1, vX, v2 = analyse_value(odd1, oddX, odd2)
+    labels = [f"{team1}", "DRAW", f"{team2}"]
+    values = [prob1, probX, prob2]
 
-    html = f"..."
-    components.html(html, height=200)
-    match_id = f"{team1}-{team2}-{best}"
+    fig, ax = plt.subplots()
 
-    if (
-        best_value > 0.20
-        and match_id not in sent_alerts
-        and current_time - last_sent_time > COOLDOWN
-    ):
+    ax.bar(labels, values)
+    ax.set_ylim(0, 100)
+    ax.set_title("Probabilités (%)")
+
+    st.pyplot(fig)
 
         message = f"""
  VALUE BET
@@ -243,8 +285,10 @@ Cotes :
 # =========================
 # CONFIG
 # =========================
-st.set_page_config(page_title="BET AI PRO", layout="centered")
-
+st.set_page_config(
+    page_title="BET AI PRO",
+    layout="centered"
+)
 # TELEGRAM (remplace par tes vraies infos)
 TOKEN = "TON_TOKEN"
 CHAT_ID = "TON_CHAT_ID"
