@@ -3,15 +3,12 @@ import numpy as np
 import requests
 import streamlit.components.v1 as components
 
-#  INIT SESSION
+#  INIT SESSION PROPRE
 if "logged" not in st.session_state:
     st.session_state.logged = False
 
-if "user" not in st
-
 if "user" not in st.session_state:
     st.session_state.user = None
-
 
 st.set_page_config(page_title="BET AI PRO", layout="centered")
 
