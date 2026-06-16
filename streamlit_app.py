@@ -156,6 +156,15 @@ matches = [
     ("Chelsea", "Arsenal", 2.0, 3.2, 3.5),
 ]
 
+st.markdown("##  Dashboard BET AI PRO")
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Matchs analysés", len(matches))
+col2.metric("Top Value", "0.25")
+col3.metric("Signal", "1")
+]
+
 # =========================
 # FREE MODE
 # =========================
