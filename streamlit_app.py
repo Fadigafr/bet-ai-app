@@ -209,8 +209,14 @@ components.html(html, height=230)
     # =========================
     # TELEGRAM ALERT
     # =========================
+for team1, team2, odd1, oddX, odd2 in matches:
+
+    prob1, probX, prob2, v1, vX, v2 = analyse_value(odd1, oddX, odd2)
+
+    html = f"..."
+    components.html(html, height=200)
     match_id = f"{team1}-{team2}-{best}"
-    current_time = time.time()
+)
 
     if (
         best_value > 0.20
