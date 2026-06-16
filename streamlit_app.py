@@ -191,8 +191,8 @@ if st.button("Se connecter"):
 if not st.session_state.logged:
     st.warning(" Connecte-toi pour accéder à l'application")
     st.stop()
-    if st.session_state.logged:
-    if st.button("Se déconnecter"):
+if st.session_state.logged:
+if st.button("Se déconnecter"):
         st.session_state.logged = False
         st.experimental_rerun()
     
