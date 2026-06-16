@@ -4,6 +4,14 @@ import time
 import requests
 import streamlit.components.v1 as components
 
+# =========================
+# UTILISATEURS
+# =========================
+users = {
+    "admin": {"password": "VIP123", "vip": True},
+    "test": {"password": "1234", "vip": False}
+}
+
 st.set_page_config(page_title="BET AI PRO", layout="centered")
 
 # =========================
