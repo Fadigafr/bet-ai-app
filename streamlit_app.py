@@ -22,8 +22,8 @@ if "logged" not in st.session_state:
 
 st.markdown("##  BET AI PRO LOGIN")
 
-username = st.text_input("Utilisateur", key="user")
-password = st.text_input("Mot de passe", type="password", key="pass")
+username = st.text_input("Utilisateur", key="input_user")
+password = st.text_input("Mot de passe", type="password", key="input_pass")
 
 if st.button("Se connecter"):
     if username in users and users[username]["password"] == password:
