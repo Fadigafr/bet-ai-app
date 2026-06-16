@@ -216,6 +216,7 @@ for team1, team2, odd1, oddX, odd2 in matches:
             <span style="background:#eef2f7;padding:5px;">2: {prob2}% | {odd2}</span>
         </div>
 
+        st.markdown(""" CSS """, unsafe_allow_html=True)
 st.markdown("""
 <style>
 .card {
