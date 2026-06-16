@@ -281,6 +281,16 @@ standings = get_standings_safe()
 for team in standings[:10]:
     st.write(f"{team['position']} - {team['team']} ({team['points']} pts)")
 
+st.markdown("""
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    zoom: 0.9;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 # =========================
 # IA ADVANCED
 # =========================
