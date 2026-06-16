@@ -188,7 +188,7 @@ if st.button("Se connecter"):
         st.success(" Connexion réussie")
     else:
         st.error(" Mot de passe incorrect")
-    if not st.session_state.logged:
+if not st.session_state.logged:
     st.warning(" Connecte-toi pour accéder à l'application")
     st.stop()
     if st.session_state.logged:
