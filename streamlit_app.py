@@ -214,6 +214,77 @@ params = {
     "next": 5
 }
 
+def get_live_matches(api_key, league_id):def get_live_matches": league_id,
+        "live": "all"
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    live_matches = []
+
+    for match in data["response"]:
+        team1 = match["teams"]["home"]["name"]
+        team2 = match["teams"]["away"]["name"]
+
+        score1 = match["goals"]["home"]
+        score2 = match["goals"]["away"]
+
+        minute = match["fixture"]["status"]["elapsed"]
+
+        live_matches.append((team1, team2, score1, score2, minute))
+
+    return live_matches
+
+    url = "https://v3.football.api-sports.io/fixtures"
+
+    headers = {"x-apisports-key": api_key}
+
+    params = {
+st.markdown("##  MATCHS LIVE")
+
+live_data = get_live_matches("TA_CLE_API", league)
+
+for team1, team2, s1, s2, minute in live_data:
+
+    st.markdown(f"""
+     {team1} vs {team2}  
+     Score : {s1} - {s2}  
+     {minute}'
+    """)
+
+def get_standings(api_key, league_id):
+
+    url = "https://v3.football.api-sports.io/standings"
+
+    headers = {"x-apisports-key": api_key}
+
+    params = {
+        "league": league_id,
+        "season": 2023
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    table = []
+
+    for team in data["response"][0]["league"]["standings"][0]:
+        table.append({
+            "position": team["rank"],
+            "team": team["team"]["name"],
+            "points": team["points"]
+        })
+
+    return table
+
+st.markdown("##  CLASSEMENT")
+
+standings = get_standings("TA_CLE_API", league)
+
+for team in standings[:10]:
+    st.write(f"{team['position']} - {team['team']} ({team['points']} pts)")
+
 
 # =========================
 # IA ADVANCED
@@ -232,6 +303,45 @@ def analyse_advanced(team1, team2):
     scorer = np.random.choice(scorers)
 
     return over25, btts, score, scorer
+
+def analyse_super_pro(odd1, oddX, odd2):
+
+    #  probabilités implicites
+    p1 = 1 / odd1
+    pX = 1 / oddX
+    p2 = 1 / odd2
+
+    total = p1 + pX + p2
+
+    prob1 = round((p1 / total) * 100)
+    probX = round((pX / total) * 100)
+    prob2 = 100 - prob1 - probX
+
+    #  score
+    if prob1 > 55:
+        score = "2-0"
+    elif prob2 > 55:
+        score = "0-2"
+    elif probX > 35:
+        score = "1-1"
+    else:
+        score = "2-1"
+
+    #  over / under
+    expected_goals = (prob1 + prob2) / 2
+    over25 = "OVER 2.5 " if expected_goals > 50 else "UNDER 2.5 "
+
+    #  BTTS
+    btts = "OUI " if prob1 > 40 and prob2 > 40 else "NON "
+
+    #  value
+    v1 = round((prob1/100 * odd1) - 1, 2)
+    vX = round((probX/100 * oddX) - 1, 2)
+    v2 = round((prob2/100 * odd2) - 1, 2)
+
+    return prob1, probX, prob2, v1, vX, v2, score, over25, btts
+
+prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_super_pro(odd1, oddX, odd2)
 
 # =========================
 # TELEGRAM
@@ -284,30 +394,19 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
     # UI
     html = f"""
-    <div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
+<div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
 
-        <h3> {team1} vs {team2}</h3>
+    <h3> {team1} vs {team2}</h3>
 
-        <p> Probabilités</p>
-        <p>1: {prob1}% | X: {probX}% | 2: {prob2}%</p>
+    <p> {prob1}% | {probX}% | {prob2}%</p>
 
-        <p style="color:{color};font-size:18px;">
-             VALUE BET : {best} ({best_value})
-        </p>
+    <p> Score : <b>{score}</b></p>
+    <p> {over25}</p>
+    <p> {btts}</p>
 
-        <hr>
-
-        <p> Score prédit : <b>{score}</b></p>
-        <p> {over25}</p>
-        <p> BTTS : {btts}</p>
-        <p> Buteur : {scorer}</p>
-
-        <p style="color:#22c55e;"> IA FOOT PRO MAX</p>
-
-    </div>
-    """
-
-    components.html(html, height=280)
+</div>
+"""
+components.html(html, height=240)
 
     # TELEGRAM
     match_id = f"{team1}-{team2}-{best}"
