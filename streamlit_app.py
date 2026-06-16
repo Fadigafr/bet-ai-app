@@ -214,7 +214,16 @@ params = {
     "next": 5
 }
 
-def get_live_matches(api_key, league_id):def get_live_matches": league_id,
+def get_live_matches(api_key, league_id):
+
+    url = "https://v3.football.api-sports.io/fixtures"
+
+    headers = {
+        "x-apisports-key": api_key
+    }
+
+    params = {
+        "league": league_id,
         "live": "all"
     }
 
