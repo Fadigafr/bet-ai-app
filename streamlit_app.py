@@ -28,12 +28,19 @@ ax.set_title("Historique performance AI")
 
 st.pyplot(fig)
 
-values = {"1": v1, "X": vX, "2": v2}
+for team1, team2, odd1, oddX, odd2 in matches:
 
-best = max(values, key=values.get)
-best_value = values[best]
+    #  calcul IA
+    prob1, probX, prob2, v1, vX, v2 = analyse_value(odd1, oddX, odd2)
 
-color = "#22c55e" if best_value > 0 else "red"
+    #  calcul value
+    values = {"1": v1, "X": vX, "2": v2}
+
+    best = max(values, key=values.get)
+    best_value = values[best]
+
+    color = "#22c55e" if best_value > 0 else "red"
+
 
 html = f"""
 <div style="background:#020617;padding:20px;border-radius:15px;margin-bottom:15px;color:white;">
