@@ -68,6 +68,11 @@ COOLDOWN = 300
 # UI HEADER
 # =========================
 st.markdown("##  BET AI PRO")
+st.markdown("""
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+""", unsafe_allow_html=True)
+
 
 # =========================
 # LOOP MATCH
