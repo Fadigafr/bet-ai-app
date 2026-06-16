@@ -29,6 +29,38 @@ if not st.session_state.logged:
 # =========================
 # MATCH DATA
 # =========================
+def get_matches():
+
+    url = "https://v3.football.api-sports.io/fixtures"
+
+    headers = {
+        "x-apisports-key": "TA_CLE_API"
+    }
+
+    params = {
+        "league": 39,
+        "season": 2023,
+        "next": 5
+    }
+
+    response = requests.get(url, headers=headers, params=params)
+    data = response.json()
+
+    matches = []
+
+    for match in data["response"]:
+        team1 = match["teams"]["home"]["name"]
+        team2 = match["teams"]["away"]["name"]
+
+        # simulation odds
+        odd1 = round(np.random.uniform(1.5, 2.5), 2)
+        oddX = round(np.random.uniform(2.5, 3.5), 2)
+        odd2 = round(np.random.uniform(2.0, 4.0), 2)
+
+        matches.append((team1, team2, odd1, oddX, odd2))
+
+    return matches
+
 matches = get_matches()
 
 def get_team_stats(team_id):
