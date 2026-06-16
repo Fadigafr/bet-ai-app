@@ -265,8 +265,9 @@ def plot_probs(prob1, probX, prob2, team1, team2):
 
     st.pyplot(fig)
 
-        message = f"""
- VALUE BET
+    message = f"""
+ 
+VALUE BET
 
 {team1} vs {team2}
 
