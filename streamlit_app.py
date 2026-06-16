@@ -232,7 +232,6 @@ message = f"""
  VALUE BET
 
 {team1} vs {team2}
-
 Choix : {best}
 Value : {best_value}
 """
