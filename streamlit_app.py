@@ -5,7 +5,11 @@ import time
 import streamlit.components.v1 as components
 
 st.text_input(" Mot de passe VIP", type="password")
+password = st.text_input(" Mot de passe VIP", type="password", key="vip_password")
 
+username = st.text_input("Utilisateur", key="username")
+
+email = st.text_input("Email", key="email")
 if "logged" not in st.session_state:
     st.session_state.logged = False
 
