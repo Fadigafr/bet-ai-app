@@ -249,7 +249,11 @@ def get_live_matches(api_key, league_id):
 
     headers = {"x-apisports-key": api_key}
 
-    params = {
+        params = {
+    "league": league_id,
+    "live": "all"
+}
+    
 st.markdown("##  MATCHS LIVE")
 
 live_data = get_live_matches("TA_CLE_API", league)
