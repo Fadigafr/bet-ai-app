@@ -160,8 +160,8 @@ competitions = {
 if selected_country is None:
     all_competitions = {}
 
-    for comp in competitions.values():
-        all_competitions.update(comp)
+for comp in competitions.values():
+    all_competitions.update(comp)
 
     filtered_comp = all_competitions
 
@@ -176,8 +176,8 @@ competition_name = st.selectbox(
 competition_id = filtered_comp[competition_name]
     all_competitions = {}
 
-    for c in competitions.values():
-        all_competitions.update(c)
+for c in competitions.values():
+    all_competitions.update(c)
 
     filtered_comp = all_competitions
 
