@@ -127,8 +127,6 @@ else:
     vX = round((probX/100 * oddX) - 1, 2)
     v2 = round((prob2/100 * odd2) - 1, 2)
 
-    return prob1, probX, prob2, v1, vX, v2, score, over25, btts
-
 # =========================
 # TELEGRAM
 # =========================
@@ -237,3 +235,44 @@ if goals_home > 0 and goals_away > 0:
     btts = "OUI "
 else:
     btts = "NON "
+
+def analyse_super_pro(odd1, oddX, odd2):
+
+    p1 = 1 / odd1
+    pX = 1 / oddX
+    p2 = 1 / odd2
+
+    total = p1 + pX + p2
+
+    prob1 = round((p1 / total) * 100)
+    probX = round((pX / total) * 100)
+    prob2 = 100 - prob1 - probX
+
+    #  SCORE
+    if prob1 > 55:
+        score = "2-0"
+    elif prob2 > 55:
+        score = "0-2"
+    elif probX > 35:
+        score = "1-1"
+    else:
+        score = "2-1"
+
+    #  BTTS CORRIGÉ
+    goals_home = int(score.split("-")[0])
+    goals_away = int(score.split("-")[1])
+
+    if goals_home > 0 and goals_away > 0:
+        btts = "OUI "
+    else:
+        btts = "NON "
+
+    #  OVER/UNDER
+    over25 = "OVER 2.5 " if (prob1 + prob2) > 60 else "UNDER 2.5 "
+
+    #  VALUE
+    v1 = round((prob1/100 * odd1) - 1, 2)
+    vX = round((probX/100 * oddX) - 1, 2)
+    v2 = round((prob2/100 * odd2) - 1, 2)
+
+    return prob1, probX, prob2, v1, vX, v2, score, over25, btts
