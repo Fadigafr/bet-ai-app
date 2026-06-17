@@ -188,8 +188,8 @@ for match in matches:
     values = {"1": v1, "X": vX, "2": v2}
 
 #  d'abord calculer best
-best = max(values, key=values.get)
-best_value = values[best]
+    best = max(values, key=values.get)
+    best_value = values[best]
 
 #  ensuite utiliser best
     match_id = f"{team1}-{team2}-{best}"
