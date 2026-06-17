@@ -58,6 +58,165 @@ def search_teams(search_text):
 st.set_page_config(page_title="BET AI PRO", layout="centered")
 
 # =========================
+# STYLE API FOOTBALL
+}</div># =========================
+        <div class="api-info">🏆 Compétition : {league}</div>
+        <span class="api-badge">{card_type.upper()}</span>
+    </div>
+    """, unsafe_allow_html=True)
+st.markdown("""
+<style>
+.api-card {
+    background: linear-gradient(135deg, #020617, #0f172a);
+    padding: 18px;
+    border-radius: 16px;
+    margin-bottom: 14px;
+    color: white;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    box-shadow: 0 0 18px rgba(34, 197, 94, 0.12);
+}
+
+.api-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #22c55e;
+    margin-bottom: 8px;
+}
+
+.api-info {
+    font-size: 14px;
+    color: #cbd5e1;
+    margin-bottom: 4px;
+}
+
+.api-badge {
+    display: inline-block;
+    background: #22c55e;
+    color: #020617;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
+    margin-top: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+# =========================
+# RAPIDAPI FOOTBALL
+# =========================
+RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY", "")
+RAPIDAPI_HOST = "free-api-live-football-data.p.rapidapi.com"
+
+
+def rapidapi_get(endpoint, params):
+    url = f"https://free-api-live-football-data.p.rapidapi.com/{endpoint}"
+
+    headers = {
+        "x-rapidapi-key": RAPIDAPI_KEY,
+        "x-rapidapi-host": RAPIDAPI_HOST,
+        "Content-Type": "application/json"
+    }
+
+    try:
+        response = requests.get(
+            url,
+            headers=headers,
+            params=params,
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            st.error(f"Erreur API : {response.status_code}")
+            st.code(response.text)
+            return []
+
+        return response.json()
+
+    except Exception as e:
+        st.error(f"Erreur connexion API : {e}")
+        return []
+
+
+def search_players(search_text):
+    return rapidapi_get(
+        "football-players-search",
+        {"search": search_text}
+    )
+
+
+def search_teams(search_text):
+    return rapidapi_get(
+        "football-teams-search",
+        {"search": search_text}
+    )
+
+
+def extract_results(api_data):
+    if isinstance(api_data, dict):
+        if "response" in api_data:
+            return api_data["response"]
+        if "data" in api_data:
+            return api_data["data"]
+        if "results" in api_data:
+            return api_data["results"]
+        return [api_data]
+
+    if isinstance(api_data, list):
+        return api_data
+
+    return []
+
+
+def display_card(item, card_type="player"):
+    if not isinstance(item, dict):
+        st.markdown(f"""
+        <div class="api-card">
+            <div class="api-title">{item}</div>
+            <span class="api-badge">{card_type.upper()}</span>
+        </div>
+        """, unsafe_allow_html=True)
+        return
+
+    name = (
+        item.get("name")
+        or item.get("player_name")
+        or item.get("team_name")
+        or item.get("title")
+        or item.get("full_name")
+        or "Nom indisponible"
+    )
+
+    team = (
+        item.get("team")
+        or item.get("club")
+        or item.get("team_name")
+        or item.get("current_team")
+        or "Non disponible"
+    )
+
+    country = (
+        item.get("country")
+        or item.get("nationality")
+        or item.get("country_name")
+        or "Non disponible"
+    )
+
+    league = (
+        item.get("league")
+        or item.get("competition")
+        or item.get("league_name")
+        or "Non disponible"
+    )
+
+    st.markdown(f"""
+    <div class="api-card">
+        <div class="api-title">⚽ {name}</div>
+        <div class="api-info">🏟️ Équipe / Club : {team}</div>
+
+
+# =========================
 # SESSION STATE
 # =========================
 if "logged" not in st.session_state:
