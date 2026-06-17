@@ -20,13 +20,23 @@ if "history" not in st.session_state:
 if "results" not in st.session_state:
     st.session_state.results = []
 
+if "bankroll" not in st.session_state:
+    st.session_state.bankroll = 100  #  capital initial
+
+if "history_gain" not in st.session_state:
+    st.session_state.history_gain = []
+
 # =========================
 # USERS
 # =========================
 users = {
     "admin": {"password": "VIP123", "vip": True},
     "user": {"password": "1234", "vip": False}
+
 }
+
+stake = st.number_input("💸 Mise (€)", min_value=1, max_value=100, value=10)
+
 
 # =========================
 # LOGIN
@@ -186,6 +196,8 @@ if total > 0:
     col2.metric(" Perdus", losses)
     col3.metric(" Winrate", f"{winrate}%")
 
+
+
 # =========================
 # TELEGRAM
 # =========================
@@ -204,6 +216,13 @@ def send_telegram(message):
 # DASHBOARD
 # =========================
 st.markdown(f"##  {competition_name}")
+
+st.markdown("##  BANKROLL")
+
+col1, col2 = st.columns(2)
+
+col1.metric(" Capital actuel", f"{round(st.session_state.bankroll,2)} €")
+col2.metric(" Profit", f"{round(st.session_state.bankroll - 100,2)} €")
 
 # =========================
 # LOOP MATCHES
@@ -272,6 +291,25 @@ for team1, team2, odd1, oddX, odd2 in matches:
 
         send_telegram(message)
         sent_alerts.add(match_id)
+
+#  simulation résultat (remplace plus tard par vrai résultat API)
+result = np.random.choice(["WIN", "LOSS"])
+
+#  cote simple simulée (1.5 → 2.5)
+odds = round(np.random.uniform(1.5, 2.5), 2)
+
+gain = 0
+
+if result == "WIN":
+    gain = stake * (odds - 1)
+    st.session_state.bankroll += gain
+else:
+    gain = -stake
+    st.session_state.bankroll += gain
+
+#  historique
+st.session_state.history_gain.append(st.session_state.bankroll)
+
 
 # =========================
 # ANALYTICS
@@ -360,5 +398,23 @@ if best_value > 0.20:
 
     send_telegram(message)
     st.session_state.combo.append((team1, team2, best))
+
+if len(st.session_state.history_gain) > 2:
+    st.line_chart(st.session_state.history_gain)
+
+st.markdown("## 🔗 COMBINÉ PRO")
+
+combo = st.session_state.combo[:5]
+
+total_odds = 1
+
+for team1, team2, bet in combo:
+    odd = round(np.random.uniform(1.3, 2.2), 2)
+    total_odds *= odd
+    st.write(f"✅ {team1} vs {team2} → {bet} ({odd})")
+
+if len(combo) > 0:
+    potential_gain = stake * total_odds
+    st.success(f"💰 Gain potentiel: {round(potential_gain,2)} €")
 
    
