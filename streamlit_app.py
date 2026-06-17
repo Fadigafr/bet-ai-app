@@ -89,53 +89,51 @@ matches = get_matches()
 # IA PRO
 # =========================
 def analyse_ultra_pro(odd1, oddX, odd2):
-def analyse_ultra probX = pX / total
+
+    #  PROBAS BOOKMAKER
+    p1 = 1 / odd1
+    pX = 1 / oddX
+    p2 = 1 / odd2
+
+    total = p1 + pX + p2
+
+    prob1 = p1 / total
+    probX = pX / total
     prob2 = p2 / total
 
-    # =========================
-    #  FORME ÉQUIPE (SIMULATION)
-    # =========================
+    #  FORME (simulation)
     form_home = np.random.uniform(0.8, 1.2)
     form_away = np.random.uniform(0.8, 1.2)
 
-    # =========================
-    #  xG (EXPECTED GOALS SIMULÉ)
-    # =========================
+    #  xG
     xg_home = (prob1 * 2.2) * form_home
     xg_away = (prob2 * 2.0) * form_away
 
-    # =========================
-    #  BUTS RÉALISTES (distribution)
-    # =========================
-    goals_home = int(round(np.random.poisson(xg_home)))
-    goals_away = int(round(np.random.poisson(xg_away)))
+    #  BUTS
+    goals_home = int(np.random.poisson(xg_home))
+    goals_away = int(np.random.poisson(xg_away))
 
-    goals_home = max(0, goals_home)
-    goals_away = max(0, goals_away)
+    goals_home = max(goals_home, 0)
+    goals_away = max(goals_away, 0)
 
     score = f"{goals_home}-{goals_away}"
 
-    # =========================
-    #  BTTS (BOTH TEAMS SCORE)
-    # =========================
-    btts = "OUI " if goals_home > 0 and goals_away > 0 else "NON "
+    #  BTTS
+    if goals_home > 0 and goals_away > 0:
+        btts = "OUI "
+    else:
+        btts = "NON "
 
-    # =========================
-    #  OVER / UNDER 2.5
-    # =========================
+    #  OVER/UNDER
     total_goals = goals_home + goals_away
     over25 = "OVER 2.5 " if total_goals >= 3 else "UNDER 2.5 "
 
-    # =========================
-    #  PROBAS POUR AFFICHAGE
-    # =========================
+    #  PROBAS %
     prob1 = int(prob1 * 100)
     probX = int(probX * 100)
     prob2 = 100 - prob1 - probX
 
-    # =========================
-    #  VALUE BET
-    # =========================
+    #  VALUE
     v1 = round((prob1/100 * odd1) - 1, 2)
     vX = round((probX/100 * oddX) - 1, 2)
     v2 = round((prob2/100 * odd2) - 1, 2)
