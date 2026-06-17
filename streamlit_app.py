@@ -284,52 +284,58 @@ for match in matches:
 
 for team1, team2, odd1, oddX, odd2 in matches:
 
+    # ✅ IA
     prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_ultra_pro(
         odd1, oddX, odd2
     )
 
+    # ✅ VALUE BET
     values = {"1": v1, "X": vX, "2": v2}
     best = max(values, key=values.get)
     best_value = values[best]
 
-    # ✅ CORRECT
+    # ✅ BANKROLL (mise intelligente)
     stake = calculate_stake(st.session_state.bankroll, best_value)
 
+    # ✅ IGNORER mauvais bets
     if stake == 0:
         continue
 
-        message = f"""
-  BET AI PRO
+    # ✅ simulation cote
+    odd_simulated = round(np.random.uniform(1.5, 2.2), 2)
 
-  {team1} vs {team2}
-  Choix : {best}
-  Value : {best_value}
-"""
+    # ✅ simulation résultat intelligent
+    win_prob = 0.60 if best_value > 0.25 else 0.45
+    result = np.random.choice(["WIN", "LOSS"], p=[win_prob, 1 - win_prob])
 
-        send_telegram(message)
-        sent_alerts.add(match_id)
+    # ✅ calcul gain/perte
+    if result == "WIN":
+        gain = stake * (odd_simulated - 1)
+    else:
+        gain = -stake
 
-#  simulation résultat (remplace plus tard par vrai résultat API)
-result = np.random.choice(["WIN", "LOSS"])
-
-#  cote simple simulée (1.5 → 2.5)
-odds = round(np.random.uniform(1.5, 2.5), 2)
-
-gain = 0
-
-if result == "WIN":
-    gain = stake * (odds - 1)
+    # ✅ mise à jour bankroll
     st.session_state.bankroll += gain
-else:
-    gain = -stake
-    st.session_state.bankroll += gain
+    st.session_state.history_gain.append(st.session_state.bankroll)
 
-#  historique
-st.session_state.history_gain.append(st.session_state.bankroll)
+    # ✅ affichage
+    st.write(f"⚽ {team1} vs {team2}")
+    st.write(f"✅ Choix: {best} | 💰 Value: {round(best_value,2)}")
+    st.write(f"💸 Mise: {round(stake,2)}€ | 🎯 Résultat: {result}")
+    st.write(f"📊 Gain: {round(gain,2)}€")
+    st.write("---")
 
-stake = calculate_stake(st.session_state.bankroll, best_value)stake = calculate_stake(st.session_state.bank si stake = 0
-if stake == 0:
-    continue
+st.markdown("## 💰 BANKROLL")
+
+profit = st.session_state.bankroll - 100
+
+col1, col2 = st.columns(2)
+
+col1.metric("💳 Capital", f"{round(st.session_state.bankroll,2)} €")
+col2.metric("📈 Profit", f"{round(profit,2)} €")
+
+if len(st.session_state.history_gain) > 2:
+    st.line_chart(st.session_state.history_gain)
 
 # =========================
 # ANALYTICS
