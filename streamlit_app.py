@@ -341,5 +341,17 @@ def analyse_real_pro(odd1, oddX, odd2):
 
 numeric = [1 if r == "WIN" else 0 for r in st.session_state.results]
 
-if len(numeric) > 2:
+if best_value > 0.20:
+
+    message = f"""
+  BET AI PRO
+
+  {team1} vs {team2}
+  Choix : {best}
+  Value : {best_value}
+"""
+
+    send_telegram(message)
+    st.session_state.combo.append((team1, team2, best))
+
    
