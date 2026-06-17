@@ -157,7 +157,23 @@ competitions = {
     }
 }
 
-if selected_country is None:if selected_country is None compétitions
+if selected_country is None:
+    # ✅ toutes les compétitions
+    filtered_comp = {}
+
+    for comp in competitions.values():
+        filtered_comp.update(comp)
+
+else:
+    # ✅ compétitions du pays choisi
+    filtered_comp = competitions.get(selected_country, {})
+
+competition_name = st.selectbox(
+    "🏆 Choisir une compétition",
+    list(filtered_comp.keys())
+)
+
+competition_id = filtered_comp[competition_name]
     all_competitions = {}
 
     for c in competitions.values():
