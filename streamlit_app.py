@@ -185,7 +185,7 @@ for match in matches:
 
     components.html(html, height=200)
 
- values = {"1": v1, "X": vX, "2": v2}
+   values = {"1": v1, "X": vX, "2": v2}
 
 #  d'abord calculer best
 best = max(values, key=values.get)
