@@ -60,10 +60,6 @@ st.set_page_config(page_title="BET AI PRO", layout="centered")
 # =========================
 # STYLE API FOOTBALL
 # =========================
-        <div class="api-info">🏆 Compétition : {league}</div>
-        <span class="api-badge">{card_type.upper()}</span>
-    </div>
-    """, unsafe_allow_html=True)
 st.markdown("""
 <style>
 .api-card {
@@ -102,6 +98,57 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
+def display_card(item, card_type="joueur"):
+    if not isinstance(item, dict):
+        st.markdown(f"""
+        <div class="api-card">
+            <div class="api-title">{item}</div>
+            <span class="api-badge">{card_type.upper()}</span>
+        </div>
+        """, unsafe_allow_html=True)
+        return
+
+    name = (
+        item.get("name")
+        or item.get("player_name")
+        or item.get("team_name")
+        or item.get("title")
+        or item.get("full_name")
+        or "Nom indisponible"
+    )
+
+    team = (
+        item.get("team")
+        or item.get("club")
+        or item.get("team_name")
+        or item.get("current_team")
+        or "Non disponible"
+    )
+
+    country = (
+        item.get("country")
+        or item.get("nationality")
+        or item.get("country_name")
+        or "Non disponible"
+    )
+
+    league = (
+        item.get("league")
+        or item.get("competition")
+        or item.get("league_name")
+        or "Non disponible"
+    )
+
+    st.markdown(f"""
+    <div class="api-card">
+        <div class="api-title">⚽ {name}</div>
+        <div class="api-info">🏟️ Équipe / Club : {team}</div>
+        <div class="api-info">🌍 Pays : {country}</div>
+        <div class="api-info">🏆 Compétition : {league}</div>
+        <span class="api-badge">{card_type.upper()}</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 # =========================
 # RAPIDAPI FOOTBALL
