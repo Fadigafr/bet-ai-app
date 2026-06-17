@@ -8,7 +8,8 @@ RAPIDAPI_HOST = "free-api-live-football-data.p.rapidapi.com"
 import requests
 import streamlit as st
 
-RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY équipes : {response.status_code}")RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY", "")
+RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY équipes : {response.status_code}")
+RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY", "")
             st.write(response.text)
             return []
 
