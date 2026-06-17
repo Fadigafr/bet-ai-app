@@ -85,6 +85,9 @@ def get_matches():
 
 matches = get_matches()
 
+st.write(matches)
+st.write("OK LOOP")
+
 # =========================
 # IA PRO
 # =========================
@@ -192,44 +195,27 @@ st.markdown(f"##  {competition_name}")
 # =========================
 # LOOP MATCHES
 # =========================
-for team1, team2, odd1, oddX, odd2 in matches:
+for match in matches:
 
-    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_real_pro(
+    #  sécurité
+    if len(match) != 5:
+        continue
+
+    team1, team2, odd1, oddX, odd2 = match
+
+    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_ultra_pro(
         odd1, oddX, odd2
     )
 
-    values = {"1": v1, "X": vX, "2": v2}
-    best = max(values, key=values.get)
-    best_value = values[best]
-
-    st.session_state.history.append(best_value)
-
-    color = "#22c55e" if best_value > 0 else "red"
-
     html = f"""
-    <div style="
-    background:#020617;
-    padding:20px;
-    border-radius:15px;
-    margin-bottom:15px;
-    color:white">
-
-    <h3> {team1} vs {team2}</h3>
-
-    <p> {prob1}% | {probX}% | {prob2}%</p>
-
-    <p style="color:{color};font-size:18px;">
-      VALUE BET : {best} ({best_value})
-    </p>
-
-    <p> Score : {score}</p>
-    <p> {over25}</p>
-    <p> {btts}</p>
-
+    <div>
+        <h3>{team1} vs {team2}</h3>
+        <p>{score} | {over25} | {btts}</p>
     </div>
     """
 
-    components.html(html, height=260)
+    components.html(html, height=200)
+
 
     # TELEGRAM ALERT
     match_id = f"{team1}-{team2}-{best}"
