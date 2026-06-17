@@ -2,36 +2,20 @@ import streamlit as st
 import numpy as np
 import requests
 
+# =========================
+# RAPIDAPI FOOTBALL
+# =========================
 RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY", "")
 RAPIDAPI_HOST = "free-api-live-football-data.p.rapidapi.com"
 
-import requests
-import streamlit as st
 
-RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY équipes : {response.status_code}")
-RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY", "")
-               st.write(response.text)
-            return []
-
-        return response.json()
-
-    except Exception as e:
-        st.error(f"Erreur connexion API équipes : {e}")
-        return []
-RAPIDAPI_HOST = "free-api-live-football-data.p.rapidapi.com"
-
-
-def search_teams(search_text):
-    url = "https://free-api-live-football-data.p.rapidapi.com/football-teams-search"
+def rapidapi_get(endpoint, params):
+    url = f"https://free-api-live-football-data.p.rapidapi.com/{endpoint}"
 
     headers = {
         "x-rapidapi-key": RAPIDAPI_KEY,
         "x-rapidapi-host": RAPIDAPI_HOST,
         "Content-Type": "application/json"
-    }
-
-    params = {
-        "search": search_text
     }
 
     try:
@@ -43,15 +27,29 @@ def search_teams(search_text):
         )
 
         if response.status_code != 200:
-            st.error(f"Erreur API équipes : {response.status_code}")
+            st.error(f"Erreur API : {response.status_code}")
             st.write(response.text)
             return []
 
         return response.json()
 
     except Exception as e:
-        st.error(f"Erreur connexion API équipes : {e}")
+        st.error(f"Erreur connexion API : {e}")
         return []
+
+
+def search_players(search_text):
+    return rapidapi_get(
+        "football-players-search",
+        {"search": search_text}
+    )
+
+
+def search_teams(search_text):
+    return rapidapi_get(
+        "football-teams-search",
+        {"search": search_text}
+    )
 
 
 # =========================
