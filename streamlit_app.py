@@ -2,6 +2,76 @@ import streamlit as st
 import numpy as np
 import requests
 
+RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY", "")
+RAPIDAPI_HOST = "free-api-live-football-data.p.rapidapi.com"
+
+import requests
+import streamlit as st
+
+RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY équipes : {response.status_code}")RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY", "")
+            st.write(response.text)
+            return []
+
+        return response.json()
+
+    except Exception as e:
+        st.error(f"Erreur connexion API équipes : {e}")
+        return []
+RAPIDAPI_HOST = "free-api-live-football-data.p.rapidapi.com"
+
+
+def search_teams(search_text):
+    url = "https://free-api-live-football-data.p.rapidapi.com/football-teams-search"
+
+    headers = {
+        "x-rapidapi-key": RAPIDAPI_KEY,
+        "x-rapidapi-host": RAPIDAPI_HOST,
+        "Content-Type": "application/json"
+    }
+
+    params = {
+        "search": search_text
+    }
+
+    try:
+        response = requests.get(
+            url,
+            headers=headers,
+            params=params,
+            timeout=15
+        )
+
+        if response.status_code != 200:
+
+def search_players(search_text):
+    url = "https://free-api-live-football-data.p.rapidapi.com/football-players-search"
+
+    headers = {
+        "x-rapidapi-key": RAPIDAPI_KEY,
+        "x-rapidapi-host": RAPIDAPI_HOST,
+        "Content-Type": "application/json"
+    }
+
+    params = {
+        "search": search_text
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=15)
+
+        if response.status_code != 200:
+            st.error(f"Erreur API : {response.status_code}")
+            return []
+
+        data = response.json()
+
+        return data
+
+    except Exception as e:
+        st.error(f"Erreur connexion API : {e}")
+        return []
+
+
 # =========================
 # CONFIG
 # =========================
@@ -157,6 +227,22 @@ season = st.selectbox(
 )
 
 st.markdown(f"## {competition_name} - Saison {season}")
+
+if st.button("Rechercher équipe", key="search_team_button"):
+    teams_data = search_teams(team_search)
+
+    st.markdown("### Résultats équipes")
+
+    if isinstance(teams_data, dict):
+        results = teams_data.get("response", teams_data.get("data", []))
+    else:
+        results = teams_data
+
+    if not results:
+        st.warning("Aucune équipe trouvée.")
+    else:
+        for team in results[:10]:
+            st.write(team)
 
 # =========================
 # API FUNCTIONS
@@ -369,6 +455,20 @@ for team1, team2, odd1, oddX, odd2 in matches:
     st.write(f"🤝 Les deux équipes marquent : {btts}")
     st.write(f"💸 Mise conseillée : {round(stake, 2)} €")
 
+st.markdown("## 🔎 Recherche équipe football")
+
+team_search = st.text_input(
+    "Entrer le nom de l'équipe",
+    value="chelsea",
+    key="team_search_input"
+)
+
+if st.button("Rechercher équipe", key="search_team_button"):
+    teams_data = search_teams(team_search)
+
+    st.markdown("### Résultats équipes")
+    st.write(teams_data)
+    
 # =========================
 # COMBINÉ
 # =========================
