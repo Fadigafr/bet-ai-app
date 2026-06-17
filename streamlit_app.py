@@ -5,6 +5,30 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="BET AI PRO", layout="centered")
 
+def get_teams(api_key, competition_id):
+
+    url = "https://v3.football.api-sports.io/teams"
+
+    headers = {
+        "x-apisports-key": api_key
+    }
+
+    params = {
+        "league": competition_id,
+        "season": 2024
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    teams = []
+
+    if "response" in data:
+        for t in data["response"]:
+            teams.append(t["team"]["name"])
+
+    return teams
+
 # =========================
 # INIT SESSION (OBLIGATOIRE)
 # =========================
