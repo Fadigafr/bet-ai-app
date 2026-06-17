@@ -88,41 +88,65 @@ matches = get_matches()
 # =========================
 # IA PRO
 # =========================
-def analyse_super_pro(odd1, oddX, odd2):
+def analyse_real_pro(odd1, oddX, odd2):
 
+    #  probas implicites (bookmaker)
     p1 = 1 / odd1
     pX = 1 / oddX
     p2 = 1 / odd2
 
     total = p1 + pX + p2
 
-    prob1 = round((p1 / total) * 100)
-    probX = round((pX / total) * 100)
-    prob2 = 100 - prob1 - probX
+    prob1 = (p1 / total)
+    probX = (pX / total)
+    prob2 = (p2 / total)
 
-    #  SCORE
-    if prob1 > 55:
-        score = "2-0"
-    elif prob2 > 55:
-        score = "0-2"
-    elif probX > 35:
-        score = "1-1"
-    else:
-        score = "2-1"
+    # =========================
+    #  SIMULATION BUTS RÉALISTES
+    # =========================
 
-    #  BTTS basé sur le score (CORRECT)
-    goals_home = int(score.split("-")[0])
-    goals_away = int(score.split("-")[1])
+    # moyenne buts (pondérée par proba)
+    home_goals_avg = 1.2 + (prob1 * 1.5)
+    away_goals_avg = 1.0 + (prob2 * 1.3)
 
+    # génération buts
+    goals_home = int(round(np.random.normal(home_goals_avg, 0.8)))
+    goals_away = int(round(np.random.normal(away_goals_avg, 0.8)))
+
+    #  éviter négatif
+    goals_home = max(goals_home, 0)
+    goals_away = max(goals_away, 0)
+
+    score = f"{goals_home}-{goals_away}"
+
+    # =========================
+    #  BTTS (LOGIQUE RÉELLE)
+    # =========================
     if goals_home > 0 and goals_away > 0:
         btts = "OUI "
     else:
         btts = "NON "
 
+    # =========================
     #  OVER / UNDER
-    over25 = "OVER 2.5 " if (prob1 + prob2) > 60 else "UNDER 2.5 "
+    # =========================
+    total_goals = goals_home + goals_away
 
+    if total_goals >= 3:
+        over25 = "OVER 2.5 "
+    else:
+        over25 = "UNDER 2.5 "
+
+    # =========================
+    #  PROBAS AFFICHAGE
+    # =========================
+    prob1 = int(prob1 * 100)
+    probX = int(probX * 100)
+    prob2 = 100 - prob1 - probX
+
+    # =========================
     #  VALUE
+    # =========================
     v1 = round((prob1/100 * odd1) - 1, 2)
     vX = round((probX/100 * oddX) - 1, 2)
     v2 = round((prob2/100 * odd2) - 1, 2)
@@ -153,7 +177,7 @@ st.markdown(f"##  {competition_name}")
 # =========================
 for team1, team2, odd1, oddX, odd2 in matches:
 
-    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_super_pro(
+    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_real_pro(
         odd1, oddX, odd2
     )
 
@@ -238,7 +262,7 @@ if goals_home > 0 and goals_away > 0:
 else:
     btts = "NON "
 
-def analyse_super_pro(odd1, oddX, odd2):
+def analyse_real_pro(odd1, oddX, odd2):
 
     p1 = 1 / odd1
     pX = 1 / oddX
