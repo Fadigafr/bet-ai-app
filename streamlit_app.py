@@ -633,6 +633,59 @@ if st.button("Rechercher équipe", key="search_team_button"):
 
     st.markdown("### Résultats équipes")
     st.write(teams_data)
+
+# =========================
+# RECHERCHE API FOOTBALL
+# =========================
+st.markdown("## 🔎 Recherche Football Pro")
+
+tab_players, tab_teams = st.tabs(["👤 Joueurs", "🏟️ Équipes"])
+
+
+with tab_players:
+    st.markdown("### 👤 Recherche joueur")
+
+    player_search = st.text_input(
+        "Nom du joueur",
+        value="messi",
+        key="player_search_input"
+    )
+
+    if st.button("🔍 Rechercher joueur", key="search_player_button"):
+        if not RAPIDAPI_KEY:
+            st.warning("Ajoute ta clé RAPIDAPI_KEY dans les secrets Streamlit.")
+        else:
+            players_data = search_players(player_search)
+            players = extract_results(players_data)
+
+            if not players:
+                st.warning("Aucun joueur trouvé.")
+            else:
+                for player in players[:10]:
+                    display_card(player, card_type="joueur")
+
+
+with tab_teams:
+    st.markdown("### 🏟️ Recherche équipe")
+
+    team_search = st.text_input(
+        "Nom de l'équipe",
+        value="chelsea",
+        key="team_search_input"
+    )
+
+    if st.button("🔍 Rechercher équipe", key="search_team_button"):
+        if not RAPIDAPI_KEY:
+            st.warning("Ajoute ta clé RAPIDAPI_KEY dans les secrets Streamlit.")
+        else:
+            teams_data = search_teams(team_search)
+            teams = extract_results(teams_data)
+
+            if not teams:
+                st.warning("Aucune équipe trouvée.")
+            else:
+                for team in teams[:10]:
+                    display_card(team, card_type="équipe")
     
 # =========================
 # COMBINÉ
