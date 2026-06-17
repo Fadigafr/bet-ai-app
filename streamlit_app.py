@@ -93,9 +93,6 @@ st.write("OK LOOP")
 # =========================
 def analyse_ultra_pro(odd1, oddX, odd2):
 
-    # =========================
-    #  PROBABILITÉS BOOKMAKER
-    # =========================
     p1 = 1 / odd1
     pX = 1 / oddX
     p2 = 1 / odd2
@@ -106,72 +103,39 @@ def analyse_ultra_pro(odd1, oddX, odd2):
     probX = pX / total
     prob2 = p2 / total
 
-    # =========================
-    #  FORME ÉQUIPE (SIMULATION)
-    # =========================
-    form_home = np.random.uniform(0.8, 1.2)
-    form_away = np.random.uniform(0.8, 1.2)
+    #  xG
+    xg_home = prob1 * 2.2
+    xg_away = prob2 * 2.0
 
-    # =========================
-    #  xG (EXPECTED GOALS)
-    # =========================
-    xg_home = (prob1 * 2.2) * form_home
-    xg_away = (prob2 * 2.0) * form_away
-
-    # =========================
-    #  BUTS RÉALISTES
-    # =========================
+    #  buts
     goals_home = int(np.random.poisson(xg_home))
     goals_away = int(np.random.poisson(xg_away))
 
-    # sécurité (pas de négatif)
     goals_home = max(0, goals_home)
     goals_away = max(0, goals_away)
 
-    # score final
     score = f"{goals_home}-{goals_away}"
 
-    # =========================
-    #  BTTS (CORRIGÉ)
-    # =========================
-    if goals_home > 0 and goals_away > 0:
-        btts = "OUI "
-    else:
-        btts = "NON "
+    #  BTTS
+    btts = "OUI " if goals_home > 0 and goals_away > 0 else "NON "
 
-    # =========================
-    #  OVER / UNDER 2.5
-    # =========================
+    #  OVER / UNDER
     total_goals = goals_home + goals_away
+    over25 = "OVER 2.5 " if total_goals >= 3 else "UNDER 2.5 "
 
-    if total_goals >= 3:
-        over25 = "OVER 2.5 "
-    else:
-        over25 = "UNDER 2.5 "
-
-    # =========================
-    #  CONVERSION EN %
-    # =========================
+    #  %
     prob1 = int(prob1 * 100)
     probX = int(probX * 100)
     prob2 = 100 - prob1 - probX
 
-    # =========================
-    #  VALUE BET
-    # =========================
-    v1 = round((prob1 / 100 * odd1) - 1, 2)
+    #  value
+    v1 = round((prob1/100 * odd1) - 1, 2)
+    vX = round((probX/100 * oddX) - 1, 2)
+    v2 = round((prob2/100 * odd2) - 1, 2)
 
+    #  RETOUR COMPLET (TRÈS IMPORTANT)
+    return prob1, probX, prob2, v1, vX, v2, score, over25, btts
 
-    # =========================
-    #  PROBABILITÉS BOOKMAKER
-    # =========================
-    p1 = 1 / odd1
-    pX = 1 / oddX
-    p2 = 1 / odd2
-
-    total = p1 + pX + p2
-
-    prob1 = p1 / total
 
 # =========================
 # TELEGRAM
