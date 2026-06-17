@@ -200,12 +200,7 @@ for team1, team2, odd1, oddX, odd2 in matches:
         odd1, oddX, odd2
     )
 
-    # EXACTEMENT 4 espaces
-    values = {
-        "1": v1,
-        "X": vX,
-        "2": v2
-    }
+    values = {"1": v1, "X": vX, "2": v2}
 
     best = max(values, key=values.get)
     best_value = values[best]
