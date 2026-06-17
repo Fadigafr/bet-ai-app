@@ -5,7 +5,7 @@ import base64
 import Path
 
 # =========================
-EC PREMIÈRE IMAGE
+# FOND AVEC PREMIÈRE IMAGE
 # =========================
 def image_to_base64(path):
 
