@@ -243,17 +243,18 @@ for team1, team2, odd1, oddX, odd2 in matches:
         odd1, oddX, odd2
     )
 
+    #  créer le dictionnaire
     values = {"1": v1, "X": vX, "2": v2}
 
+    #  calculer best
     best = max(values, key=values.get)
+
+    #  calculer best_value AVANT le if
     best_value = values[best]
 
-    match_id = f"{team1}-{team2}-{best}"
-
-    # TELEGRAM ALERT
-    match_id = f"{team1}-{team2}-{best}"
-
-    if best_value > 0.20 and match_id not in sent_alerts:
+    #  maintenant tu peux utiliser le if
+    if best_value > 0.20:
+        st.write(f" VALUE BET: {team1} vs {team2} → {best}")
 
         message = f"""
   BET AI PRO
