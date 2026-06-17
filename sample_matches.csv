@@ -4,7 +4,7 @@ def get_live_matches():
     url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
     
     headers = {
-        "X-RapidAPI-Key": "TA_API_KEY"
+        "X-RapidAPI-Key": "dcaf36dbc3ae0f6f05fc7c8a76de1c7b"
     }
 
     response = requests.get(url, headers=headers)
@@ -46,7 +46,7 @@ curl --request GET \
 	--url 'https://free-api-live-football-data.p.rapidapi.com/football-players-search?search=m' \
 	--header 'Content-Type: application/json' \
 	--header 'x-rapidapi-host: free-api-live-football-data.p.rapidapi.com' \
-	--header 'x-rapidapi-key: acddc25c4amsh1b5de20e73be716p1933dfjsn4e554c3a6bf4'
+	--header 'x-rapidapi-key: dcaf36dbc3ae0f6f05fc7c8a76de1c7b'
 
 xg_home,xg_away,form_home,form_away,result
 1.8,1.2,5,3,0
