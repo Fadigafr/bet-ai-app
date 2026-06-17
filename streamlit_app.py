@@ -10,7 +10,7 @@ import streamlit as st
 
 RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY équipes : {response.status_code}")
 RAPIDAPI_KEY = st.secrets.get("RAPIDAPI_KEY", "")
-            st.write(response.text)
+               st.write(response.text)
             return []
 
         return response.json()
