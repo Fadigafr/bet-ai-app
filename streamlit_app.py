@@ -43,33 +43,14 @@ def search_teams(search_text):
         )
 
         if response.status_code != 200:
-
-def search_players(search_text):
-    url = "https://free-api-live-football-data.p.rapidapi.com/football-players-search"
-
-    headers = {
-        "x-rapidapi-key": RAPIDAPI_KEY,
-        "x-rapidapi-host": RAPIDAPI_HOST,
-        "Content-Type": "application/json"
-    }
-
-    params = {
-        "search": search_text
-    }
-
-    try:
-        response = requests.get(url, headers=headers, params=params, timeout=15)
-
-        if response.status_code != 200:
-            st.error(f"Erreur API : {response.status_code}")
+            st.error(f"Erreur API équipes : {response.status_code}")
+            st.write(response.text)
             return []
 
-        data = response.json()
-
-        return data
+        return response.json()
 
     except Exception as e:
-        st.error(f"Erreur connexion API : {e}")
+        st.error(f"Erreur connexion API équipes : {e}")
         return []
 
 
@@ -244,6 +225,32 @@ if st.button("Rechercher équipe", key="search_team_button"):
     else:
         for team in results[:10]:
             st.write(team)
+
+st.markdown("## 🔎 Recherche API Football")
+
+tab1, tab2 = st.tabs(["Joueurs", "Équipes"])
+
+with tab1:
+    player_search = st.text_input(
+        "Nom du joueur",
+        value="messi",
+        key="player_search_input"
+    )
+
+    if st.button("Rechercher joueur", key="search_player_button"):
+        players_data = search_players(player_search)
+        st.write(players_data)
+
+with tab2:
+    team_search = st.text_input(
+        "Nom de l'équipe",
+        value="chelsea",
+        key="team_search_input"
+    )
+
+    if st.button("Rechercher équipe", key="search_team_button"):
+        teams_data = search_teams(team_search)
+        st.write(teams_data)
 
 # =========================
 # API FUNCTIONS
