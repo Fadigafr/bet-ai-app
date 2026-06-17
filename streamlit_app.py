@@ -239,20 +239,21 @@ for match in matches:
 
 for team1, team2, odd1, oddX, odd2 in matches:
 
+    # 1️⃣ IA
     prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_ultra_pro(
         odd1, oddX, odd2
     )
 
-    #  créer le dictionnaire
+    # 2️⃣ dictionnaire
     values = {"1": v1, "X": vX, "2": v2}
 
-    #  calculer best
+    # 3️⃣ calcul du meilleur choix
     best = max(values, key=values.get)
 
-    #  calculer best_value AVANT le if
+    # 4️⃣ calcul de la valeur
     best_value = values[best]
 
-    #  maintenant tu peux utiliser le if
+    # 5️⃣  MAINTENANT tu peux utiliser le if
     if best_value > 0.20:
         st.write(f" VALUE BET: {team1} vs {team2} → {best}")
 
