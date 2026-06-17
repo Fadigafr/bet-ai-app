@@ -258,7 +258,7 @@ def analyse_super_pro(odd1, oddX, odd2):
     else:
         score = "2-1"
 
-    #  BTTS CORRIGÉ
+    #  BTTS basé sur le score (CORRECT)
     goals_home = int(score.split("-")[0])
     goals_away = int(score.split("-")[1])
 
@@ -267,7 +267,7 @@ def analyse_super_pro(odd1, oddX, odd2):
     else:
         btts = "NON "
 
-    #  OVER/UNDER
+    #  OVER / UNDER
     over25 = "OVER 2.5 " if (prob1 + prob2) > 60 else "UNDER 2.5 "
 
     #  VALUE
