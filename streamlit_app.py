@@ -90,28 +90,6 @@ competition_name = st.selectbox(
 
 competition_id = competitions[competition_name]
 
-def get_teams(api_key, competition_id):
-
-    url = "https://v3.football.api-sports.io/teams"
-
-    headers = {"x-apisports-key": api_key}
-
-    params = {
-        "league": competition_id,
-        "season": 2024
-    }
-
-    res = requests.get(url, headers=headers, params=params)
-    data = res.json()
-
-    teams = []
-
-    if "response" in data:
-        for t in data["response"]:
-            teams.append(t["team"]["name"])
-
-    return teams
-
 # =========================
 # MATCH DATA (SAFE)
 # =========================
@@ -425,6 +403,28 @@ if len(calendar) == 0:
 else:
     for date, t1, t2 in calendar[:20]:
         st.write(f"📆 {date} → {t1} vs {t2}")
+
+def get_teams(api_key, competition_id):
+
+    url = "https://v3.football.api-sports.io/teams"
+
+    headers = {"x-apisports-key": api_key}
+
+    params = {
+        "league": competition_id,
+        "season": 2024
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    teams = []
+
+    if "response" in data:
+        for t in data["response"]:
+            teams.append(t["team"]["name"])
+
+    return teams
 
 # =========================
 # ANALYTICS
