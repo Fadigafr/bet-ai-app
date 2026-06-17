@@ -160,7 +160,21 @@ if "combo" not in st.session_state:
 
 #  ajouter uniquement les bons value bets
 
-if best_value > 0.20:
+for team1, team2, odd1, oddX, odd2 in matches:
+
+    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_ultra_pro(
+        odd1, oddX, odd2
+    )
+
+    values = {"1": v1, "X": vX, "2": v2}
+
+    best = max(values, key=values.get)
+    best_value = values[best]
+
+    # ✅ ICI uniquement
+    if best_value > 0.20:
+        st.write(f"🔥 VALUE BET: {team1} vs {team2} → {best}")
+    
     st.session_state.combo.append((team1, team2, best))
 
 st.markdown("##  COMBINÉ DU JOUR")
