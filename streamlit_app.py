@@ -112,7 +112,15 @@ def analyse_super_pro(odd1, oddX, odd2):
 
     # MARKETS
     over25 = "OVER 2.5 " if (prob1 + prob2) > 60 else "UNDER 2.5 "
-    btts = "OUI " if prob1 > 40 and prob2 > 40 else "NON "
+    #  extraction des buts depuis le score
+goals_home = int(score.split("-")[0])
+goals_away = int(score.split("-")[1])
+
+#  logique BTTS correcte
+if goals_home > 0 and goals_away > 0:
+    btts = "OUI "
+else:
+    btts = "NON "
 
     # VALUE
     v1 = round((prob1/100 * odd1) - 1, 2)
@@ -210,3 +218,22 @@ col2.metric("Signals", len(st.session_state.history))
 
 if len(st.session_state.history) > 2:
     st.line_chart(st.session_state.history)
+
+# SCORE
+if prob1 > 55:
+    score = "2-0"
+elif prob2 > 55:
+    score = "0-2"
+elif probX > 35:
+    score = "1-1"
+else:
+    score = "2-1"
+
+#  BTTS CORRIGÉ
+goals_home = int(score.split("-")[0])
+goals_away = int(score.split("-")[1])
+
+if goals_home > 0 and goals_away > 0:
+    btts = "OUI "
+else:
+    btts = "NON "
