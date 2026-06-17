@@ -174,8 +174,6 @@ competition_name = st.selectbox(
 
 competition_id = filtered_comp[competition_name]
 
-st.markdown(f"## 🌍 {country_name}")
-
 # =========================
 # MATCH DATA (SAFE)
 # =========================
@@ -663,4 +661,5 @@ potential_gain = total_odds * stake
 if len(st.session_state.history_gain) > 2:
     st.line_chart(st.session_state.history_gain)
 
+st.markdown(f"## 🌍 {country_name}")
    
