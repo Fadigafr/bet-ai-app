@@ -282,6 +282,19 @@ for match in matches:
 #  ensuite utiliser best
     match_id = f"{team1}-{team2}-{best}"
 
+def calculate_stake(bankroll, value):def calculate_stake(bankroll return bankroll * 0.10
+
+    else:
+        return bankroll * 0.15
+
+    if value < 0.10:
+        return 0
+
+    elif value < 0.20:
+        return bankroll * 0.05
+
+    elif value < 0.40:
+
 for team1, team2, odd1, oddX, odd2 in matches:
 
     # ✅ IA
