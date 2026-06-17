@@ -403,6 +403,7 @@ competition_name = st.selectbox(
 )
 
 competition_id = filtered_competitions[competition_name]
+        
 # =========================
 # API FUNCTIONS
 # =========================
