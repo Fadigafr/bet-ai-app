@@ -17,6 +17,9 @@ if "user" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []
 
+if "results" not in st.session_state:
+    st.session_state.results = []
+
 # =========================
 # USERS
 # =========================
@@ -141,6 +144,46 @@ def analyse_ultra_pro(odd1, oddX, odd2):
 
 #  ensuite utiliser best
     match_id = f"{team1}-{team2}-{best}"
+
+if "combo" not in st.session_state:
+    st.session_state.combo = []
+
+#  ajouter uniquement les bons value bets
+if best_value > 0.20:
+    st.session_state.combo.append((team1, team2, best))
+
+st.markdown("##  COMBINÉ DU JOUR")
+
+combo = st.session_state.combo[:5]  # max 5 matchs
+
+if len(combo) == 0:
+    st.info("Pas de combiné disponible")
+else:
+    for match in combo:
+        team1, team2, bet = match
+        st.write(f" {team1} vs {team2} → {bet}")
+
+    st.success(" Ticket combiné prêt à jouer !")
+
+#  simulation résultat (placeholder)
+result = np.random.choice(["WIN", "LOSS"])
+
+st.session_state.results.append(result)
+
+st.markdown("##  PERFORMANCE IA")
+
+wins = st.session_state.results.count("WIN")
+losses = st.session_state.results.count("LOSS")
+
+total = len(st.session_state.results)
+
+if total > 0:
+    winrate = round((wins / total) * 100)
+
+    col1, col2, col3 = st.columns(3)
+    col1.metric(" Gagnés", wins)
+    col2.metric(" Perdus", losses)
+    col3.metric(" Winrate", f"{winrate}%")
 
 # =========================
 # TELEGRAM
@@ -295,3 +338,8 @@ def analyse_real_pro(odd1, oddX, odd2):
     v2 = round((prob2/100 * odd2) - 1, 2)
 
     return prob1, probX, prob2, v1, vX, v2, score, over25, btts
+
+numeric = [1 if r == "WIN" else 0 for r in st.session_state.results]
+
+if len(numeric) > 2:
+   
