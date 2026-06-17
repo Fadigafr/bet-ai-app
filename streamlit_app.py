@@ -85,9 +85,6 @@ def get_matches():
 
 matches = get_matches()
 
-st.write(matches)
-st.write("OK LOOP")
-
 # =========================
 # IA PRO
 # =========================
