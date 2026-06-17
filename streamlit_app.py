@@ -401,6 +401,7 @@ competitions_by_country = {
     },
     "World": {
         "🌍 Coupe du Monde": 1,
+        "🌍 Coupe du Monde 2026": 1,
         "🏆 Euro": 4
     },
     "Africa": {
