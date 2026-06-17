@@ -71,20 +71,46 @@ if not users[current_user]["vip"]:
 # COMPETITIONS
 # =========================
 competitions = {
+    # Ligues
     "🏴 Premier League": 39,
     "🇪🇸 La Liga": 140,
     "🇫🇷 Ligue 1": 61,
-    "🇩🇪 Bundesliga": 78,
-    "🇮🇹 Serie A": 135,
-    "🏆 Ligue des Champions": 2,
-    "🏆 Ligue Europa": 3
-}
 
+    # Coupes internationales
+    "🌍 Coupe du Monde": 1,
+    "🌍 Coupe du Monde 2026": 1,
+    "🏆 CAN (Afrique)": 6,
+    "🏆 Copa America": 9,
+    "🏆 Euro": 4,
+}
 competition_name = st.selectbox(
-    " Choisir une compétition",
-    list(competitions.keys()),
-    key="competition_select"
+    "🏆 Choisir une compétition",
+    list(competitions.keys())
 )
+
+competition_id = competitions[competition_name]
+
+def get_teams(api_key, competition_id):
+
+    url = "https://v3.football.api-sports.io/teams"
+
+    headers = {"x-apisports-key": api_key}
+
+    params = {
+        "league": competition_id,
+        "season": 2024
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    teams = []
+
+    if "response" in data:
+        for t in data["response"]:
+            teams.append(t["team"]["name"])
+
+    return teams
 
 # =========================
 # MATCH DATA (SAFE)
@@ -97,6 +123,7 @@ def get_matches():
     ]
 
 matches = get_matches()
+
 
 # =========================
 # IA PRO
@@ -350,6 +377,54 @@ col2.metric("📈 Profit", f"{round(profit,2)} €")
 
 if len(st.session_state.history_gain) > 2:
     st.line_chart(st.session_state.history_gain)
+
+teams = get_teams(API_KEY, competition_id)
+
+st.markdown("## ⚽ ÉQUIPES")
+
+for team in teams:
+    st.write(f"✅ {team}")
+
+def get_calendar(api_key, competition_id, season):
+
+    url = "https://v3.football.api-sports.io/fixtures"
+
+    headers = {"x-apisports-key": api_key}
+
+    params = {
+        "league": competition_id,
+        "season": season
+    }
+
+    res = requests.get(url, headers=headers, params=params)
+    data = res.json()
+
+    calendar = []
+
+    if "response" in data:
+        for match in data["response"]:
+            date = match["fixture"]["date"][:10]
+            team1 = match["teams"]["home"]["name"]
+            team2 = match["teams"]["away"]["name"]
+
+            calendar.append((date, team1, team2))
+
+    return calendar
+
+season = st.selectbox(
+    "📅 Choisir une année",
+    [2024, 2025, 2026, 2027]
+)
+
+calendar = get_calendar(API_KEY, competition_id, season)
+
+st.markdown(f"## 📅 CALENDRIER {season}")
+
+if len(calendar) == 0:
+    st.warning("Pas de données disponibles")
+else:
+    for date, t1, t2 in calendar[:20]:
+        st.write(f"📆 {date} → {t1} vs {t2}")
 
 # =========================
 # ANALYTICS
