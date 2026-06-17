@@ -281,6 +281,36 @@ col3.metric("🎯 ROI", f"{round((profit/100)*100,1)} %")
 # =========================
 # LOOP MATCHES
 # =========================
+def get_teams(api_key, competition_id):
+
+    import requests
+
+    url = "https://v3.football.api-sports.io/teams"
+
+    headers = {
+        "x-apisports-key": api_key
+    }
+
+    params = {
+        "league": competition_id,
+        "season": 2024
+    }
+
+    try:
+        res = requests.get(url, headers=headers, params=params)
+        data = res.json()
+
+        teams = []
+
+        if "response" in data and len(data["response"]) > 0:
+            for t in data["response"]:
+                teams.append(t["team"]["name"])
+
+        return teams
+
+    except:
+        return []
+
 for match in matches:
 
     #  sécurité
