@@ -1,6 +1,37 @@
 import streamlit as st
 import numpy as np
 import requests
+import base64
+from pathlib 
+import Path
+
+EC PREMIÈRE IMAGEdef image_to_base64(path):
+# =========================
+if Path("background.jpg").exists():
+    bg = image_to_base64("background.jpg")
+
+    st.markdown(f"""
+    <style>
+    .stApp {{
+        background-image:
+        linear-gradient(rgba(2, 6, 23, 0.78), rgba(2, 6, 23, 0.90)),
+        url("data:image/jpg;base64,{bg}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+# =========================
+# LOGO AVEC DEUXIÈME IMAGE
+# =========================
+if Path("logo.jpg").exists():
+    st.image("logo.jpg", use_container_width=True)
+else:
+    st.title("⚽ BET AI PRO")
+    with open(path, "rb") as file:
+        return base64.b64encode(file.read()).decode()
 
 # =========================
 # RAPIDAPI FOOTBALL
