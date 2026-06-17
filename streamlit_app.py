@@ -133,6 +133,14 @@ def analyse_ultra_pro(odd1, oddX, odd2):
     #  RETOUR COMPLET (TRÈS IMPORTANT)
     return prob1, probX, prob2, v1, vX, v2, score, over25, btts
 
+values = {"1": v1, "X": vX, "2": v2}
+
+#  d'abord calculer best
+best = max(values, key=values.get)
+best_value = values[best]
+
+#  ensuite utiliser best
+match_id = f"{team1}-{team2}-{best}"
 
 # =========================
 # TELEGRAM
@@ -176,6 +184,28 @@ for match in matches:
     """
 
     components.html(html, height=200)
+
+ values = {"1": v1, "X": vX, "2": v2}
+
+#  d'abord calculer best
+best = max(values, key=values.get)
+best_value = values[best]
+
+#  ensuite utiliser best
+match_id = f"{team1}-{team2}-{best}"
+
+for team1, team2, odd1, oddX, odd2 in matches:
+
+    prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_ultra_pro(
+        odd1, oddX, odd2
+    )
+
+    values = {"1": v1, "X": vX, "2": v2}
+
+    best = max(values, key=values.get)
+    best_value = values[best]
+
+    match_id = f"{team1}-{team2}-{best}"
 
 
     # TELEGRAM ALERT
