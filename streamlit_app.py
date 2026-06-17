@@ -238,6 +238,17 @@ col1, col2 = st.columns(2)
 col1.metric(" Capital actuel", f"{round(st.session_state.bankroll,2)} €")
 col2.metric(" Profit", f"{round(st.session_state.bankroll - 100,2)} €")
 
+st.markdown("## 💰 DASHBOARD FINANCIER")
+
+profit = st.session_state.bankroll - 100
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("💳 Bankroll", f"{round(st.session_state.bankroll,2)} €")
+col2.metric("📈 Profit", f"{round(profit,2)} €")
+col3.metric("🎯 ROI", f"{round((profit/100)*100,1)} %")
+
+
 # =========================
 # LOOP MATCHES
 # =========================
@@ -324,6 +335,9 @@ else:
 #  historique
 st.session_state.history_gain.append(st.session_state.bankroll)
 
+stake = calculate_stake(st.session_state.bankroll, best_value)stake = calculate_stake(st.session_state.bank si stake = 0
+if stake == 0:
+    continue
 
 # =========================
 # ANALYTICS
@@ -398,9 +412,19 @@ def analyse_real_pro(odd1, oddX, odd2):
 
     return prob1, probX, prob2, v1, vX, v2, score, over25, btts
 
-numeric = [1 if r == "WIN" else 0 for r in st.session_state.results]
+def calculate_stake(bankroll, value):
 
-if best_value > 0.20:
+    if value < 0.10:
+        return 0
+
+    elif value < 0.20:
+        return bankroll * 0.05
+
+    elif value < 0.40:
+        return bankroll * 0.10
+
+    else:
+        return bankroll * 0.15
 
     message = f"""
   BET AI PRO
@@ -430,5 +454,36 @@ for team1, team2, bet in combo:
 if len(combo) > 0:
     potential_gain = stake * total_odds
     st.success(f"💰 Gain potentiel: {round(potential_gain,2)} €")
+
+# ✅ probabilité de gagner basée sur value
+win_prob = 0.55 if best_value > 0.20 else 0.45
+
+result = np.random.choice(["WIN", "LOSS"], p=[win_prob, 1 - win_prob])
+
+# ✅ cote réelle simulée
+odd = round(np.random.uniform(1.5, 2.2), 2)
+
+if result == "WIN":
+    gain = stake * (odd - 1)
+else:
+    gain = -stake
+
+# ✅ mise à jour bankroll
+st.session_state.bankroll += gain
+st.session_state.history_gain.append(st.session_state.bankroll)
+
+if st.session_state.bankroll <= 0:
+    st.error("💀 Bankroll détruite ! Recharge nécessaire")
+    st.stop
+
+total_odds = 1
+
+for match in combo:
+    total_odds *= match[3]
+
+potential_gain = total_odds * stake
+
+if len(st.session_state.history_gain) > 2:
+    st.line_chart(st.session_state.history_gain)
 
    
