@@ -284,27 +284,19 @@ for match in matches:
 
 for team1, team2, odd1, oddX, odd2 in matches:
 
-    # ✅ IA
     prob1, probX, prob2, v1, vX, v2, score, over25, btts = analyse_ultra_pro(
         odd1, oddX, odd2
     )
 
-    # ✅ créer valeurs
     values = {"1": v1, "X": vX, "2": v2}
-
-    # ✅ calcul meilleur choix
     best = max(values, key=values.get)
-
-    # ✅ calcul value
     best_value = values[best]
 
-    # ✅ MAINTENANT seulement
-    if best_value > 0.20:
-        st.write(f"🔥 VALUE BET: {team1} vs {team2} → {best}")
+    # ✅ CORRECT
+    stake = calculate_stake(st.session_state.bankroll, best_value)
 
-    # 5️⃣  MAINTENANT tu peux utiliser le if
-    if best_value > 0.20:
-        st.write(f" VALUE BET: {team1} vs {team2} → {best}")
+    if stake == 0:
+        continue
 
         message = f"""
   BET AI PRO
