@@ -3,8 +3,6 @@ import numpy as np
 import requests
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="BET AI PRO", layout="centered")
-
 def get_teams(api_key, competition_id):
 
     url = "https://v3.football.api-sports.io/teams"
@@ -28,6 +26,8 @@ def get_teams(api_key, competition_id):
             teams.append(t["team"]["name"])
 
     return teams
+
+st.set_page_config(page_title="BET AI PRO", layout="centered")
 
 # =========================
 # INIT SESSION (OBLIGATOIRE)
@@ -416,32 +416,6 @@ st.markdown("## ⚽ ÉQUIPES")
 
 for team in teams:
     st.write(f"✅ {team}")
-
-def get_calendar(api_key, competition_id, season):
-
-    url = "https://v3.football.api-sports.io/fixtures"
-
-    headers = {"x-apisports-key": api_key}
-
-    params = {
-        "league": competition_id,
-        "season": season
-    }
-
-    res = requests.get(url, headers=headers, params=params)
-    data = res.json()
-
-    calendar = []
-
-    if "response" in data:
-        for match in data["response"]:
-            date = match["fixture"]["date"][:10]
-            team1 = match["teams"]["home"]["name"]
-            team2 = match["teams"]["away"]["name"]
-
-            calendar.append((date, team1, team2))
-
-    return calendar
 
 season = st.selectbox(
     "📅 Choisir une année",
