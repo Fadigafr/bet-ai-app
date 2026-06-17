@@ -1,8 +1,7 @@
 import streamlit as st
 import numpy as np
 import requests
-import base64
-from pathlib 
+import base64 
 import Path
 
 EC PREMIÈRE IMAGEdef image_to_base64(path):
