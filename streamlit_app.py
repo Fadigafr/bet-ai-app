@@ -59,7 +59,7 @@ st.set_page_config(page_title="BET AI PRO", layout="centered")
 
 # =========================
 # STYLE API FOOTBALL
-}</div># =========================
+# =========================
         <div class="api-info">🏆 Compétition : {league}</div>
         <span class="api-badge">{card_type.upper()}</span>
     </div>
