@@ -330,7 +330,7 @@ if st.sidebar.button("Se déconnecter", key="logout_button"):
     st.rerun()
 
 # =========================
-# COMPÉTITIONS PAR PAYS
+# FILTRE PAYS + COMPÉTITIONS
 # =========================
 countries = {
     "🌍 Tous": None,
@@ -341,46 +341,45 @@ countries = {
     "🇮🇹 Italie": "Italy",
     "🌍 International": "World",
     "🌍 Afrique": "Africa",
-    "🌎 Amérique du Sud": "South America",
+    "🌎 Amérique du Sud": "South America"
 }
 
-competitions = {
+competitions_by_country = {
     "England": {
         "🏴 Premier League": 39,
-        "🏴 FA Cup": 45,
+        "🏴 FA Cup": 45
     },
     "Spain": {
         "🇪🇸 La Liga": 140,
-        "🇪🇸 Copa del Rey": 143,
+        "🇪🇸 Copa del Rey": 143
     },
     "France": {
         "🇫🇷 Ligue 1": 61,
-        "🇫🇷 Coupe de France": 66,
+        "🇫🇷 Coupe de France": 66
     },
     "Germany": {
-        "🇩🇪 Bundesliga": 78,
+        "🇩🇪 Bundesliga": 78
     },
     "Italy": {
         "🇮🇹 Serie A": 135,
-        "🇮🇹 Coppa Italia": 137,
+        "🇮🇹 Coppa Italia": 137
     },
     "World": {
         "🌍 Coupe du Monde": 1,
-        "🌍 Coupe du Monde 2026": 1,
-        "🏆 Euro": 4,
+        "🏆 Euro": 4
     },
     "Africa": {
-        "🏆 CAN": 6,
+        "🏆 CAN": 6
     },
     "South America": {
-        "🏆 Copa America": 9,
-    },
+        "🏆 Copa America": 9
+    }
 }
 
 country_name = st.selectbox(
-    "🌍 Choisir un pays / zone",
+    "🌍 Choisir un pays",
     list(countries.keys()),
-    key="country_filter"
+    key="country_select"
 )
 
 selected_country = countries[country_name]
@@ -388,74 +387,22 @@ selected_country = countries[country_name]
 if selected_country is None:
     filtered_competitions = {}
 
-    for comp_group in competitions.values():
+    for comp_group in competitions_by_country.values():
         filtered_competitions.update(comp_group)
 else:
-    filtered_competitions = competitions.get(selected_country, {})
+    filtered_competitions = competitions_by_country.get(selected_country, {})
 
 if not filtered_competitions:
-    st.warning("Aucune compétition disponible pour ce choix.")
+    st.warning("Aucune compétition disponible.")
     st.stop()
 
 competition_name = st.selectbox(
     "🏆 Choisir une compétition",
     list(filtered_competitions.keys()),
-    key="competition_filter"
+    key="competition_select"
 )
 
 competition_id = filtered_competitions[competition_name]
-
-season = st.selectbox(
-    "📅 Choisir une saison",
-    [2024, 2025, 2026, 2027],
-    index=2,
-    key="season_filter"
-)
-
-st.markdown(f"## {competition_name} - Saison {season}")
-
-if st.button("Rechercher équipe", key="search_team_button"):
-    teams_data = search_teams(team_search)
-
-    st.markdown("### Résultats équipes")
-
-    if isinstance(teams_data, dict):
-        results = teams_data.get("response", teams_data.get("data", []))
-    else:
-        results = teams_data
-
-    if not results:
-        st.warning("Aucune équipe trouvée.")
-    else:
-        for team in results[:10]:
-            st.write(team)
-
-st.markdown("## 🔎 Recherche API Football")
-
-tab1, tab2 = st.tabs(["Joueurs", "Équipes"])
-
-with tab1:
-    player_search = st.text_input(
-        "Nom du joueur",
-        value="messi",
-        key="player_search_input"
-    )
-
-    if st.button("Rechercher joueur", key="search_player_button"):
-        players_data = search_players(player_search)
-        st.write(players_data)
-
-with tab2:
-    team_search = st.text_input(
-        "Nom de l'équipe",
-        value="chelsea",
-        key="team_search_input"
-    )
-
-    if st.button("Rechercher équipe", key="search_team_button"):
-        teams_data = search_teams(team_search)
-        st.write(teams_data)
-
 # =========================
 # API FUNCTIONS
 # =========================
