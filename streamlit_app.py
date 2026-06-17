@@ -4,8 +4,11 @@ import requests
 import base64 
 import Path
 
-EC PREMIÈRE IMAGEdef image_to_base64(path):
 # =========================
+EC PREMIÈRE IMAGE
+# =========================
+def image_to_base64(path):
+
 if Path("background.jpg").exists():
     bg = image_to_base64("background.jpg")
 
