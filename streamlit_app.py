@@ -114,6 +114,68 @@ competition_name = st.selectbox(
 
 competition_id = competitions[competition_name]
 
+countries = {
+    "🌍 Tous": None,
+    "🇬🇧 Angleterre": "England",
+    "🇪🇸 Espagne": "Spain",
+    "🇫🇷 France": "France",
+    "🇩🇪 Allemagne": "Germany",
+    "🇮🇹 Italie": "Italy",
+    "🌍 International": "World",
+    "🌍 Afrique": "Africa",
+    "🌎 Amérique du Sud": "South America"
+}
+
+country_name = st.selectbox(
+    "🌍 Choisir un pays",
+    list(countries.keys())
+)
+
+selected_country = countries[country_name]
+
+competitions = {
+    "England": {
+        "🏴 Premier League": 39,
+        "🏴 FA Cup": 45
+    },
+    "Spain": {
+        "🇪🇸 La Liga": 140,
+        "🇪🇸 Copa del Rey": 143
+    },
+    "France": {
+        "🇫🇷 Ligue 1": 61,
+        "🇫🇷 Coupe de France": 66
+    },
+    "World": {
+        "🌍 Coupe du Monde": 1
+    },
+    "Africa": {
+        "🏆 CAN": 6
+    },
+    "South America": {
+        "🏆 Copa America": 9
+    }
+}
+
+if selected_country is None:if selected_country is None compétitions
+    all_competitions = {}
+
+    for c in competitions.values():
+        all_competitions.update(c)
+
+    filtered_comp = all_competitions
+
+else:
+    filtered_comp = competitions.get(selected_country, {})
+competition_name = st.selectbox(
+    "🏆 Choisir une compétition",
+    list(filtered_comp.keys())
+)
+
+competition_id = filtered_comp[competition_name]
+
+st.markdown(f"## 🌍 {country_name}")
+
 # =========================
 # MATCH DATA (SAFE)
 # =========================
