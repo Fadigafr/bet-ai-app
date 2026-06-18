@@ -513,7 +513,7 @@ else:
 st.write(f"⚠️ Niveau de risque : {risk_level}")
 
     # -------------------------
-    # COMBO
+    # COMBINÉ AUTOMATIQUE
     # -------------------------
     st.markdown("## 🔗 Combiné automatique")
 
@@ -521,6 +521,7 @@ st.write(f"⚠️ Niveau de risque : {risk_level}")
         st.info("Aucun combiné disponible pour le moment.")
     else:
         total_odds = 1.0
+
         for team1, team2, bet, odd in combo[:5]:
             total_odds *= odd
             st.write(f"✅ {team1} vs {team2} → {bet} @ {odd}")
