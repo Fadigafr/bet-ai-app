@@ -4,6 +4,33 @@ from pathlib import Path
 import numpy as np
 import requests
 import streamlit as st
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"io"
+)
+
+func main() {
+
+	url := "https://sportapi7.p.rapidapi.com/api/v1/event/15508283/atbat/983367/pitches"
+
+	req, _ := http.NewRequest("GET", url, nil)
+
+	req.Header.Add("x-rapidapi-key", "298a846a33msh155e943d226a3cap1bf4afjsn718c8c7eb1b1")
+	req.Header.Add("x-rapidapi-host", "sportapi7.p.rapidapi.com")
+	req.Header.Add("Content-Type", "application/json")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
+}
 
 # =====================================================
 # BET AI PRO - STREAMLIT COMPLET PROPRE
@@ -476,17 +503,24 @@ def main():
         tab_players, tab_teams = st.tabs(["👤 Joueurs", "🏟️ Équipes"])
 
         with tab_players:
-            player_search = st.text_input("Nom du joueur", value="messi", key="player_search")
-            if st.button("Rechercher joueur", api_key="player_btn"):
-                if not api_key:
-                    st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
-                else:
-                    data = search_players(player_search, api_key)
-                    results = extract_results(data)
-                    if not results:
-                        st.warning("Aucun joueur trouvé.")
-                    for item in results[:10]:
-                        display_api_card(item, "joueur")
+    player_search = st.text_input(
+        "Nom du joueur",
+        value="messi",
+        key="player_search"
+    )
+
+    if st.button("Rechercher joueur", key="player_btn"):
+        if not api_key:
+            st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
+        else:
+            data = search_players(player_search, api_key)
+            results = extract_results(data)
+
+            if not results:
+                st.warning("Aucun joueur trouvé.")
+            else:
+                for item in results[:10]:
+                    display_api_card(item, "joueur")
 
         with tab_teams:
             team_search = st.text_input("Nom de l'équipe", value="chelsea", key="team_search")
