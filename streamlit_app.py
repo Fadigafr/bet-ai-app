@@ -19,7 +19,7 @@ LOGO_FILES = ["logo.jpg", "banner.jpg", "2026-06-17 23.19.12.jpg"]
 st.info(
     "BET AI PRO est un outil d’analyse et de prédiction football. "
     "Les résultats proposés sont des estimations statistiques et ne garantissent aucun gain. "
-    "Les paris sportifs comportent un risque
+    "Les paris sportifs comportent un risque. "
 
     MAX_STAKE_PERCENT = 0.10  # maximum 10% de la bankroll par pari
 STOP_LOSS_PERCENT = 0.30  # stop si perte de 30%
