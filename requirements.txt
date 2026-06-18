@@ -1,4 +1,5 @@
-streamlit
-requests
-numpy
-matplotlib
+bet-ai-app/
+├── streamlit_app.py
+├── background.jpg
+├── logo.jpg
+├── requirements.txt
