@@ -32,4 +32,23 @@
   ]
 }
 
+using System.Net.Http.Headers;
+var client = new HttpClient();
+var request = new HttpRequestMessage
+{
+	Method = HttpMethod.Get,
+	RequestUri = new Uri("https://sportapi7.p.rapidapi.com/api/v1/event/15508283/atbat/983367/pitches"),
+	Headers =
+	{
+		{ "x-rapidapi-key", "acddc25c4amsh1b5de20e73be716p1933dfjsn4e554c3a6bf4" },
+		{ "x-rapidapi-host", "sportapi7.p.rapidapi.com" },
+	},
+};
+using (var response = await client.SendAsync(request))
+{
+	response.EnsureSuccessStatusCode();
+	var body = await response.Content.ReadAsStringAsync();
+	Console.WriteLine(body);
+}
+
 st.image("logo.jpg", use_container_width=True)
