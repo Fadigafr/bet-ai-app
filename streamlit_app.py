@@ -16,7 +16,21 @@ RAPIDAPI_HOST = "free-api-live-football-data.p.rapidapi.com"
 BACKGROUND_FILES = ["background.jpg", "fond.jpg", "2026-06-17 23.18.44.jpg"]
 LOGO_FILES = ["logo.jpg", "banner.jpg", "2026-06-17 23.19.12.jpg"]
 
-USERS = {
+st.info(
+    "BET AI PRO est un outil d’analyse et de prédiction football. "
+    "Les résultats proposés sont des estimations statistiques et ne garantissent aucun gain. "
+    "Les paris sportifs comportent un risque
+
+    MAX_STAKE_PERCENT = 0.10  # maximum 10% de la bankroll par pari
+STOP_LOSS_PERCENT = 0.30  # stop si perte de 30%
+
+initial_bankroll = 100
+
+if st.session_state.bankroll <= initial_bankroll * (1 - STOP_LOSS_PERCENT):
+    st.error("⛔ Stop-loss atteint : arrête les paris aujourd’hui.")
+    st.stop()
+    
+    USERS = {
     "admin": {"password": "VIP123", "vip": True},
     "user": {"password": "1234", "vip": False},
 }
@@ -474,6 +488,15 @@ def main():
 
         display_match_card(team1, team2, prob1, probX, prob2, best, best_value, score, over25, btts, stake, odd1, oddX, odd2)
 
+if best_value < 0.10:
+    risk_level = "ÉLEVÉ"
+elif best_value < 0.25:
+    risk_level = "MOYEN"
+else:
+    risk_level = "CONTRÔLÉ"
+
+st.write(f"⚠️ Niveau de risque : {risk_level}")
+
     # -------------------------
     # COMBO
     # -------------------------
@@ -504,6 +527,16 @@ def main():
     if len(st.session_state.history_gain) > 2:
         st.line_chart(st.session_state.history_gain)
 
-
 if __name__ == "__main__":
     main()
+
+MAX_STAKE_PERCENT = 0.10  # maximum 10% de la bankroll par pari
+STOP_LOSS_PERCENT = 0.30  # stop si perte de 30%
+
+initial_bankroll = 100
+
+if st.session_state.bankroll <= initial_bankroll * (1 - STOP_LOSS_PERCENT):
+    st.error("⛔ Stop-loss atteint : arrête les paris aujourd’hui.")
+    st.stop()
+
+    
