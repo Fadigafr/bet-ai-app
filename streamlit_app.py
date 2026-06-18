@@ -4,31 +4,6 @@ from pathlib import Path
 import numpy as np
 import requests
 import streamlit as st
-import (
-	"fmt"
-	"net/http"
-	"io"
-)
-
-func main() {
-
-	url := "https://sportapi7.p.rapidapi.com/api/v1/event/15508283/atbat/983367/pitches"
-
-	req, _ := http.NewRequest("GET", url, nil)
-
-	req.Header.Add("x-rapidapi-key", "298a846a33msh155e943d226a3cap1bf4afjsn718c8c7eb1b1")
-	req.Header.Add("x-rapidapi-host", "sportapi7.p.rapidapi.com")
-	req.Header.Add("Content-Type", "application/json")
-
-	res, _ := http.DefaultClient.Do(req)
-
-	defer res.Body.Close()
-	body, _ := io.ReadAll(res.Body)
-
-	fmt.Println(res)
-	fmt.Println(string(body))
-
-}
 
 # =====================================================
 # BET AI PRO - STREAMLIT COMPLET PROPRE
