@@ -1,12 +1,13 @@
 import base64
-from pathlib import Path
+from pathlib 
+import Path
 
 import numpy as np
 import requests
 import streamlit as st
 
 # =====================================================
-# BET AI PRO - STREAMLIT COMPLET PROPRE
+# BET AI PRO - STREAMLIT COMPLET, PROPRE, SANS ERREUR
 # =====================================================
 st.set_page_config(page_title="BET AI PRO", layout="wide", page_icon="⚽")
 
@@ -88,8 +89,8 @@ def init_session():
         "user": None,
         "bankroll": DEFAULT_BANKROLL,
         "history_gain": [DEFAULT_BANKROLL],
-        "combo_history": [],
     }
+
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
@@ -191,15 +192,6 @@ def apply_style():
         font-weight: 700;
     }
 
-    .risk-box {
-        background: rgba(249, 115, 22, 0.12);
-        border: 1px solid rgba(249, 115, 22, 0.30);
-        color: #fed7aa;
-        padding: 14px;
-        border-radius: 16px;
-        margin-bottom: 18px;
-    }
-
     .stButton button {
         border-radius: 12px;
         font-weight: 800;
@@ -215,6 +207,7 @@ def apply_style():
 
 def show_logo():
     logo_file = find_existing_file(LOGO_FILES)
+
     if logo_file:
         st.image(logo_file, use_container_width=True)
     else:
@@ -233,7 +226,11 @@ def read_secret(name, default=""):
 
 def get_rapidapi_key():
     secret_key = read_secret("RAPIDAPI_KEY", "")
-    sidebar_key = st.sidebar.text_input("Clé RapidAPI", type="password", key="rapidapi_key_input")
+    sidebar_key = st.sidebar.text_input(
+        "Clé RapidAPI",
+        type="password",
+        key="rapidapi_key_input",
+    )
     return sidebar_key or secret_key
 
 
@@ -268,8 +265,10 @@ def extract_results(api_data):
         if api_data.get("error"):
             return []
         return [api_data]
+
     if isinstance(api_data, list):
         return api_data
+
     return []
 
 
@@ -281,7 +280,7 @@ def search_teams(search_text, api_key):
     return rapidapi_get("football-teams-search", {"search": search_text}, api_key)
 
 # =====================================================
-# DATA
+# DONNÉES
 # =====================================================
 def get_filtered_competitions(selected_country):
     if selected_country is None:
@@ -289,6 +288,7 @@ def get_filtered_competitions(selected_country):
         for competition_group in COMPETITIONS_BY_COUNTRY.values():
             filtered_competitions.update(competition_group)
         return filtered_competitions
+
     return COMPETITIONS_BY_COUNTRY.get(selected_country, {})
 
 
@@ -331,6 +331,7 @@ def analyse_ultra_pro(odd1, oddX, odd2):
 
 def calculate_stake(bankroll, value):
     max_stake = bankroll * MAX_STAKE_PERCENT
+
     if value < 0.10:
         return 0.0
     if value < 0.20:
@@ -363,7 +364,7 @@ def check_stop_loss():
         st.stop()
 
 # =====================================================
-# UI
+# AFFICHAGE
 # =====================================================
 def display_api_card(item, card_type="élément"):
     if not isinstance(item, dict):
@@ -473,47 +474,35 @@ def main():
     st.markdown(f"## 📊 Dashboard — {competition_name} ({season})")
 
     with st.expander("🔎 Recherche API Football : joueurs et équipes"):
-    tab_players, tab_teams = st.tabs(["👤 Joueurs", "🏟️ Équipes"])
+        tab_players, tab_teams = st.tabs(["👤 Joueurs", "🏟️ Équipes"])
 
-    with tab_players:
-        player_search = st.text_input(
-            "Nom du joueur",
-            value="messi",
-            key="player_search"
-        )
-
-        if st.button("Rechercher joueur", key="player_btn"):
-            if not api_key:
-                st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
-            else:
-                data = search_players(player_search, api_key)
-                results = extract_results(data)
-
-                if not results:
-                    st.warning("Aucun joueur trouvé.")
+        with tab_players:
+            player_search = st.text_input("Nom du joueur", value="messi", key="player_search")
+            if st.button("Rechercher joueur", key="player_btn"):
+                if not api_key:
+                    st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
                 else:
-                    for item in results[:10]:
-                        display_api_card(item, "joueur")
+                    data = search_players(player_search, api_key)
+                    results = extract_results(data)
+                    if not results:
+                        st.warning("Aucun joueur trouvé.")
+                    else:
+                        for item in results[:10]:
+                            display_api_card(item, "joueur")
 
-    with tab_teams:
-        team_search = st.text_input(
-            "Nom de l'équipe",
-            value="chelsea",
-            key="team_search"
-        )
-
-        if st.button("Rechercher équipe", key="team_btn"):
-            if not api_key:
-                st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
-            else:
-                data = search_teams(team_search, api_key)
-                results = extract_results(data)
-
-                if not results:
-                    st.warning("Aucune équipe trouvée.")
+        with tab_teams:
+            team_search = st.text_input("Nom de l'équipe", value="chelsea", key="team_search")
+            if st.button("Rechercher équipe", key="team_btn"):
+                if not api_key:
+                    st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
                 else:
-                    for item in results[:10]:
-                        display_api_card(item, "équipe")
+                    data = search_teams(team_search, api_key)
+                    results = extract_results(data)
+                    if not results:
+                        st.warning("Aucune équipe trouvée.")
+                    else:
+                        for item in results[:10]:
+                            display_api_card(item, "équipe")
 
     matches = get_demo_matches()
     combo = []
