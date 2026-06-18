@@ -21,19 +21,32 @@ st.info(
     "Les résultats proposés sont des estimations statistiques et ne garantissent aucun gain. "
     "Les paris sportifs comportent un risque. ")
 
-    MAX_STAKE_PERCENT = 0.10  # maximum 10% de la bankroll par pari
-STOP_LOSS_PERCENT = 0.30  # stop si perte de 30%
+DEFAULT_BANKROLL = 100.0
+PAYSTACK_LINK = "https://paystack.com/pay/TON-LIEN"
+RAPIDAPI_HOST = "free-api-live-football-data.p.rapidapi.com"
 
-initial_bankroll = 100
+# =========================
+# GESTION DU RISQUE
+# =========================
+MAX_STAKE_PERCENT = 0.10
+STOP_LOSS_PERCENT = 0.30
 
-if st.session_state.bankroll <= initial_bankroll * (1 - STOP_LOSS_PERCENT):
-    st.error("⛔ Stop-loss atteint : arrête les paris aujourd’hui.")
-    st.stop()
+
+def check_stop_loss():
+    limite = DEFAULT_BANKROLL * (1 - STOP_LOSS_PERCENT)
+
+    if st.session_state.bankroll <= limite:
+        st.error("⛔ Stop-loss atteint : arrête les paris aujourd’hui.")
+        st.stop()
     
     USERS = {
     "admin": {"password": "VIP123", "vip": True},
     "user": {"password": "1234", "vip": False},
 }
+
+if st.session_state.bankroll <= DEFAULT_BANKROLL * (1 - STOP_LOSS_PERCENT):
+    st.error("⛔ Stop-loss atteint : arrête les paris aujourd’hui.")
+    st.stop()
 
 COUNTRIES = {
     "🌍 Tous": None,
@@ -383,6 +396,8 @@ def main():
     show_logo()
 
     api_key = get_rapidapi_key()
+
+    check_stop_loss()
 
     # -------------------------
     # LOGIN
