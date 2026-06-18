@@ -473,38 +473,45 @@ def main():
     st.markdown(f"## 📊 Dashboard — {competition_name} ({season})")
 
     with st.expander("🔎 Recherche API Football : joueurs et équipes"):
-        tab_players, tab_teams = st.tabs(["👤 Joueurs", "🏟️ Équipes"])
+    tab_players, tab_teams = st.tabs(["👤 Joueurs", "🏟️ Équipes"])
 
-        with tab_players:
-    player_search = st.text_input(
-        "Nom du joueur",
-        value="messi",
-        key="player_search"
-    )
+    with tab_players:
+        player_search = st.text_input(
+            "Nom du joueur",
+            value="messi",
+            key="player_search"
+        )
 
-    if st.button("Rechercher joueur", key="player_btn"):
-        if not api_key:
-            st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
-        else:
-            data = search_players(player_search, api_key)
-            results = extract_results(data)
-
-            if not results:
-                st.warning("Aucun joueur trouvé.")
+        if st.button("Rechercher joueur", key="player_btn"):
+            if not api_key:
+                st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
             else:
-                for item in results[:10]:
-                    display_api_card(item, "joueur")
+                data = search_players(player_search, api_key)
+                results = extract_results(data)
 
-        with tab_teams:
-            team_search = st.text_input("Nom de l'équipe", value="chelsea", key="team_search")
-            if st.button("Rechercher équipe", key="team_btn"):
-                if not api_key:
-                    st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
+                if not results:
+                    st.warning("Aucun joueur trouvé.")
                 else:
-                    data = search_teams(team_search, api_key)
-                    results = extract_results(data)
-                    if not results:
-                        st.warning("Aucune équipe trouvée.")
+                    for item in results[:10]:
+                        display_api_card(item, "joueur")
+
+    with tab_teams:
+        team_search = st.text_input(
+            "Nom de l'équipe",
+            value="chelsea",
+            key="team_search"
+        )
+
+        if st.button("Rechercher équipe", key="team_btn"):
+            if not api_key:
+                st.warning("Ajoute RAPIDAPI_KEY dans les secrets ou dans la sidebar.")
+            else:
+                data = search_teams(team_search, api_key)
+                results = extract_results(data)
+
+                if not results:
+                    st.warning("Aucune équipe trouvée.")
+                else:
                     for item in results[:10]:
                         display_api_card(item, "équipe")
 
