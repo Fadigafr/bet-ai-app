@@ -4,8 +4,6 @@ from pathlib import Path
 import numpy as np
 import requests
 import streamlit as st
-package main
-
 import (
 	"fmt"
 	"net/http"
