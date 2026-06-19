@@ -3,18 +3,13 @@ from pathlib import Path
 
 import numpy as np
 import requests
-import streamlit as st
-
+ CONFIGimport streamlit as st
 # ==========================================
-# CONFIG
-# ==========================================
-st.set_page_config(page_title="BET AI ELITE", layout="wide")
+st.set_page_config(page_title="BET AI PRO+", layout="wide")
 
 DEFAULT_BANKROLL = 100.0
-MAX_STAKE = 0.1
-STOP_LOSS = 0.3
-
-RAPIDAPI_HOST = "free-api-live-football-data.p.rapidapi.com"
+MAX_STAKE = 0.10
+STOP_LOSS = 0.30
 
 # ==========================================
 # SESSION
@@ -23,9 +18,9 @@ if "bankroll" not in st.session_state:
     st.session_state.bankroll = DEFAULT_BANKROLL
 
 # ==========================================
-# STYLE
+# UI DESIGN PRO
 # ==========================================
-def set_background():
+def load_background():
     if Path("background.jpg").exists():
         with open("background.jpg", "rb") as f:
             bg = base64.b64encode(f.read()).decode()
@@ -33,46 +28,77 @@ def set_background():
         st.markdown(f"""
         <style>
         .stApp {{
-            background-image: url("data:image/jpg;base64,{bg}");
+            background-image:
+            linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)),
+            url("data:image/jpg;base64,{bg}");
             background-size: cover;
         }}
+
+        .card {{
+            background: rgba(15,23,42,0.85);
+            padding: 18px;
+            border-radius: 18px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(56,189,248,0.25);
+        }}
+
+        .value {{
+            color:#22c55e;
+            font-weight:bold;
+        }}
+
+        .risk-high {{color:#ef4444;}}
+        .risk-mid {{color:#f59e0b;}}
+        .risk-low {{color:#22c55e;}}
         </style>
         """, unsafe_allow_html=True)
 
 # ==========================================
-# API
+# IA ENGINE
 # ==========================================
-def get_api_key():
-    try:
-        return st.secrets.get("RAPIDAPI_KEY", "")
-    except:
-        return ""
+def compute_probs(o1, oX, o2):
+    p1, pX, p2 = 1/o1, 1/oX, 1/o2
+    total = p1+pX+p2
+    return p1/total, pX/total, p2/total
 
-def get_matches(api_key):
+def poisson(p1, p2):
+    return np.random.poisson(p1*2.3), np.random.poisson(p2*2.0)
+
+def value(prob, odd):
+    return prob*odd - 1
+
+def kelly(bankroll, prob, odd):
+    edge = prob*odd - 1
+    if edge <= 0:
+        return 0
+    k = edge/(odd-1)
+    return min(bankroll*k, bankroll*MAX_STAKE)
+
+def confidence(v, p):
+    score = (v*100)+(p*100)
+    return max(0, min(100, round(score,1)))
+
+def risk_level(conf):
+    if conf < 40:
+        return "🔴 ÉLEVÉ", "risk-high"
+    elif conf < 65:
+        return "🟠 MOYEN", "risk-mid"
+    return "🟢 FAIBLE", "risk-low"
+
+# ==========================================
+# API ODDS (BOOKMAKERS)
+# ==========================================
+def fetch_odds(api_key):
     if not api_key:
         return []
 
-    url = f"https://{RAPIDAPI_HOST}/football-matches"
-    headers = {
-        "x-rapidapi-key": api_key,
-        "x-rapidapi-host": RAPIDAPI_HOST
-    }
-
-    try:
-        r = requests.get(url, headers=headers)
-        data = r.json()
-        return data.get("response", [])
-    except:
-        return []
-
-def fetch_odds(api_key):
     url = "https://api.odds-api.io/v3/odds"
 
     params = {
         "apiKey": api_key,
         "sport": "football",
         "league": "england-premier-league",
-        "bookmakers": "Bet365,Betfair,1xBet"
+        "bookmakers": "Bet365,Betfair"
     }
 
     try:
@@ -85,14 +111,11 @@ def fetch_odds(api_key):
             home = game["home"]
             away = game["away"]
 
-            # extraire odds bookmaker
             book = list(game["bookmakers"].values())[0]
             odds_data = book[0]["odds"][0]
 
             o1 = float(odds_data["home"])
             o2 = float(odds_data["away"])
-
-            # simulate draw si absent
             oX = 3.2
 
             matches.append((home, away, o1, oX, o2))
@@ -101,73 +124,53 @@ def fetch_odds(api_key):
 
     except:
         return []
-        
-# ==========================================
-# IA ENGINE
-# ==========================================
-def compute_probs(o1, oX, o2):
-    p1, pX, p2 = 1/o1, 1/oX, 1/o2
-    total = p1 + pX + p2
-    return p1/total, pX/total, p2/total
-
-def poisson(p1, p2):
-    return np.random.poisson(p1*2.3), np.random.poisson(p2*2.1)
-
-def value(prob, odd):
-    return prob * odd - 1
-
-def kelly(bankroll, prob, odd):
-    edge = prob*odd - 1
-    if edge <= 0:
-        return 0
-    k = edge / (odd - 1)
-    return min(bankroll * k, bankroll * MAX_STAKE)
-
-def confidence(value, prob):
-    score = (value*100) + (prob*100)
-    return max(0, min(100, round(score,1)))
 
 # ==========================================
-# DEMO FALLBACK
+# FALLBACK
 # ==========================================
-def demo_matches():
+def fallback_matches():
     return [
-        ("PSG", "Marseille", 1.8, 3.3, 4.2),
-        ("Real Madrid", "Barcelone", 1.9, 3.2, 3.6),
-        ("Chelsea", "Arsenal", 2.1, 3.1, 3.3),
+        ("PSG","Marseille",1.8,3.3,4.2),
+        ("Real Madrid","Barcelone",1.9,3.2,3.6),
+        ("Chelsea","Arsenal",2.1,3.1,3.3),
     ]
 
 # ==========================================
 # MAIN
 # ==========================================
 def main():
-    set_background()
+    load_background()
 
-    st.title("⚽ BET AI ELITE 🔥")
-    st.warning("⚠️ Analyse IA – aucun gain garanti")
+    st.title("⚽ BET AI PRO+ 🔥")
+    st.warning("⚠️ Analyse IA – pas de garantie de gain")
 
-    api_key = st.sidebar.text_input("Clé API", type="password")
+    api_key = st.sidebar.text_input("Clé API Odds", type="password")
 
     bankroll = st.session_state.bankroll
 
     # STOP LOSS
-    if bankroll <= DEFAULT_BANKROLL * (1 - STOP_LOSS):
+    if bankroll <= DEFAULT_BANKROLL*(1-STOP_LOSS):
         st.error("⛔ Stop-loss atteint")
         st.stop()
 
-    odds_matches = fetch_odds(api_key)
+    matches = fetch_odds(api_key)
 
-if odds_matches:
-    st.success("✅ Cotes bookmakers chargées")
-    matches = odds_matches
-else:
-    st.warning("⚠️ Mode simulation")
-    matches = fallback_matches()
+    if not matches:
+        st.info("Mode simulation activé")
+        matches = fallback_matches()
+    else:
+        st.success("Cotes bookmakers chargées ✅")
 
+    results = []
+    combo = []
+
+    # ======================================
+    # LOOP MATCHES
+    # ======================================
     for team1, team2, o1, oX, o2 in matches:
 
-        p1, pX, p2 = compute_probs(o1, oX, o2)
-        gh, ga = poisson(p1, p2)
+        p1, pX, p2 = compute_probs(o1,oX,o2)
+        gh, ga = poisson(p1,p2)
 
         v1, vX, v2 = value(p1,o1), value(pX,oX), value(p2,o2)
 
@@ -179,56 +182,65 @@ else:
         prob = probs[best]
 
         conf = confidence(best_value, prob)
-
         stake = kelly(bankroll, prob, {"1":o1,"X":oX,"2":o2}[best])
+
+        risk_text, risk_class = risk_level(conf)
 
         if conf > 65:
             combo.append((team1, team2, best))
 
-        # DISPLAY
         st.markdown(f"""
-## ⚽ {team1} vs {team2}
+        <div class="card">
+        <h3>⚽ {team1} vs {team2}</h3>
 
-📊 Probabilités : {int(p1*100)}% / {int(pX*100)}% / {int(p2*100)}%
+        📊 Prob : {int(p1*100)} / {int(pX*100)} / {int(p2*100)}<br>
 
-💸 Cotes Bookmaker :
-- 🟢 {team1} : {o1}
-- ⚪ Draw : {oX}
-- 🔴 {team2} : {o2}
+        💸 Cotes :
+        {o1} | {oX} | {o2}<br><br>
 
-💰 Value Bet : {best} ({round(best_value,2)})
-🧠 Confiance : {conf}%
-""")
-st.markdown(f"""
-<b>🧠 Confiance :</b> {conf}%
-""", unsafe_allow_html=True)
+        💰 <span class="value">Value Bet : {best} ({round(best_value,2)})</span><br>
 
-🎯 Score : {gh}-{ga}  
-📈 {'OVER 2.5' if gh+ga>=3 else 'UNDER 2.5'}  
-🤝 {'OUI' if gh>0 and ga>0 else 'NON'}
+        🧠 Confiance : {conf}%<br>
+        ⚠️ <span class="{risk_class}">Risque : {risk_text}</span><br>
 
-💸 Mise : {round(stake,2)}€
-""")
+        🎯 Score : {gh}-{ga}<br>
+        📈 {'OVER 2.5' if gh+ga>=3 else 'UNDER 2.5'}<br>
+        🤝 {'OUI' if gh>0 and ga>0 else 'NON'}<br>
+
+        💸 Mise Kelly : {round(stake,2)}€
+        </div>
+        """, unsafe_allow_html=True)
 
         results.append((team1, team2, conf, best))
 
-    # CLASSEMENT
-    st.markdown("## 🧠 Meilleurs paris")
+    # ======================================
+    # TOP BETS
+    # ======================================
+    st.markdown("## 🧠 TOP PARIS")
+
     for r in sorted(results, key=lambda x:x[2], reverse=True):
         st.write(f"✅ {r[0]} vs {r[1]} → {r[3]} ({r[2]}%)")
 
+    # ======================================
     # COMBO
-    st.markdown("## 🔗 Combiné IA")
+    # ======================================
+    st.markdown("## 🔗 COMBINÉ IA")
+
     if combo:
         for c in combo:
             st.write(f"{c[0]} vs {c[1]} → {c[2]}")
     else:
         st.info("Aucun combiné fiable")
 
+    # ======================================
     # BANKROLL
-    st.markdown("## 💳 Bankroll")
+    # ======================================
+    st.markdown("## 💳 BANKROLL")
+
     st.metric("Capital", f"{round(bankroll,2)} €")
 
 # ==========================================
 if __name__ == "__main__":
     main()
+
+# ==========================================
