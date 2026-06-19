@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import streamlit as st
 
-:# ==========================================
+# ==========================================
         return 0
     stake = (edge / (odd - 1))
     return min(bankroll * stake, bankroll * MAX_STAKE_PERCENT)
