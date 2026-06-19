@@ -199,7 +199,9 @@ else:
 💰 Value Bet : {best} ({round(best_value,2)})
 🧠 Confiance : {conf}%
 """)
-🧠 Confiance : {conf}%
+st.markdown(f"""
+<b>🧠 Confiance :</b> {conf}%
+""", unsafe_allow_html=True)
 
 🎯 Score : {gh}-{ga}  
 📈 {'OVER 2.5' if gh+ga>=3 else 'UNDER 2.5'}  
