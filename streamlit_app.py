@@ -65,6 +65,43 @@ def get_matches(api_key):
     except:
         return []
 
+def fetch_odds(api_key):
+    url = "https://api.odds-api.io/v3/odds"
+
+    params = {
+        "apiKey": api_key,
+        "sport": "football",
+        "league": "england-premier-league",
+        "bookmakers": "Bet365,Betfair,1xBet"
+    }
+
+    try:
+        res = requests.get(url, params=params, timeout=10)
+        data = res.json()
+
+        matches = []
+
+        for game in data.get("data", []):
+            home = game["home"]
+            away = game["away"]
+
+            # extraire odds bookmaker
+            book = list(game["bookmakers"].values())[0]
+            odds_data = book[0]["odds"][0]
+
+            o1 = float(odds_data["home"])
+            o2 = float(odds_data["away"])
+
+            # simulate draw si absent
+            oX = 3.2
+
+            matches.append((home, away, o1, oX, o2))
+
+        return matches
+
+    except:
+        return []
+        
 # ==========================================
 # IA ENGINE
 # ==========================================
@@ -118,10 +155,14 @@ def main():
         st.error("⛔ Stop-loss atteint")
         st.stop()
 
-    matches = demo_matches()
+    odds_matches = fetch_odds(api_key)
 
-    results = []
-    combo = []
+if odds_matches:
+    st.success("✅ Cotes bookmakers chargées")
+    matches = odds_matches
+else:
+    st.warning("⚠️ Mode simulation")
+    matches = fallback_matches()
 
     for team1, team2, o1, oX, o2 in matches:
 
@@ -146,12 +187,18 @@ def main():
 
         # DISPLAY
         st.markdown(f"""
-### ⚽ {team1} vs {team2}
+## ⚽ {team1} vs {team2}
 
-📊 Prob : {int(p1*100)}% / {int(pX*100)}% / {int(p2*100)}%
+📊 Probabilités : {int(p1*100)}% / {int(pX*100)}% / {int(p2*100)}%
 
-💰 Value : {best} ({round(best_value,2)})
+💸 Cotes Bookmaker :
+- 🟢 {team1} : {o1}
+- ⚪ Draw : {oX}
+- 🔴 {team2} : {o2}
 
+💰 Value Bet : {best} ({round(best_value,2)})
+🧠 Confiance : {conf}%
+""")
 🧠 Confiance : {conf}%
 
 🎯 Score : {gh}-{ga}  
