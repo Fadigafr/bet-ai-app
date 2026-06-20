@@ -5,233 +5,177 @@ import numpy as np
 import requests
 import streamlit as st
 
-# ==============================================
+# ==========================================
 # CONFIG
-# ==============================================
-st.set_page_config(page_title="BET AI SAAS PRO", layout="wide")
+# ==========================================
+st.set_page_config(page_title="BET AI ENTERPRISE", layout="wide")
 
-DEFAULT_BANKROLL = 100.0
-MAX_STAKE = 0.10
-STOP_LOSS = 0.30
+PAYSTACK_LINK = "https://paystack.com/pay/TON-LIEN"
+API_URL = "http://localhost:8000"  # FastAPI backend
 
-# ==============================================
-# SESSION
-# ==============================================
-if "bankroll" not in st.session_state:
-    st.session_state.bankroll = DEFAULT_BANKROLL
-
-# ==============================================
+# ==========================================
 # DATABASE
-# ==============================================
-conn = sqlite3.connect("bets.db", check_same_thread=False)
+# ==========================================
+conn = sqlite3.connect("app.db", check_same_thread=False)
 cursor = conn.cursor()
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS bets (
-    id INTEGER PRIMARY KEY,
-    match TEXT,
-    prediction TEXT,
-    confidence REAL,
-    profit REAL,
-    result REAL
+CREATE TABLE IF NOT EXISTS users(
+    username TEXT PRIMARY KEY,
+    password TEXT,
+    vip INTEGER
 )
 """)
 
 conn.commit()
 
-# ==============================================
-# UI DESIGN
-# ==============================================
+# ==========================================
+# LOGIN
+# ==========================================
+def login():
+    st.title("🔐 Connexion")
+
+    user = st.text_input("Utilisateur")
+    pwd = st.text_input("Mot de passe", type="password")
+
+    if st.button("Login"):
+        res = cursor.execute(
+            "SELECT * FROM users WHERE username=? AND password=?",
+            (user, pwd)
+        ).fetchone()
+
+        if res:
+            st.session_state.logged = True
+            st.session_state.user = user
+            st.session_state.vip = res[2]
+            st.rerun()
+        else:
+            st.error("Erreur login")
+
+# ==========================================
+# STYLE
+# ==========================================
 def load_bg():
     if Path("background.jpg").exists():
         with open("background.jpg","rb") as f:
             data = base64.b64encode(f.read()).decode()
 
         st.markdown(f"""
-        <style>
-        .stApp {{
-            background-image:
-            linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)),
-            url("data:image/jpg;base64,{data}");
-            background-size: cover;
-        }}
+<style>
+.stApp {{
+background-image: linear-gradient(rgba(0,0,0,0.9),rgba(0,0,0,0.95)),
+url("data:image/jpg;base64,{data}");
+background-size: cover;
+}}
+.card {{
+background:#0f172a;
+padding:15px;
+border-radius:12px;
+margin-bottom:10px;
+}}
+</style>
+""", unsafe_allow_html=True)
 
-        .card {{
-            background: rgba(15,23,42,0.85);
-            padding: 18px;
-            border-radius: 16px;
-            margin-bottom: 12px;
-            border: 1px solid #22c55e40;
-        }}
-        </style>
-        """, unsafe_allow_html=True)
-
-# ==============================================
-# IA ENGINE
-# ==============================================
-def probs(o1,oX,o2):
-    p1,pX,p2=1/o1,1/oX,1/o2
+# ==========================================
+# IA + ARBITRAGE
+# ==========================================
+def analyse(o1,oX,o2):
+    p1,pX,p2 = 1/o1,1/oX,1/o2
     t=p1+pX+p2
-    return p1/t,pX/t,p2/t
 
-def poisson(p1,p2):
-    return np.random.poisson(p1*2.3), np.random.poisson(p2*2.1)
+    probs=[p1/t,pX/t,p2/t]
+    values=[probs[0]*o1-1, probs[1]*oX-1, probs[2]*o2-1]
 
-def value(prob,odd):
-    return prob*odd-1
+    best = ["1","X","2"][np.argmax(values)]
+    conf = round(max(values)*100,2)
 
-def confidence(v,p):
-    return max(0,min(100,round((v+p)*100/2,1)))
+    inv = (1/o1)+(1/oX)+(1/o2)
+    arb = inv < 1
+    profit = round((1-inv)*100,2) if arb else 0
 
-def kelly(bank,prob,odd):
-    edge = prob*odd-1
-    if edge <= 0:
-        return 0
-    k = edge/(odd-1)
-    return min(bank*k, bank*MAX_STAKE)
+    return best, conf, arb, profit
 
-# ==============================================
-# ARBITRAGE
-# ==============================================
-def arbitrage(o1,oX,o2):
-    inv=(1/o1)+(1/oX)+(1/o2)
-    if inv<1:
-        return True, round((1-inv)*100,2)
-    return False,0
+# ==========================================
+# MATCHS
+# ==========================================
+teams = [
+("PSG","Marseille"),
+("Real Madrid","Barcelone"),
+("Chelsea","Arsenal"),
+("Bayern","Dortmund"),
+("Liverpool","Man City")
+]
 
-# ==============================================
-# TELEGRAM ALERT
-# ==============================================
-def send_telegram(msg):
-    TOKEN=st.secrets.get("TELEGRAM_TOKEN","")
-    CHAT=st.secrets.get("TELEGRAM_CHAT_ID","")
-
-    if not TOKEN or not CHAT:
-        return
-
-    url=f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    requests.post(url,data={"chat_id":CHAT,"text":msg})
-
-# ==============================================
-# FAKE DATA (100 MATCHES)
-# ==============================================
-def generate_matches(n=100):
-    np.random.seed(42)
+def get_matches():
     matches=[]
-    for i in range(n):
-        o1=np.random.uniform(1.5,3)
-        oX=np.random.uniform(2.8,4)
-        o2=np.random.uniform(1.8,4)
-        matches.append((f"Team{i}",f"Team{i+1}",o1,oX,o2))
+    for t1,t2 in teams:
+        matches.append((
+            t1,t2,
+            np.random.uniform(1.5,3),
+            np.random.uniform(2.8,4),
+            np.random.uniform(2,4)
+        ))
     return matches
 
-# ==============================================
-# MAIN
-# ==============================================
-def main():
+# ==========================================
+# APP
+# ==========================================
+def app():
     load_bg()
 
-    st.title("🔥 BET AI SAAS PRO")
+    st.sidebar.write(f"👤 {st.session_state.user}")
 
-    bankroll=st.session_state.bankroll
+    # Vérifier VIP via API backend (auto update)
+    try:
+        r = requests.get(f"{API_URL}/user/{st.session_state.user}")
+        st.session_state.vip = r.json().get("vip",0)
+    except:
+        pass
 
-    if bankroll <= DEFAULT_BANKROLL*(1-STOP_LOSS):
-        st.error("⛔ STOP LOSS atteint")
+    # PAYWALL
+    if not st.session_state.vip:
+        st.warning("🔒 Accès VIP requis")
+
+        st.markdown(f"""
+💎 Accès complet :
+
+✅ Arbitrage PRO  
+✅ Scanner  
+✅ Alerts  
+
+👉 [Payer ici]({PAYSTACK_LINK})
+""")
+
         st.stop()
 
-    matches=generate_matches(100)
+    st.title("⚽ BET AI ENTERPRISE")
 
-    total_profit=0
-    total_bets=0
-    wins=0
+    matches = get_matches()
 
-    st.markdown("## 📊 Analyse en cours...")
+    for t1,t2,o1,oX,o2 in matches:
 
-    for team1,team2,o1,oX,o2 in matches:
+        best, conf, arb, profit = analyse(o1,oX,o2)
 
-        p1,pX,p2=probs(o1,oX,o2)
-        gh,ga=poisson(p1,p2)
-
-        v1,vX,v2=value(p1,o1),value(pX,oX),value(p2,o2)
-
-        values={"1":v1,"X":vX,"2":v2}
-        best=max(values,key=values.get)
-
-        prob={"1":p1,"X":pX,"2":p2}[best]
-        val=values[best]
-
-        conf=confidence(val,prob)
-        stake=kelly(bankroll,prob,{"1":o1,"X":oX,"2":o2}[best])
-
-        arb,profit=arbitrage(o1,oX,o2)
-
-        if arb and profit>2:
-            send_telegram(f"ARBITRAGE: {team1} vs {team2} profit {profit}%")
-
-        # SIMULATION RESULTAT
-        result = np.random.choice([1,-1])
-        gain = stake if result==1 else -stake
-
-        total_profit += gain
-        total_bets +=1
-
-        if result==1:
-            wins+=1
-
-        cursor.execute("""
-        INSERT INTO bets (match,prediction,confidence,profit,result)
-        VALUES (?,?,?,?,?)
-        """,(f"{team1} vs {team2}",best,conf,profit,gain))
-
-        conn.commit()
-
-        # UI
         st.markdown(f"""
 <div class="card">
-<b>⚽ {team1} vs {team2}</b><br>
+<b>{t1} vs {t2}</b><br>
 
-💰 Value : {best} ({round(val,2)})<br>
+💸 Odds : {round(o1,2)} | {round(oX,2)} | {round(o2,2)}<br>
+
+💰 Bet : {best}<br>
 🧠 Confiance : {conf}%<br>
 
-🎯 Score : {gh}-{ga}<br>
-💸 Mise : {round(stake,2)} €<br>
-
+{"✅ ARBITRAGE "+str(profit)+"%" if arb else "❌ No arbitrage"}
 </div>
 """, unsafe_allow_html=True)
 
-    # ======================================
-    # DASHBOARD ANALYTICS
-    # ======================================
-    st.markdown("## 📈 DASHBOARD ANALYTICS")
+# ==========================================
+# ROUTER
+# ==========================================
+if "logged" not in st.session_state:
+    st.session_state.logged=False
 
-    roi = (total_profit / DEFAULT_BANKROLL) * 100
-    winrate = (wins / total_bets) * 100 if total_bets else 0
-
-    col1,col2,col3=st.columns(3)
-
-    col1.metric("Profit total", f"{round(total_profit,2)} €")
-    col2.metric("ROI", f"{round(roi,2)} %")
-    col3.metric("Winrate", f"{round(winrate,2)} %")
-
-    # GRAPHIQUE
-    data = cursor.execute("SELECT result FROM bets").fetchall()
-    curve = np.cumsum([x[0] for x in data])
-
-    st.line_chart(curve)
-
-    # HISTORIQUE
-    st.markdown("## 📊 Historique récents")
-
-    history=cursor.execute("SELECT match,profit,result FROM bets ORDER BY id DESC LIMIT 10").fetchall()
-
-    for h in history:
-        st.write(h)
-
-    # BANKROLL
-    st.markdown("## 💳 Bankroll")
-    st.metric("Capital initial", f"{DEFAULT_BANKROLL} €")
-    st.metric("Profit actuel", f"{round(total_profit,2)} €")
-
-# ==============================================
-if __name__=="__main__":
-    main()
+if not st.session_state.logged:
+    login()
+else:
+    app()
