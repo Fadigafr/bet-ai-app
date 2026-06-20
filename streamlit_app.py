@@ -1,28 +1,47 @@
 import base64
 from pathlib import Path
-
+import sqlite3
 import numpy as np
 import requests
 import streamlit as st
 
-# ==========================================
+# ==============================================
 # CONFIG
-# ==========================================
-st.set_page_config(page_title="BET AI ULTRA PRO", layout="wide")
+# ==============================================
+st.set_page_config(page_title="BET AI SAAS PRO", layout="wide")
 
 DEFAULT_BANKROLL = 100.0
 MAX_STAKE = 0.10
 STOP_LOSS = 0.30
 
-# ==========================================
+# ==============================================
 # SESSION
-# ==========================================
+# ==============================================
 if "bankroll" not in st.session_state:
     st.session_state.bankroll = DEFAULT_BANKROLL
 
-# ==========================================
+# ==============================================
+# DATABASE
+# ==============================================
+conn = sqlite3.connect("bets.db", check_same_thread=False)
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS bets (
+    id INTEGER PRIMARY KEY,
+    match TEXT,
+    prediction TEXT,
+    confidence REAL,
+    profit REAL,
+    result REAL
+)
+""")
+
+conn.commit()
+
+# ==============================================
 # UI DESIGN
-# ==========================================
+# ==============================================
 def load_bg():
     if Path("background.jpg").exists():
         with open("background.jpg","rb") as f:
@@ -42,17 +61,16 @@ def load_bg():
             padding: 18px;
             border-radius: 16px;
             margin-bottom: 12px;
-            border: 1px solid #22c55e30;
+            border: 1px solid #22c55e40;
         }}
-
         </style>
         """, unsafe_allow_html=True)
 
-# ==========================================
+# ==============================================
 # IA ENGINE
-# ==========================================
+# ==============================================
 def probs(o1,oX,o2):
-    p1,pX,p2 = 1/o1,1/oX,1/o2
+    p1,pX,p2=1/o1,1/oX,1/o2
     t=p1+pX+p2
     return p1/t,pX/t,p2/t
 
@@ -67,69 +85,74 @@ def confidence(v,p):
 
 def kelly(bank,prob,odd):
     edge = prob*odd-1
-    if edge<=0:
+    if edge <= 0:
         return 0
     k = edge/(odd-1)
     return min(bank*k, bank*MAX_STAKE)
 
-# ==========================================
-# ARBITRAGE ENGINE
-# ==========================================
+# ==============================================
+# ARBITRAGE
+# ==============================================
 def arbitrage(o1,oX,o2):
-    inv = (1/o1)+(1/oX)+(1/o2)
+    inv=(1/o1)+(1/oX)+(1/o2)
     if inv<1:
         return True, round((1-inv)*100,2)
-    return False, 0
+    return False,0
 
-def arb_stakes(bank,o1,oX,o2):
-    inv=(1/o1)+(1/oX)+(1/o2)
-    return (
-        bank*(1/o1)/inv,
-        bank*(1/oX)/inv,
-        bank*(1/o2)/inv
-    )
+# ==============================================
+# TELEGRAM ALERT
+# ==============================================
+def send_telegram(msg):
+    TOKEN=st.secrets.get("TELEGRAM_TOKEN","")
+    CHAT=st.secrets.get("TELEGRAM_CHAT_ID","")
 
-# ==========================================
-# DATA (SIMULATION OU API)
-# ==========================================
+    if not TOKEN or not CHAT:
+        return
+
+    url=f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    requests.post(url,data={"chat_id":CHAT,"text":msg})
+
+# ==============================================
+# FAKE DATA (100 MATCHES)
+# ==============================================
 def generate_matches(n=100):
-    np.random.seed(1)
+    np.random.seed(42)
     matches=[]
     for i in range(n):
-        t1=f"Team{i}"
-        t2=f"Team{i+1}"
         o1=np.random.uniform(1.5,3)
         oX=np.random.uniform(2.8,4)
         o2=np.random.uniform(1.8,4)
-        matches.append((t1,t2,o1,oX,o2))
+        matches.append((f"Team{i}",f"Team{i+1}",o1,oX,o2))
     return matches
 
-# ==========================================
+# ==============================================
 # MAIN
-# ==========================================
+# ==============================================
 def main():
     load_bg()
 
-    st.title("⚽ BET AI ULTRA PRO — SCANNER 100 MATCHS")
+    st.title("🔥 BET AI SAAS PRO")
 
     bankroll=st.session_state.bankroll
 
     if bankroll <= DEFAULT_BANKROLL*(1-STOP_LOSS):
-        st.error("⛔ Stop-loss atteint")
+        st.error("⛔ STOP LOSS atteint")
         st.stop()
 
-    matches = generate_matches(100)
+    matches=generate_matches(100)
 
-    arb_count=0
-    best_bets=[]
+    total_profit=0
+    total_bets=0
+    wins=0
+
+    st.markdown("## 📊 Analyse en cours...")
 
     for team1,team2,o1,oX,o2 in matches:
 
-        p1,pX,p2 = probs(o1,oX,o2)
+        p1,pX,p2=probs(o1,oX,o2)
+        gh,ga=poisson(p1,p2)
 
-        gh,ga = poisson(p1,p2)
-
-        v1,vX,v2 = value(p1,o1),value(pX,oX),value(p2,o2)
+        v1,vX,v2=value(p1,o1),value(pX,oX),value(p2,o2)
 
         values={"1":v1,"X":vX,"2":v2}
         best=max(values,key=values.get)
@@ -137,72 +160,78 @@ def main():
         prob={"1":p1,"X":pX,"2":p2}[best]
         val=values[best]
 
-        conf = confidence(val,prob)
+        conf=confidence(val,prob)
+        stake=kelly(bankroll,prob,{"1":o1,"X":oX,"2":o2}[best])
 
-        stake = kelly(bankroll,prob,{"1":o1,"X":oX,"2":o2}[best])
+        arb,profit=arbitrage(o1,oX,o2)
 
-        arb,profit = arbitrage(o1,oX,o2)
+        if arb and profit>2:
+            send_telegram(f"ARBITRAGE: {team1} vs {team2} profit {profit}%")
 
-        if arb:
-            arb_count +=1
-            s1,sX,s2 = arb_stakes(bankroll,o1,oX,o2)
+        # SIMULATION RESULTAT
+        result = np.random.choice([1,-1])
+        gain = stake if result==1 else -stake
 
-        best_bets.append((team1,team2,conf,best))
+        total_profit += gain
+        total_bets +=1
 
-        # =====================================
-        # UI CARD
-        # =====================================
+        if result==1:
+            wins+=1
+
+        cursor.execute("""
+        INSERT INTO bets (match,prediction,confidence,profit,result)
+        VALUES (?,?,?,?,?)
+        """,(f"{team1} vs {team2}",best,conf,profit,gain))
+
+        conn.commit()
+
+        # UI
         st.markdown(f"""
 <div class="card">
+<b>⚽ {team1} vs {team2}</b><br>
 
-<h4>⚽ {team1} vs {team2}</h4>
+💰 Value : {best} ({round(val,2)})<br>
+🧠 Confiance : {conf}%<br>
 
-📊 Odds : {round(o1,2)} | {round(oX,2)} | {round(o2,2)}  
-
-🧠 Confiance IA : <b>{conf}%</b>  
-💰 Value : <b>{best} ({round(val,2)})</b>  
-
-🎯 Score IA : {gh}-{ga}  
-📈 {'OVER 2.5' if gh+ga>=3 else 'UNDER 2.5'}  
-
-💸 Mise Kelly : {round(stake,2)} €
+🎯 Score : {gh}-{ga}<br>
+💸 Mise : {round(stake,2)} €<br>
 
 </div>
 """, unsafe_allow_html=True)
 
-        # =====================================
-        # ARBITRAGE UI
-        # =====================================
-        if arb:
-            st.success(f"""
-💰 ARBITRAGE DÉTECTÉ
+    # ======================================
+    # DASHBOARD ANALYTICS
+    # ======================================
+    st.markdown("## 📈 DASHBOARD ANALYTICS")
 
-Profit : {profit}%
+    roi = (total_profit / DEFAULT_BANKROLL) * 100
+    winrate = (wins / total_bets) * 100 if total_bets else 0
 
-Mises :
-1 → {round(s1,2)} €
-X → {round(sX,2)} €
-2 → {round(s2,2)} €
-""")
+    col1,col2,col3=st.columns(3)
 
-    # =====================================
-    # STATS
-    # =====================================
-    st.markdown("## 📊 RÉSULTATS")
+    col1.metric("Profit total", f"{round(total_profit,2)} €")
+    col2.metric("ROI", f"{round(roi,2)} %")
+    col3.metric("Winrate", f"{round(winrate,2)} %")
 
-    st.metric("Arbitrages trouvés", arb_count)
+    # GRAPHIQUE
+    data = cursor.execute("SELECT result FROM bets").fetchall()
+    curve = np.cumsum([x[0] for x in data])
 
-    # TOP IA
-    st.markdown("## 🧠 TOP IA")
+    st.line_chart(curve)
 
-    for m in sorted(best_bets, key=lambda x:x[2], reverse=True)[:10]:
-        st.write(f"{m[0]} vs {m[1]} → {m[3]} ({m[2]}%)")
+    # HISTORIQUE
+    st.markdown("## 📊 Historique récents")
+
+    history=cursor.execute("SELECT match,profit,result FROM bets ORDER BY id DESC LIMIT 10").fetchall()
+
+    for h in history:
+        st.write(h)
 
     # BANKROLL
-    st.markdown("## 💳 BANKROLL")
-    st.metric("Capital", f"{round(bankroll,2)} €")
+    st.markdown("## 💳 Bankroll")
+    st.metric("Capital initial", f"{DEFAULT_BANKROLL} €")
+    st.metric("Profit actuel", f"{round(total_profit,2)} €")
 
-
-# ==========================================
-if __name__ == "__main__":
+# ==============================================
+if __name__=="__main__":
     main()
