@@ -6,7 +6,7 @@ import requests
 import streamlit as st
 
 # ==========================================
-CONFIG
+# CONFIG
 # ==========================================
 st.set_page_config(page_title="BET AI PRO+", layout="wide")
 
