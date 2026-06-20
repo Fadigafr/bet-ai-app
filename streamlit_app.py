@@ -3,7 +3,10 @@ from pathlib import Path
 
 import numpy as np
 import requests
- CONFIGimport streamlit as st
+import streamlit as st
+
+# ==========================================
+CONFIG
 # ==========================================
 st.set_page_config(page_title="BET AI PRO+", layout="wide")
 
