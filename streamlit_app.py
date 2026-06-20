@@ -33,29 +33,40 @@ conn.commit()
 # LOGIN
 # ==========================================
 def login():
-    st.title("🔐 Connexion")
+    st.title("🔐 Connexion / Inscription")
 
     user = st.text_input("Utilisateur")
     pwd = st.text_input("Mot de passe", type="password")
 
-    if st.button("Login"):
-        res = cursor.execute(
+    col1, col2 = st.columns(2)
+
+    # LOGIN
+    if col1.button("Se connecter"):
+        result = cursor.execute(
             "SELECT * FROM users WHERE username=? AND password=?",
             (user, pwd)
         ).fetchone()
 
-        if res:
+        if result:
             st.session_state.logged = True
             st.session_state.user = user
-            st.session_state.vip = res[2]
+            st.session_state.vip = result[2]
+            st.success("Connexion réussie ✅")
             st.rerun()
         else:
-            st.error("Erreur login")
+            st.error("❌ Mauvais identifiants")
 
-cursor.execute("""
-INSERT OR IGNORE INTO users VALUES ('admin','1234',1)
-""")
-conn.commit()
+    # REGISTER
+    if col2.button("Créer un compte"):
+        cursor.execute(
+            "INSERT OR IGNORE INTO users VALUES (?,?,?)",
+            (user, pwd, 0)
+        )
+        conn.commit()
+        st.success("✅ Compte créé ! Connecte-toi maintenant")
+
+users = cursor.execute("SELECT * FROM users").fetchall()
+st.write(users)
 
 # ==========================================
 # STYLE
