@@ -33,7 +33,7 @@ async def paystack_webhook(request: Request):
 
     if event == "charge.success":
 
-        email = data["data"]["customer"]["email"]
+        email = data["data"]["customer"]["fadigafr2000@yahoo.fr"]
 
         # convert email → username (à adapter)
         username = email.split("@")[0]
