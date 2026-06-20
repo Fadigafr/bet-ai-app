@@ -52,6 +52,11 @@ def login():
         else:
             st.error("Erreur login")
 
+cursor.execute("""
+INSERT OR IGNORE INTO users VALUES ('admin','1234',1)
+""")
+conn.commit()
+
 # ==========================================
 # STYLE
 # ==========================================
