@@ -80,35 +80,32 @@ def login():
             st.error("❌ Identifiants incorrects")
 
     # REGISTER
-    if col2.button("Créer compte"):
+if col2.button("Créer compte"):
 
-        if not email or not password:
-            st.warning("⚠️ Remplis tous les champs")
-            st.stop()
+    if not email or not password:
+        st.warning("⚠️ Remplis tous les champs")
+        st.stop()
 
-        existing = cursor.execute(
-            "SELECT * FROM users WHERE username=?",
-            (email,)
-        ).fetchone()
+    existing = cursor.execute(
+        "SELECT * FROM users WHERE username=?",
+        (email,)
+    ).fetchone()
 
-        hashed = hash_password(password)
+    hashed = hash_password(password)
 
-        if existing:
-            cursor.execute(
-                "UPDATE users SET password=? WHERE username=?",
-                (hashed, email)
-            )
-        else:
-            cursor.execute("""
-CREATE TABLE IF NOT EXISTS users(
-    username TEXT PRIMARY KEY,
-    password TEXT,
-    vip INTEGER,
-    score INTEGER DEFAULT 0
-)
-""")
-conn.commit()
-        st.success("✅ Compte créé - connecte-toi")
+    if existing:
+        cursor.execute(
+            "UPDATE users SET password=? WHERE username=?",
+            (hashed, email)
+        )
+    else:
+        cursor.execute(
+            "INSERT INTO users VALUES (?, ?, ?)",
+            (email, hashed, 0)
+        )
+
+    conn.commit()   # ✅ même niveau que if/else
+    st.success("✅ Compte créé - connecte-toi")   # ✅ même niveau
 
 def profile_page():
 
