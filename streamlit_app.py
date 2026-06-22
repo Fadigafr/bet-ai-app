@@ -54,39 +54,49 @@ def login():
 def admin_panel():
     st.title("🛠️ ADMIN PANEL")
 
-    # Sécurité : accès admin uniquement
+    # Sécurité admin
     if st.session_state.user != "admin@gmail.com":
         st.error("⛔ Accès refusé")
         return
-
-    st.markdown("## 👥 Utilisateurs")
 
     users = cursor.execute("SELECT * FROM users").fetchall()
 
     for user in users:
         username, password, vip = user
 
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5 = st.columns(5)
 
         col1.write(username)
         col2.write("VIP ✅" if vip == 1 else "Free ❌")
 
-        # ACTIVER VIP
-        if col3.button(f"Activer VIP {username}"):
-            cursor.execute(
-                "UPDATE users SET vip=1 WHERE username=?",
-                (username,)
-            )
+        # ✅ Activer VIP
+        if col3.button(f"VIP {username}", key=f"vip_{username}"):
+            cursor.execute("UPDATE users SET vip=1 WHERE username=?", (username,))
             conn.commit()
             st.success(f"{username} → VIP ✅")
             st.rerun()
 
-        # SUPPRIMER USER
-        if col4.button(f"Supprimer {username}"):
-            cursor.execute(
-                "DELETE FROM users WHERE username=?",
-                (username,)
-            )
+        # ✅ Reset password (INPUT DOIT ÊTRE DANS BOUCLE)
+        new_pass = col4.text_input(
+            f"Nouveau mdp {username}",
+            type="password",
+            key=f"pass_{username}"
+        )
+
+        if col4.button(f"Reset {username}", key=f"reset_{username}"):
+            if new_pass:
+                hashed = hash_password(new_pass)
+                cursor.execute(
+                    "UPDATE users SET password=? WHERE username=?",
+                    (hashed, username)
+                )
+                conn.commit()
+                st.success("Mot de passe changé ✅")
+                st.rerun()
+
+        # ✅ Supprimer utilisateur
+        if col5.button(f"❌ {username}", key=f"del_{username}"):
+            cursor.execute("DELETE FROM users WHERE username=?", (username,))
             conn.commit()
             st.warning(f"{username} supprimé")
             st.rerun()
