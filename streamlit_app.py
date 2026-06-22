@@ -33,29 +33,39 @@ conn.commit()
 # ==========================================
 # LOGIN
 # ==========================================
-def hash_password(password):
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+def Créer compte"):def hash_password(password):
+        hashed = hash_password(password)
+
+        cursor.execute(
+            "INSERT OR IGNORE INTO users VALUES (?, ?, ?)",
+            (email, hashed, 0)
+        )
+        conn.commit()
+
+        st.success("✅ Compte créé ! Connecte-toi")
+
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 def check_password(password, hashed):
-    return bcrypt.checkpw(password.encode(), hashed)
+    return bcrypt.checkpw(password.encode(), hashed.encode())
 
 def login():
-    st.title("🔐 Connexion sécurisée")
+    st.title("🔐 Connexion / Inscription")
 
     email = st.text_input("Email")
     password = st.text_input("Mot de passe", type="password")
 
     col1, col2 = st.columns(2)
 
-    # LOGIN
+    # ✅ LOGIN
     if col1.button("Se connecter"):
-
         user = cursor.execute(
             "SELECT * FROM users WHERE username=?",
             (email,)
         ).fetchone()
 
-        if user and check_password(password, user[1].encode()):
+        if user and check_password(password, user[1]):
             st.session_state.logged = True
             st.session_state.user = email
             st.session_state.vip = user[2]
@@ -64,19 +74,8 @@ def login():
         else:
             st.error("❌ Identifiants incorrects")
 
-def hash_password(password):
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    # ✅ REGISTER (ALIGNÉ AVEC col1)
 
-# ✅ CRÉATION ADMIN AUTO
-cursor.execute("""
-INSERT OR IGNORE INTO users (username, password, vip)
-VALUES (?, ?, ?)
-""", (
-    "fadigafr2000@yahoo.fr",
-    hash_password("admin123"),
-    1
-))
-conn.commit()
 
     # REGISTER
     if col2.button("Créer compte"):
