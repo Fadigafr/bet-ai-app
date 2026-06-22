@@ -64,6 +64,20 @@ def login():
         else:
             st.error("❌ Identifiants incorrects")
 
+def hash_password(password):
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+# ✅ CRÉATION ADMIN AUTO
+cursor.execute("""
+INSERT OR IGNORE INTO users (username, password, vip)
+VALUES (?, ?, ?)
+""", (
+    "fadigafr2000@yahoo.fr",
+    hash_password("admin123"),
+    1
+))
+conn.commit()
+
     # REGISTER
     if col2.button("Créer compte"):
 
