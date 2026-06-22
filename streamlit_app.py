@@ -1,15 +1,11 @@
 # ==========================================
-# IMPORTS
-# ==========================================
-import sqlite3
-import streamlit as st
-import bcrypt
+# IMPORTimport bcrypt# IMPORTS
 import numpy as np
 
 # ==========================================
 # CONFIG
 # ==========================================
-st.set_page_config(page_title="BET AI ELITE", layout="wide")
+st.set_page_config(page_title="BET AI CLEAN FINAL", layout="wide")
 
 # ==========================================
 # DATABASE
@@ -40,12 +36,12 @@ def check_password(password, hashed):
         return False
 
 # ==========================================
-# ADMIN DEFAULT
+# ADMIN DEFAULT (SAFE)
 # ==========================================
-cursor.execute(
-    "INSERT OR IGNORE INTO users VALUES (?, ?, ?, ?)",
-    ("admin@gmail.com", hash_password("admin123"), 1, 100)
-)
+cursor.execute("""
+INSERT OR IGNORE INTO users (username, password, vip, score)
+VALUES (?, ?, ?, ?)
+""", ("admin@gmail.com", hash_password("admin123"), 1, 100))
 conn.commit()
 
 # ==========================================
@@ -69,10 +65,10 @@ def update_score(user):
     return points
 
 # ==========================================
-# LOGIN
+# LOGIN / REGISTER
 # ==========================================
 def login():
-    st.title("🔐 Connexion / Inscription")
+    st.title("🔐 Connexion")
 
     email = st.text_input("Email")
     password = st.text_input("Mot de passe", type="password")
@@ -89,6 +85,7 @@ def login():
         if user and check_password(password, user[1]):
             st.session_state.logged = True
             st.session_state.user = email
+            st.session_state.vip = user[2]
             st.success("✅ Connexion réussie")
             st.rerun()
         else:
@@ -115,18 +112,18 @@ def login():
             )
         else:
             cursor.execute(
-                "INSERT INTO users VALUES (?, ?, ?, ?)",
+                "INSERT INTO users (username, password, vip, score) VALUES (?, ?, ?, ?)",
                 (email, hashed, 0, 0)
             )
 
         conn.commit()
-        st.success("✅ Compte créé - connecte-toi")
+        st.success("✅ Compte créé")
 
 # ==========================================
 # PROFIL
 # ==========================================
 def profile_page():
-    st.title("👤 Profil Utilisateur")
+    st.title("👤 Profil")
 
     user = cursor.execute(
         "SELECT * FROM users WHERE username=?",
@@ -148,7 +145,7 @@ def profile_page():
 # ADMIN PANEL
 # ==========================================
 def admin_panel():
-    st.title("🛠️ ADMIN PANEL PRO")
+    st.title("🛠️ ADMIN PANEL")
 
     if st.session_state.user != "admin@gmail.com":
         st.error("⛔ Accès refusé")
@@ -157,19 +154,18 @@ def admin_panel():
     users = cursor.execute("SELECT * FROM users").fetchall()
 
     # DASHBOARD USERS
-    st.subheader("📊 Dashboard Utilisateurs")
+    st.subheader("📊 Dashboard utilisateurs")
 
     total = len(users)
     vip = sum([u[2] for u in users])
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Utilisateurs", total)
+    c1.metric("Total", total)
     c2.metric("VIP", vip)
     c3.metric("Free", total - vip)
 
     st.divider()
 
-    # GESTION USERS
     for u in users:
         username, password, is_vip, score = u
 
@@ -177,8 +173,9 @@ def admin_panel():
 
         col1.write(username)
         col2.write(f"Score: {score}")
+        col3.write("VIP ✅" if is_vip else "Free ❌")
 
-        if col3.button("VIP", key=f"vip_{username}"):
+        if col3.button("Activer VIP", key=f"vip_{username}"):
             cursor.execute(
                 "UPDATE users SET vip=1 WHERE username=?",
                 (username,)
@@ -186,7 +183,7 @@ def admin_panel():
             conn.commit()
             st.rerun()
 
-        if col4.button("❌", key=f"del_{username}"):
+        if col4.button("❌ Supprimer", key=f"del_{username}"):
             cursor.execute(
                 "DELETE FROM users WHERE username=?",
                 (username,)
@@ -195,10 +192,10 @@ def admin_panel():
             st.rerun()
 
 # ==========================================
-# IA ARBITRAGE
+# ARBITRAGE
 # ==========================================
 def analyse(o1, oX, o2):
-    inv = (1/o1)+(1/oX)+(1/o2)
+    inv = (1/o1) + (1/oX) + (1/o2)
     if inv < 1:
         return True, round((1-inv)*100, 2)
     return False, 0
@@ -215,6 +212,7 @@ def app():
         ["Dashboard", "Betting", "Profil", "Admin"]
     )
 
+    # DASHBOARD
     if menu == "Dashboard":
         st.title("📊 Dashboard")
         data = np.random.randn(50).cumsum()
@@ -224,9 +222,9 @@ def app():
         st.title("⚽ Scanner Arbitrage")
 
         matches = [
-            ("PSG","Marseille"),
-            ("Real Madrid","Barcelone"),
-            ("Chelsea","Arsenal"),
+            ("PSG", "Marseille"),
+            ("Real Madrid", "Barcelone"),
+            ("Chelsea", "Arsenal"),
         ]
 
         for t1, t2 in matches:
@@ -234,7 +232,7 @@ def app():
             oX = np.random.uniform(2.8, 4)
             o2 = np.random.uniform(2, 4)
 
-            arb, profit = analyse(o1,oX,o2)
+            arb, profit = analyse(o1, oX, o2)
 
             st.write(f"{t1} vs {t2}")
 
@@ -242,7 +240,7 @@ def app():
                 st.success(f"💰 Arbitrage {profit}%")
                 update_score(st.session_state.user)
             else:
-                st.warning("❌ Pas d’arbitrage")
+                st.warning("❌ Aucun arbitrage")
 
     elif menu == "Profil":
         profile_page()
@@ -257,3 +255,7 @@ if not st.session_state.logged:
     login()
 else:
     app()
+
+# ==========================================
+import sqlite3
+import streamlit as st
