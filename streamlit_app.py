@@ -99,13 +99,40 @@ def login():
                 (hashed, email)
             )
         else:
-            cursor.execute(
-                "INSERT INTO users VALUES (?, ?, ?)",
-                (email, hashed, 0)
-            )
-
-        conn.commit()
+            cursor.execute("""
+CREATE TABLE IF NOT EXISTS users(
+    username TEXT PRIMARY KEY,
+    password TEXT,
+    vip INTEGER,
+    score INTEGER DEFAULT 0
+)
+""")
+conn.commit()
         st.success("✅ Compte créé - connecte-toi")
+
+def profile_page():
+
+    st.title("👤 Profil Utilisateur")
+
+    user = cursor.execute(
+        "SELECT * FROM users WHERE username=?",
+        (st.session_state.user,)
+    ).fetchone()
+
+    username, password, vip, score = user
+
+    st.subheader("Informations")
+
+    st.write(f"📧 Email : {username}")
+    st.write(f"💎 Statut : {'VIP ✅' if vip else 'Free ❌'}")
+    st.write(f"🏆 Score : {score}")
+
+    st.divider()
+
+    if st.button("⚡ Améliorer score"):
+        gained = update_score(username)
+        st.success(f"+{gained} points gagnés !")
+        st.rerun()
 
 # ==========================================
 # ADMIN PANEL
@@ -208,12 +235,26 @@ def app():
 
             if arb:
                 st.success(f"💰 Arbitrage : {profit}%")
-            else:
-                st.warning("❌ Aucun arbitrage")
+            update_score(st.session_state.user)
 
     # ADMIN
     elif menu == "Admin":
         admin_panel()
+def update_score(user):
+    score = np.random.randint(1, 10)
+
+    cursor.execute(
+        "UPDATE users SET score = score + ? WHERE username=?",
+        (score, user)
+    )
+    conn.commit()
+
+    return score
+
+menu = st.sidebar.selectbox(
+    "Menu",
+    ["Dashboard", "Betting", "Profil", "Admin"]
+)
 
 # ==========================================
 # ROUTER
@@ -222,3 +263,6 @@ if not st.session_state.logged:
     login()
 else:
     app()
+
+elif menu == "Profil":
+    profile_page()
