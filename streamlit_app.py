@@ -51,7 +51,46 @@ def login():
     password = st.text_input("Mot de passe", type="password")
 
     col1, col2 = st.columns(2)
+def admin_panel():
+    st.title("🛠️ ADMIN PANEL")
 
+    # Sécurité : accès admin uniquement
+    if st.session_state.user != "admin@gmail.com":
+        st.error("⛔ Accès refusé")
+        return
+
+    st.markdown("## 👥 Utilisateurs")
+
+    users = cursor.execute("SELECT * FROM users").fetchall()
+
+    for user in users:
+        username, password, vip = user
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.write(username)
+        col2.write("VIP ✅" if vip == 1 else "Free ❌")
+
+        # ACTIVER VIP
+        if col3.button(f"Activer VIP {username}"):
+            cursor.execute(
+                "UPDATE users SET vip=1 WHERE username=?",
+                (username,)
+            )
+            conn.commit()
+            st.success(f"{username} → VIP ✅")
+            st.rerun()
+
+        # SUPPRIMER USER
+        if col4.button(f"Supprimer {username}"):
+            cursor.execute(
+                "DELETE FROM users WHERE username=?",
+                (username,)
+            )
+            conn.commit()
+            st.warning(f"{username} supprimé")
+            st.rerun()
+            
     # =========================
     # LOGIN
     # =========================
@@ -82,14 +121,23 @@ def login():
 
         hashed = hash_password(password)
 
-        cursor.execute(
-            "INSERT OR IGNORE INTO users VALUES (?, ?, ?)",
-            (email, hashed, 0)
-        )
+        cursor.execute("""
+INSERT OR IGNORE INTO users VALUES (?, ?, ?)
+""", ("admin@gmail.com", hash_password("admin123"), 1))
         conn.commit()
 
         st.success("✅ Compte créé ! Connecte-toi")
+new_pass = col3.text_input(f"Nouveau mdp {username}", type="password")
 
+if col3.button(f"Reset {username}"):
+    hashed = hash_password(new_pass)
+
+    cursor.execute("""
+    UPDATE users SET password=? WHERE username=?
+    """, (hashed, username))
+
+    conn.commit()
+    st.success("Mot de passe changé ✅")
 # ==========================================
 # STYLE
 # ==========================================
@@ -113,6 +161,40 @@ margin-bottom:10px;
 }}
 </style>
 """, unsafe_allow_html=True)
+
+def dashboard_users():
+    st.markdown("## 📊 Dashboard Utilisateurs")
+
+    total_users = cursor.execute(
+        "SELECT COUNT(*) FROM users"
+    ).fetchone()[0]
+
+    total_vip = cursor.execute(
+        "SELECT COUNT(*) FROM users WHERE vip=1"
+    ).fetchone()[0]
+
+    total_free = total_users - total_vip
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Total Users", total_users)
+    col2.metric("VIP", total_vip)
+    col3.metric("Free", total_free)
+
+menu = st.sidebar.selectbox(
+    "Menu",
+    ["🏠 Dashboard", "⚽ Betting", "🛠️ Admin"]
+)
+
+if menu == "🏠 Dashboard":
+    dashboard_users()
+
+elif menu == "⚽ Betting":
+    # ton code actuel de matchs ici
+    pass
+
+elif menu == "🛠️ Admin":
+    admin_panel()
 
 # ==========================================
 # IA + ARBITRAGE
