@@ -1,4 +1,12 @@
-import base64import basecursor.execute("""
+import base64 
+
+from pathlib import Path
+import sqlite3
+import numpy as np
+import streamlit as st
+import bcrypt
+
+basecursor.execute("""
 CREATE TABLE IF NOT EXISTS users(
     username TEXT PRIMARY KEY,
     password TEXT,
@@ -160,12 +168,6 @@ if not st.session_state.logged:
     login()
 else:
     app()
-
-from pathlib import Path
-import sqlite3
-import numpy as np
-import streamlit as st
-import bcrypt
 
 # ==========================================
 # CONFIG
