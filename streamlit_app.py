@@ -2,104 +2,17 @@
 # IMPORTS
 # ==========================================
 import sqlite3
-import numpy as np
 import streamlit as st
 import bcrypt
+import numpy as np
 
 # ==========================================
 # CONFIG
 # ==========================================
-st.set_page_config(page_title="BET AI PRO", layout="wide")
+st.set_page_config(page_title="BET AI PRODUCTION", layout="wide")
 
 # ==========================================
 # DATABASE
-# ==========================================
-conn = sqlite3.connect("app.db", check_same_thread=False)
-cursor = conn.cursor()
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS users(
-    username TEXT PRIMARY KEY,
-    password TEXT,
-    vip INTEGER
-)
-""")
-conn.commit()
-
-# ==========================================
-#RAGE# IMPORTS
-# ==========================================
-def analyse(o1, oX, o2):
-    inv = (1/o1)+(1/oX)+(1/o2)
-    if inv < 1:
-        return True, round((1-inv)*100,2)
-    return False, 0
-
-# ==========================================
-# APP PRINCIPALE
-# ==========================================
-def app():
-
-    st.sidebar.write(f"👤 {st.session_state.user}")
-
-    menu = st.sidebar.selectbox(
-        "Menu",
-        ["Dashboard", "Betting", "Admin"]
-    )
-
-    # DASHBOARD
-    if menu == "Dashboard":
-        st.title("📊 Dashboard")
-        st.success("✅ App stable")
-
-    # BETTING
-    elif menu == "Betting":
-        st.title("⚽ Scanner")
-
-        matches = [
-            ("PSG","Marseille"),
-            ("Real Madrid","Barcelone"),
-            ("Chelsea","Arsenal"),
-        ]
-
-        for t1, t2 in matches:
-            o1,oX,o2 = (
-                np.random.uniform(1.5,3),
-                np.random.uniform(2.8,4),
-                np.random.uniform(2,4)
-            )
-
-            arb, profit = analyse(o1,oX,o2)
-
-            st.write(f"{t1} vs {t2}")
-
-            if arb:
-                st.success(f"💰 Arbitrage {profit}%")
-            else:
-                st.warning("❌ Pas d’arbitrage")
-
-    # ADMIN
-    elif menu == "Admin":
-        admin_panel()
-
-# ==========================================
-# ROUTER
-# ==========================================
-if "logged" not in st.session_state:
-    st.session_state.logged = False
-
-if not st.session_state.logged:
-    login()
-else:
-    app()
-
-# ==========================================
-# CONFIG
-# ==========================================
-st.set_page_config(page_title="BET AI PRO CLEAN", layout="wide")
-
-# ==========================================
-# DATABASE (TOUJOURS EN HAUT)
 # ==========================================
 conn = sqlite3.connect("app.db", check_same_thread=False)
 cursor = conn.cursor()
@@ -131,6 +44,12 @@ INSERT OR IGNORE INTO users VALUES (?, ?, ?)
 conn.commit()
 
 # ==========================================
+# SESSION
+# ==========================================
+if "logged" not in st.session_state:
+    st.session_state.logged = False
+
+# ==========================================
 # LOGIN
 # ==========================================
 def login():
@@ -153,7 +72,6 @@ def login():
                 st.session_state.logged = True
                 st.session_state.user = email
                 st.session_state.vip = user[2]
-                st.success("Connexion réussie ✅")
                 st.rerun()
             else:
                 st.error("❌ Mauvais mot de passe")
@@ -177,35 +95,48 @@ def login():
         st.success("✅ Compte créé")
 
 # ==========================================
-# ADMIN PANEL PRO
+# ADMIN PANEL PRO + DASHBOARD USERS
 # ==========================================
 def admin_panel():
     st.title("🛠️ ADMIN PANEL PRO")
 
+    # Sécurité
     if st.session_state.user != "admin@gmail.com":
         st.error("⛔ Accès refusé")
         return
 
     users = cursor.execute("SELECT * FROM users").fetchall()
 
-    st.subheader("📊 Dashboard Users")
+    # =========================
+    # DASHBOARD USERS
+    # =========================
+    st.subheader("📊 Dashboard Utilisateurs")
+
+    total_users = len(users)
+    total_vip = sum([u[2] for u in users])
+    total_free = total_users - total_vip
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Total", len(users))
-    col2.metric("VIP", sum([u[2] for u in users]))
-    col3.metric("Free", len(users) - sum([u[2] for u in users]))
+    col1.metric("Total", total_users)
+    col2.metric("VIP", total_vip)
+    col3.metric("Free", total_free)
 
     st.divider()
 
-    for user in users:
-        username, password, vip = user
+    # =========================
+    # GESTION USERS
+    # =========================
+    st.subheader("👥 Gestion utilisateurs")
+
+    for u in users:
+        username, password, vip = u
 
         c1, c2, c3, c4 = st.columns(4)
 
         c1.write(username)
         c2.write("VIP ✅" if vip else "Free ❌")
 
-        # VIP
+        # ACTIVER VIP
         if c3.button("VIP", key=f"vip_{username}"):
             cursor.execute(
                 "UPDATE users SET vip=1 WHERE username=?",
@@ -214,7 +145,7 @@ def admin_panel():
             conn.commit()
             st.rerun()
 
-        # DELETE
+        # SUPPRIMER
         if c4.button("❌", key=f"del_{username}"):
             cursor.execute(
                 "DELETE FROM users WHERE username=?",
@@ -224,19 +155,16 @@ def admin_panel():
             st.rerun()
 
 # ==========================================
-
-
-# ==========================================
 # IA + ARBITRAGE
 # ==========================================
 def analyse(o1, oX, o2):
-    inv = (1/o1) + (1/oX) + (1/o2)
+    inv = (1/o1)+(1/oX)+(1/o2)
     if inv < 1:
-        return True, round((1-inv)*100, 2)
+        return True, round((1-inv)*100,2)
     return False, 0
 
 # ==========================================
-# APP MAIN
+# APP PRINCIPALE
 # ==========================================
 def app():
 
@@ -253,30 +181,30 @@ def app():
     if menu == "🏠 Dashboard":
         st.title("📊 Dashboard Global")
 
-        odds = [np.random.uniform(1.5, 3) for _ in range(20)]
-        st.line_chart(odds)
+        data = np.random.randn(50).cumsum()
+        st.line_chart(data)
 
-        st.success("✅ Application stable")
+        st.success("✅ Application stable (Production Ready)")
 
     # ======================
-    # BETTING
+    # SCANNER
     # ======================
     elif menu == "⚽ Betting":
-        st.title("⚽ Scanner Arbitrage")
+        st.title("⚽ Scanner Arbitrage PRO")
 
-        teams = [
+        matches = [
             ("PSG","Marseille"),
             ("Real Madrid","Barcelone"),
             ("Chelsea","Arsenal"),
             ("Bayern","Dortmund"),
         ]
 
-        for t1, t2 in teams:
+        for t1, t2 in matches:
             o1 = np.random.uniform(1.5,3)
             oX = np.random.uniform(2.8,4)
             o2 = np.random.uniform(2,4)
 
-            arb, profit = analyse(o1, oX, o2)
+            arb, profit = analyse(o1,oX,o2)
 
             st.write(f"{t1} vs {t2}")
             st.write(f"Odds: {round(o1,2)} | {round(oX,2)} | {round(o2,2)}")
@@ -284,7 +212,7 @@ def app():
             if arb:
                 st.success(f"💰 Arbitrage détecté : {profit}%")
             else:
-                st.warning("❌ Pas d’arbitrage")
+                st.warning("❌ Aucun arbitrage")
 
     # ======================
     # ADMIN
@@ -293,11 +221,8 @@ def app():
         admin_panel()
 
 # ==========================================
-# ROUTER
+# ROUTER (TOUJOURS EN BAS)
 # ==========================================
-if "logged" not in st.session_state:
-    st.session_state.logged = False
-
 if not st.session_state.logged:
     login()
 else:
