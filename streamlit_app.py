@@ -86,10 +86,27 @@ def login():
 
         hashed = hash_password(password)
 
-        cursor.execute(
-            "INSERT OR IGNORE INTO users VALUES (?, ?, ?)",
-            (email, hashed, 0)
-        )
+        user = cursor.execute(
+    "SELECT * FROM users WHERE username=?",
+    (email,)
+).fetchone()
+
+hashed = hash_password(password)
+
+if user:
+    # ✅ update password si existe
+    cursor.execute(
+        "UPDATE users SET password=? WHERE username=?",
+        (hashed, email)
+    )
+else:
+    # ✅ sinon créer
+    cursor.execute(
+        "INSERT INTO users VALUES (?, ?, ?)",
+        (email, hashed, 0)
+    )
+
+conn.commit()
         conn.commit()
 
         st.success("✅ Compte créé")
