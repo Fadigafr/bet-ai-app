@@ -33,22 +33,17 @@ conn.commit()
 # ==========================================
 # LOGIN
 # ==========================================
-def Créer compte"):def hash_password(password):
-        hashed = hash_password(password)
+import bcrypt
 
-        cursor.execute(
-            "INSERT OR IGNORE INTO users VALUES (?, ?, ?)",
-            (email, hashed, 0)
-        )
-        conn.commit()
-
-        st.success("✅ Compte créé ! Connecte-toi")
-
+# ✅ HASH PASSWORD
+def hash_password(password):
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
+# ✅ VERIFY PASSWORD
 def check_password(password, hashed):
     return bcrypt.checkpw(password.encode(), hashed.encode())
 
+# ✅ INTERFACE LOGIN
 def login():
     st.title("🔐 Connexion / Inscription")
 
@@ -57,7 +52,9 @@ def login():
 
     col1, col2 = st.columns(2)
 
-    # ✅ LOGIN
+    # =========================
+    # LOGIN
+    # =========================
     if col1.button("Se connecter"):
         user = cursor.execute(
             "SELECT * FROM users WHERE username=?",
@@ -68,26 +65,30 @@ def login():
             st.session_state.logged = True
             st.session_state.user = email
             st.session_state.vip = user[2]
+
             st.success("Connexion réussie ✅")
             st.rerun()
         else:
             st.error("❌ Identifiants incorrects")
 
-    # ✅ REGISTER (ALIGNÉ AVEC col1)
-
-
+    # =========================
     # REGISTER
+    # =========================
     if col2.button("Créer compte"):
+
+        if not email or not password:
+            st.warning("⚠️ Remplis tous les champs")
+            return
 
         hashed = hash_password(password)
 
-        cursor.execute("""
-        INSERT OR IGNORE INTO users VALUES (?, ?, ?)
-        """, (email, hashed.decode(), 0))
-
+        cursor.execute(
+            "INSERT OR IGNORE INTO users VALUES (?, ?, ?)",
+            (email, hashed, 0)
+        )
         conn.commit()
 
-        st.success("✅ Compte créé (connecte-toi)")
+        st.success("✅ Compte créé ! Connecte-toi")
 
 # ==========================================
 # STYLE
