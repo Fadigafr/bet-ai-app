@@ -1,19 +1,19 @@
-# ==========================================
-# IMPORTS
-# ==========================================
+# ==================================
+# IMPORTS (OBLIGATOIRE EN PREMIER)
+# ==================================
 import streamlit as st
 import sqlite3
 import bcrypt
 import numpy as np
 
-# ==========================================
+# ==================================
 # CONFIG
-# ==========================================
+# ==================================
 st.set_page_config(page_title="BET AI ULTRA PRO", layout="wide")
 
-# ==========================================
+# ==================================
 # DATABASE
-# ==========================================
+# ==================================
 conn = sqlite3.connect("app.db", check_same_thread=False)
 cursor = conn.cursor()
 
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS users(
 """)
 conn.commit()
 
-# ==========================================
+# ==================================
 # PASSWORD
-# ==========================================
+# ==================================
 def hash_password(password):
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
@@ -39,64 +39,47 @@ def check_password(password, hashed):
     except:
         return False
 
-# ==========================================
+# ==================================
 # ADMIN DEFAULT
-# ==========================================
+# ==================================
 cursor.execute("""
 INSERT OR IGNORE INTO users (username, password, vip, score)
 VALUES (?, ?, ?, ?)
 """, ("admin@gmail.com", hash_password("admin123"), 1, 100))
 conn.commit()
 
-# ==========================================
+# ==================================
 # SESSION
-# ==========================================
+# ==================================
 if "logged" not in st.session_state:
     st.session_state.logged = False
 
-# ==========================================
-# IA ANALYSE MATCH
-# ==========================================
-def full_analysis(o1, oX, o2):
+# ==================================
+# ANALYSE MATCH PRO
+# ==================================
+def analyse_match(o1, oX, o2):
 
-    # Arbitrage
     inv = (1/o1)+(1/oX)+(1/o2)
-    arb = inv < 1
-    profit = round((1-inv)*100,2) if arb else 0
+    arbitrage = inv < 1
+    profit = round((1-inv)*100, 2) if arbitrage else 0
 
-    # Probabilités simplifiées
     p1, pX, p2 = 1/o1, 1/oX, 1/o2
 
-    # BTTS estimation
+    # BTTS
     btts = p1 > 0.4 and p2 > 0.4
 
-    # Over / Under 2.5
+    # OVER/UNDER
     over25 = (p1 + p2) > pX
 
-    # Score estimé
-    goals_home = int((p1*3))
-    goals_away = int((p2*3))
-    score = f"{goals_home}-{goals_away}"
+    # SCORE ESTIMÉ
+    score_home = int(p1 * 3)
+    score_away = int(p2 * 3)
 
-    return arb, profit, btts, over25, score
+    return arbitrage, profit, btts, over25, f"{score_home}-{score_away}"
 
-# ==========================================
-# SCORE SYSTEM
-# ==========================================
-def update_score(user):
-    gain = np.random.randint(1,5)
-
-    cursor.execute(
-        "UPDATE users SET score = score + ? WHERE username=?",
-        (gain, user)
-    )
-    conn.commit()
-
-    return gain
-
-# ==========================================
+# ==================================
 # LOGIN
-# ==========================================
+# ==================================
 def login():
 
     st.title("🔐 Connexion")
@@ -106,6 +89,7 @@ def login():
 
     col1, col2 = st.columns(2)
 
+    # LOGIN
     if col1.button("Se connecter"):
         user = cursor.execute(
             "SELECT * FROM users WHERE username=?",
@@ -117,38 +101,39 @@ def login():
             st.session_state.user = email
             st.rerun()
         else:
-            st.error("❌ Mauvais identifiants")
+            st.error("Identifiants incorrects")
 
+    # REGISTER
     if col2.button("Créer compte"):
 
         if not email or not password:
-            st.warning("Remplis tout")
+            st.warning("Remplis tous les champs")
             st.stop()
 
         hashed = hash_password(password)
 
-        user = cursor.execute(
+        existing = cursor.execute(
             "SELECT * FROM users WHERE username=?",
             (email,)
         ).fetchone()
 
-        if user:
+        if existing:
             cursor.execute(
                 "UPDATE users SET password=? WHERE username=?",
                 (hashed, email)
             )
         else:
             cursor.execute(
-                "INSERT INTO users VALUES (?, ?, ?, ?)",
+                "INSERT INTO users (username,password,vip,score) VALUES (?, ?, ?, ?)",
                 (email, hashed, 0, 0)
             )
 
         conn.commit()
-        st.success("✅ Compte créé")
+        st.success("Compte créé")
 
-# ==========================================
+# ==================================
 # PROFIL
-# ==========================================
+# ==================================
 def profile():
 
     st.title("👤 Profil")
@@ -158,19 +143,13 @@ def profile():
         (st.session_state.user,)
     ).fetchone()
 
-    username, _, vip, score = user
+    st.write(f"Email : {user[0]}")
+    st.write(f"VIP : {'✅' if user[2] else '❌'}")
+    st.write(f"Score : {user[3]}")
 
-    st.write(f"Email : {username}")
-    st.write(f"VIP : {'✅' if vip else '❌'}")
-    st.write(f"Score : {score}")
-
-    if st.button("+ Points"):
-        gain = update_score(username)
-        st.success(f"+{gain} points")
-
-# ==========================================
-# ADMIN (ANALYSE PRO)
-# ==========================================
+# ==================================
+# ADMIN PANEL + ANALYSE
+# ==================================
 def admin():
 
     if st.session_state.user != "admin@gmail.com":
@@ -192,24 +171,22 @@ def admin():
         oX = np.random.uniform(2.8,4)
         o2 = np.random.uniform(2,4)
 
-        arb, profit, btts, over25, score = full_analysis(o1,oX,o2)
+        arb, profit, btts, over25, score = analyse_match(o1,oX,o2)
 
         st.subheader(f"{t1} vs {t2}")
-
-        st.write("Odds:", round(o1,2), round(oX,2), round(o2,2))
 
         col1, col2, col3, col4 = st.columns(4)
 
         col1.metric("BTTS", "✅" if btts else "❌")
-        col2.metric("Over2.5", "✅" if over25 else "❌")
+        col2.metric("Over 2.5", "✅" if over25 else "❌")
         col3.metric("Score", score)
         col4.metric("Arbitrage", f"{profit}%" if arb else "❌")
 
         st.divider()
 
-# ==========================================
+# ==================================
 # APP
-# ==========================================
+# ==================================
 def app():
 
     menu = st.sidebar.selectbox(
@@ -227,9 +204,9 @@ def app():
     elif menu == "Admin":
         admin()
 
-# ==========================================
+# ==================================
 # ROUTER
-# ==========================================
+# ==================================
 if not st.session_state.logged:
     login()
 else:
