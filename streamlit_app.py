@@ -83,7 +83,7 @@ if col2.button("Créer compte"):
 
     if not email or not password:
         st.warning("⚠️ Remplis tous les champs")
-        return
+        st.stop()   # ✅ remplace return
 
     user = cursor.execute(
         "SELECT * FROM users WHERE username=?",
