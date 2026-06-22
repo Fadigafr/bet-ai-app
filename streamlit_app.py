@@ -85,7 +85,7 @@ def login():
 
         if not email or not password:
             st.warning("⚠️ Remplis tous les champs")
-            return   ✅ OK ici
+            return   
 
     user = cursor.execute(
         "SELECT * FROM users WHERE username=?",
