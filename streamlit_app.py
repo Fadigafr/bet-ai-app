@@ -1,49 +1,13 @@
-import base64
-from pathlib import Path
-import sqlite3
-import numpy as np
-import requests
-import streamlit as st
-import bcrypt
-
+import base64import base64 DEFAULT
 # ==========================================
-# CONFIG
-# ==========================================
-st.set_page_config(page_title="BET AI ENTERPRISE", layout="wide")
-
-PAYSTACK_LINK = "https://paystack.com/pay/TON-LIEN"
-API_URL = "http://localhost:8000"  # FastAPI backend
-API_URL = "https://bet-ai-api.onrender.com"
-# ==========================================
-# DATABASE
-# ==========================================
-conn = sqlite3.connect("app.db", check_same_thread=False)
-cursor = conn.cursor()
-
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS users(
-    username TEXT PRIMARY KEY,
-    password TEXT,
-    vip INTEGER
-)
-""")
-
+INSERT OR IGNORE INTO users VALUES (?, ?, ?)
+""", ("admin@gmail.com", hash_password("admin123"), 1))
 conn.commit()
 
 # ==========================================
 # LOGIN
 # ==========================================
-import bcrypt
-
-# ✅ HASH PASSWORD
-def hash_password(password):
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-
-# ✅ VERIFY PASSWORD
-def check_password(password, hashed):
-    return bcrypt.checkpw(password.encode(), hashed.encode())
-
-# ✅ INTERFACE LOGIN
 def login():
     st.title("🔐 Connexion / Inscription")
 
@@ -51,6 +15,39 @@ def login():
     password = st.text_input("Mot de passe", type="password")
 
     col1, col2 = st.columns(2)
+
+    if col1.button("Se connecter"):
+        user = cursor.execute(
+            "SELECT * FROM users WHERE username=?",
+            (email,)
+        ).fetchone()
+
+        if user and check_password(password, user[1]):
+            st.session_state.logged = True
+            st.session_state.user = email
+            st.session_state.vip = user[2]
+            st.rerun()
+        else:
+            st.error("❌ Identifiants incorrects")
+
+    if col2.button("Créer compte"):
+        if not email or not password:
+            st.warning("⚠️ Remplis tous les champs")
+            return
+
+        hashed = hash_password(password)
+
+        cursor.execute(
+            "INSERT OR IGNORE INTO users VALUES (?, ?, ?)",
+            (email, hashed, 0)
+        )
+        conn.commit()
+
+        st.success("✅ Compte créé")
+
+# ==========================================
+# ADMIN PANEL
+# ==========================================
 def admin_panel():
     st.title("🛠️ ADMIN PANEL")
 
@@ -63,104 +60,80 @@ def admin_panel():
     for user in users:
         username, password, vip = user
 
-        # ✅ IMPORTANT : CRÉER LES COLONNES ICI
         col1, col2, col3, col4, col5 = st.columns(5)
 
         col1.write(username)
-        col2.write("VIP ✅" if vip == 1 else "Free ❌")
+        col2.write("VIP ✅" if vip else "Free ❌")
 
-        # ✅ bouton VIP
         if col3.button("VIP", key=f"vip_{username}"):
-            cursor.execute(
-                "UPDATE users SET vip=1 WHERE username=?",
-                (username,)
-            )
+            cursor.execute("UPDATE users SET vip=1 WHERE username=?", (username,))
             conn.commit()
             st.rerun()
 
-        # ✅ input mot de passe (DANS LE MÊME BLOC)
-        new_pass = col4.text_input(
-            "Nouveau mdp",
-            type="password",
-            key=f"pass_{username}"
-        )
+        new_pass = col4.text_input("MDP", type="password", key=f"pass_{username}")
 
-        # ✅ bouton reset
         if col4.button("Reset", key=f"reset_{username}"):
             if new_pass:
                 hashed = hash_password(new_pass)
-
                 cursor.execute(
                     "UPDATE users SET password=? WHERE username=?",
                     (hashed, username)
                 )
                 conn.commit()
-
-                st.success("✅ MDP changé")
                 st.rerun()
 
-        # ✅ supprimer
         if col5.button("❌", key=f"del_{username}"):
-            cursor.execute(
-                "DELETE FROM users WHERE username=?",
-                (username,)
-            )
+            cursor.execute("DELETE FROM users WHERE username=?", (username,))
             conn.commit()
             st.rerun()
-            
-    # =========================
-    # LOGIN
-    # =========================
-    if col1.button("Se connecter"):
-        user = cursor.execute(
-            "SELECT * FROM users WHERE username=?",
-            (email,)
-        ).fetchone()
 
-        if user and check_password(password, user[1]):
-            st.session_state.logged = True
-            st.session_state.user = email
-            st.session_state.vip = user[2]
+# ==========================================
+# IA + ARBITRAGE
+# ==========================================
+def analyse(o1, oX, o2):
+    p1, pX, p2 = 1/o1, 1/oX, 1/o2
+    total = p1+pX+p2
 
-            st.success("Connexion réussie ✅")
-            st.rerun()
-        else:
-            st.error("❌ Identifiants incorrects")
+    probs = [p1/total, pX/total, p2/total]
+    values = [probs[0]*o1-1, probs[1]*oX-1, probs[2]*o2-1]
 
-    # =========================
-    # REGISTER
-    # =========================
-    if col2.button("Créer compte"):
+    best = ["1","X","2"][np.argmax(values)]
+    conf = round(max(values)*100, 2)
 
-        if not email or not password:
-            st.warning("⚠️ Remplis tous les champs")
-            return
+    inv = (1/o1)+(1/oX)+(1/o2)
+    arb = inv < 1
+    profit = round((1-inv)*100, 2) if arb else 0
 
-        hashed = hash_password(password)
+    return best, conf, arb, profit
 
-        cursor.execute("""
-INSERT OR IGNORE INTO users VALUES (?, ?, ?)
-""", ("admin@gmail.com", hash_password("admin123"), 1))
-        conn.commit()
+# ==========================================
+# MATCHS
+# ==========================================
+teams = [
+("PSG","Marseille"),
+("Real Madrid","Barcelone"),
+("Chelsea","Arsenal"),
+("Bayern","Dortmund"),
+("Liverpool","Man City"),
+]
 
-        st.success("✅ Compte créé ! Connecte-toi")
-new_pass = col3.text_input(f"Nouveau mdp {username}", type="password")
+def generate_matches():
+    matches = []
+    for t1, t2 in teams:
+        matches.append((
+            t1, t2,
+            np.random.uniform(1.5, 3),
+            np.random.uniform(2.8, 4),
+            np.random.uniform(2, 4)
+        ))
+    return matches
 
-if col3.button(f"Reset {username}"):
-    hashed = hash_password(new_pass)
-
-    cursor.execute("""
-    UPDATE users SET password=? WHERE username=?
-    """, (hashed, username))
-
-    conn.commit()
-    st.success("Mot de passe changé ✅")
 # ==========================================
 # STYLE
 # ==========================================
 def load_bg():
     if Path("background.jpg").exists():
-        with open("background.jpg","rb") as f:
+        with open("background.jpg", "rb") as f:
             data = base64.b64encode(f.read()).decode()
 
         st.markdown(f"""
@@ -173,127 +146,57 @@ background-size: cover;
 .card {{
 background:#0f172a;
 padding:15px;
-border-radius:12px;
+border-radius:10px;
 margin-bottom:10px;
 }}
 </style>
 """, unsafe_allow_html=True)
 
-def dashboard_users():
-    st.markdown("## 📊 Dashboard Utilisateurs")
-
-    total_users = cursor.execute(
-        "SELECT COUNT(*) FROM users"
-    ).fetchone()[0]
-
-    total_vip = cursor.execute(
-        "SELECT COUNT(*) FROM users WHERE vip=1"
-    ).fetchone()[0]
-
-    total_free = total_users - total_vip
-
-    col1, col2, col3 = st.columns(3)
-
-    col1.metric("Total Users", total_users)
-    col2.metric("VIP", total_vip)
-    col3.metric("Free", total_free)
-
-menu = st.sidebar.selectbox(
-    "Menu",
-    ["🏠 Dashboard", "⚽ Betting", "🛠️ Admin"]
-)
-
-if menu == "🏠 Dashboard":
-    dashboard_users()
-
-elif menu == "⚽ Betting":
-    # ton code actuel de matchs ici
-    pass
-
-elif menu == "🛠️ Admin":
-    admin_panel()
-
 # ==========================================
-# IA + ARBITRAGE
-# ==========================================
-def analyse(o1,oX,o2):
-    p1,pX,p2 = 1/o1,1/oX,1/o2
-    t=p1+pX+p2
-
-    probs=[p1/t,pX/t,p2/t]
-    values=[probs[0]*o1-1, probs[1]*oX-1, probs[2]*o2-1]
-
-    best = ["1","X","2"][np.argmax(values)]
-    conf = round(max(values)*100,2)
-
-    inv = (1/o1)+(1/oX)+(1/o2)
-    arb = inv < 1
-    profit = round((1-inv)*100,2) if arb else 0
-
-    return best, conf, arb, profit
-
-# ==========================================
-# MATCHS
-# ==========================================
-teams = [
-("PSG","Marseille"),
-("Real Madrid","Barcelone"),
-("Chelsea","Arsenal"),
-("Bayern","Dortmund"),
-("Liverpool","Man City")
-]
-
-def get_matches():
-    matches=[]
-    for t1,t2 in teams:
-        matches.append((
-            t1,t2,
-            np.random.uniform(1.5,3),
-            np.random.uniform(2.8,4),
-            np.random.uniform(2,4)
-        ))
-    return matches
-
-# ==========================================
-# APP
+# MAIN APP
 # ==========================================
 def app():
     load_bg()
 
     st.sidebar.write(f"👤 {st.session_state.user}")
 
-    # Vérifier VIP via API backend (auto update)
-    try:
-        r = requests.get(f"{API_URL}/user/{st.session_state.user}")
-        st.session_state.vip = r.json().get("vip",0)
-    except:
-        pass
+    menu = st.sidebar.selectbox(
+        "Menu",
+        ["🏠 Dashboard", "⚽ Betting", "🛠️ Admin"]
+    )
 
-    # PAYWALL
+    # PAYSTACK PAYWALL
     if not st.session_state.vip:
         st.warning("🔒 Accès VIP requis")
-
-        st.markdown(f"""
-💎 Accès complet :
-
-✅ Arbitrage PRO  
-✅ Scanner  
-✅ Alerts  
-
-👉 [Payer ici]({PAYSTACK_LINK})
-""")
-
+        st.markdown(PAYSTACK_LINK)
         st.stop()
 
-    st.title("⚽ BET AI ENTERPRISE")
+    # DASHBOARD
+    if menu == "🏠 Dashboard":
+        st.title("📊 Dashboard")
 
-    matches = get_matches()
+        matches = generate_matches()
+        profits = []
 
-    for t1,t2,o1,oX,o2 in matches:
+        for t1, t2, o1, oX, o2 in matches:
+            _, _, arb, profit = analyse(o1, oX, o2)
+            profits.append(profit)
 
-        best, conf, arb, profit = analyse(o1,oX,o2)
+        st.metric("Opportunités arbitrage", sum([1 for p in profits if p > 0]))
+        st.metric("Profit moyen", round(np.mean(profits),2))
 
-        st.markdown(f"""
+        st.line_chart(profits)
+
+    # BETTING
+    elif menu == "⚽ Betting":
+        st.title("⚽ Analyse matchs")
+
+        matches = generate_matches()
+
+        for t1, t2, o1, oX, o2 in matches:
+            best, conf, arb, profit = analyse(o1, oX, o2)
+
+            st.markdown(f"""
 <div class="card">
 <b>{t1} vs {t2}</b><br>
 
@@ -302,17 +205,63 @@ def app():
 💰 Bet : {best}<br>
 🧠 Confiance : {conf}%<br>
 
-{"✅ ARBITRAGE "+str(profit)+"%" if arb else "❌ No arbitrage"}
+{"✅ ARBITRAGE "+str(profit)+"%" if arb else "❌ Aucun arbitrage"}
 </div>
 """, unsafe_allow_html=True)
+
+    # ADMIN
+    elif menu == "🛠️ Admin":
+        admin_panel()
 
 # ==========================================
 # ROUTER
 # ==========================================
 if "logged" not in st.session_state:
-    st.session_state.logged=False
+    st.session_state.logged = False
 
 if not st.session_state.logged:
     login()
 else:
     app()
+from pathlib import Path
+import sqlite3
+import numpy as np
+import streamlit as st
+import bcrypt
+
+# ==========================================
+# CONFIG
+# ==========================================
+st.set_page_config(page_title="BET AI SAAS PRO", layout="wide")
+
+DEFAULT_BANKROLL = 100.0
+STOP_LOSS = 0.3
+
+PAYSTACK_LINK = "https://paystack.com/pay/TON-LIEN"
+
+# ==========================================
+# DATABASE
+# ==========================================
+conn = sqlite3.connect("app.db", check_same_thread=False)
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    username TEXT PRIMARY KEY,
+    password TEXT,
+    vip INTEGER
+)
+""")
+
+conn.commit()
+
+# ==========================================
+# PASSWORD
+# ==========================================
+def hash_password(password):
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+def check_password(password, hashed):
+    return bcrypt.checkpw(password.encode(), hashed.encode())
+
+# ==========================================
