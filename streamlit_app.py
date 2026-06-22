@@ -224,11 +224,6 @@ def update_score(user):
 
     return score
 
-menu = st.sidebar.selectbox(
-    "Menu",
-    ["Dashboard", "Betting", "Profil", "Admin"]
-)
-
 # ==========================================
 # ROUTER
 # ==========================================
