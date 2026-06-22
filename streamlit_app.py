@@ -92,11 +92,6 @@ if not st.session_state.logged:
     login()
 else:
     app()
-# ==========================================
-import sqlite3
-import streamlit as st
-import bcrypt
-import numpy as np
 
 # ==========================================
 # CONFIG
