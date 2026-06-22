@@ -220,17 +220,27 @@ def login():
     # =====================
     if col2.button("Créer compte"):
 
-        if not email or not password:
-            st.warning("⚠️ Remplis tous les champs")
-            st.stop()
+    if not email or not password:
+        st.warning("⚠️ Remplis tous les champs")
+        st.stop()
 
-        existing = cursor.execute(
-            "SELECT * FROM users WHERE username=?",
-            (email,)
-        ).fetchone()
+    existing = cursor.execute(
+        "SELECT * FROM users WHERE username=?",
+        (email,)
+    ).fetchone()
 
-        hashed = hash_password(password)
+    hashed = hash_password(password)
 
-        if existing:
-            # ✅ update si existe
-            cursor.execute(
+    if existing:
+        cursor.execute(
+            "UPDATE users SET password=? WHERE username=?",
+            (hashed, email)
+        )
+    else:
+        cursor.execute(
+            "INSERT INTO users VALUES (?, ?, ?)",
+            (email, hashed, 0)
+        )
+
+    conn.commit()
+    st.success("✅ Compte prêt")
