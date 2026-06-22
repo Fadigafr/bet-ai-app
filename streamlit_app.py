@@ -79,11 +79,13 @@ def login():
             st.error("❌ Utilisateur introuvable")
 
     # REGISTER
-if col2.button("Créer compte"):
+def login():
 
-    if not email or not password:
-        st.warning("⚠️ Remplis tous les champs")
-        st.stop()   # ✅ remplace return
+    if col2.button("Créer compte"):
+
+        if not email or not password:
+            st.warning("⚠️ Remplis tous les champs")
+            return   ✅ OK ici
 
     user = cursor.execute(
         "SELECT * FROM users WHERE username=?",
