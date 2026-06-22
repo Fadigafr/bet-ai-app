@@ -105,8 +105,6 @@ if col2.button("Créer compte"):
 
     conn.commit()  # ✅ BIEN ALIGNÉ
 
-        st.success("✅ Compte créé")
-
 # ==========================================
 # ADMIN PANEL PRO + DASHBOARD USERS
 # ==========================================
