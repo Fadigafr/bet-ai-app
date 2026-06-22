@@ -79,34 +79,31 @@ def login():
             st.error("❌ Utilisateur introuvable")
 
     # REGISTER
-    if col2.button("Créer compte"):
-        if not email or not password:
-            st.warning("⚠️ Remplis tous les champs")
-            return
+if col2.button("Créer compte"):
 
-        hashed = hash_password(password)
+    if not email or not password:
+        st.warning("⚠️ Remplis tous les champs")
+        return
 
-        user = cursor.execute(
-    "SELECT * FROM users WHERE username=?",
-    (email,)
-).fetchone()
+    user = cursor.execute(
+        "SELECT * FROM users WHERE username=?",
+        (email,)
+    ).fetchone()
 
-hashed = hash_password(password)
+    hashed = hash_password(password)
 
-if user:
-    # ✅ update password si existe
-    cursor.execute(
-        "UPDATE users SET password=? WHERE username=?",
-        (hashed, email)
-    )
-else:
-    # ✅ sinon créer
-    cursor.execute(
-        "INSERT INTO users VALUES (?, ?, ?)",
-        (email, hashed, 0)
-    )
+    if user:
+        cursor.execute(
+            "UPDATE users SET password=? WHERE username=?",
+            (hashed, email)
+        )
+    else:
+        cursor.execute(
+            "INSERT INTO users VALUES (?, ?, ?)",
+            (email, hashed, 0)
+        )
 
-conn.commit()
+    conn.commit()  # ✅ BIEN ALIGNÉ
 
         st.success("✅ Compte créé")
 
