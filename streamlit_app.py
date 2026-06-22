@@ -26,6 +26,17 @@ conn.commit()
 # ==========================================
 # LOGIN
 # ==========================================
+import bcrypt
+
+# ✅ HASH PASSWORD
+def hash_password(password):
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+# ✅ VERIFY PASSWORD
+def check_password(password, hashed):
+    return bcrypt.checkpw(password.encode(), hashed.encode())
+
+# ✅ INTERFACE LOGIN
 def login():
     st.title("🔐 Connexion / Inscription")
 
@@ -34,7 +45,9 @@ def login():
 
     col1, col2 = st.columns(2)
 
+    # =========================
     # LOGIN
+    # =========================
     if col1.button("Se connecter"):
         user = cursor.execute(
             "SELECT * FROM users WHERE username=?",
@@ -45,14 +58,19 @@ def login():
             st.session_state.logged = True
             st.session_state.user = email
             st.session_state.vip = user[2]
+
+            st.success("Connexion réussie ✅")
             st.rerun()
         else:
             st.error("❌ Identifiants incorrects")
 
+    # =========================
     # REGISTER
+    # =========================
     if col2.button("Créer compte"):
+
         if not email or not password:
-            st.warning("⚠️ Remplis tout")
+            st.warning("⚠️ Remplis tous les champs")
             return
 
         hashed = hash_password(password)
@@ -63,7 +81,8 @@ def login():
         )
         conn.commit()
 
-        st.success("✅ Compte créé")
+        st.success("✅ Compte créé ! Connecte-toi")
+        
 basecursor.execute("""
 CREATE TABLE IF NOT EXISTS users(
     username TEXT PRIMARY KEY,
