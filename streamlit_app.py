@@ -13,7 +13,7 @@ st.set_page_config(page_title="BET AI ENTERPRISE", layout="wide")
 
 PAYSTACK_LINK = "https://paystack.com/pay/TON-LIEN"
 API_URL = "http://localhost:8000"  # FastAPI backend
-
+API_URL = "https://bet-ai-api.onrender.com"
 # ==========================================
 # DATABASE
 # ==========================================
