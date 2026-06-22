@@ -27,6 +27,98 @@ CREATE TABLE IF NOT EXISTS users(
 conn.commit()
 
 # ==========================================
+#RAGE# IMPORTS
+# ==========================================
+def analyse(o1, oX, o2):
+    inv = (1/o1)+(1/oX)+(1/o2)
+    if inv < 1:
+        return True, round((1-inv)*100,2)
+    return False, 0
+
+# ==========================================
+# APP PRINCIPALE
+# ==========================================
+def app():
+
+    st.sidebar.write(f"👤 {st.session_state.user}")
+
+    menu = st.sidebar.selectbox(
+        "Menu",
+        ["Dashboard", "Betting", "Admin"]
+    )
+
+    # DASHBOARD
+    if menu == "Dashboard":
+        st.title("📊 Dashboard")
+        st.success("✅ App stable")
+
+    # BETTING
+    elif menu == "Betting":
+        st.title("⚽ Scanner")
+
+        matches = [
+            ("PSG","Marseille"),
+            ("Real Madrid","Barcelone"),
+            ("Chelsea","Arsenal"),
+        ]
+
+        for t1, t2 in matches:
+            o1,oX,o2 = (
+                np.random.uniform(1.5,3),
+                np.random.uniform(2.8,4),
+                np.random.uniform(2,4)
+            )
+
+            arb, profit = analyse(o1,oX,o2)
+
+            st.write(f"{t1} vs {t2}")
+
+            if arb:
+                st.success(f"💰 Arbitrage {profit}%")
+            else:
+                st.warning("❌ Pas d’arbitrage")
+
+    # ADMIN
+    elif menu == "Admin":
+        admin_panel()
+
+# ==========================================
+# ROUTER
+# ==========================================
+if "logged" not in st.session_state:
+    st.session_state.logged = False
+
+if not st.session_state.logged:
+    login()
+else:
+    app()
+# ==========================================
+import sqlite3
+import streamlit as st
+import bcrypt
+import numpy as np
+
+# ==========================================
+# CONFIG
+# ==========================================
+st.set_page_config(page_title="BET AI PRO CLEAN", layout="wide")
+
+# ==========================================
+# DATABASE (TOUJOURS EN HAUT)
+# ==========================================
+conn = sqlite3.connect("app.db", check_same_thread=False)
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users(
+    username TEXT PRIMARY KEY,
+    password TEXT,
+    vip INTEGER
+)
+""")
+conn.commit()
+
+# ==========================================
 # PASSWORD
 # ==========================================
 def hash_password(password):
@@ -61,13 +153,17 @@ def login():
             (email,)
         ).fetchone()
 
-        if user and check_password(password, user[1]):
-            st.session_state.logged = True
-            st.session_state.user = email
-            st.session_state.vip = user[2]
-            st.rerun()
+        if user:
+            if check_password(password, user[1]):
+                st.session_state.logged = True
+                st.session_state.user = email
+                st.session_state.vip = user[2]
+                st.success("Connexion réussie ✅")
+                st.rerun()
+            else:
+                st.error("❌ Mauvais mot de passe")
         else:
-            st.error("❌ Identifiants incorrects")
+            st.error("❌ Utilisateur introuvable")
 
     # REGISTER
     if col2.button("Créer compte"):
@@ -97,32 +193,25 @@ def admin_panel():
 
     users = cursor.execute("SELECT * FROM users").fetchall()
 
-    # DASHBOARD USERS
-    st.subheader("📊 Dashboard Utilisateurs")
+    st.subheader("📊 Dashboard Users")
 
-    total_users = len(users)
-    total_vip = sum([u[2] for u in users])
-    total_free = total_users - total_vip
-
-    colA, colB, colC = st.columns(3)
-    colA.metric("Utilisateurs", total_users)
-    colB.metric("VIP", total_vip)
-    colC.metric("Free", total_free)
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total", len(users))
+    col2.metric("VIP", sum([u[2] for u in users]))
+    col3.metric("Free", len(users) - sum([u[2] for u in users]))
 
     st.divider()
 
-    st.subheader("👥 Gestion utilisateurs")
+    for user in users:
+        username, password, vip = user
 
-    for u in users:
-        username, password, vip = u
+        c1, c2, c3, c4 = st.columns(4)
 
-        col1, col2, col3, col4 = st.columns(4)
+        c1.write(username)
+        c2.write("VIP ✅" if vip else "Free ❌")
 
-        col1.write(username)
-        col2.write("VIP ✅" if vip else "Free ❌")
-
-        # ✅ ACTIVER VIP
-        if col3.button("VIP", key=f"vip_{username}"):
+        # VIP
+        if c3.button("VIP", key=f"vip_{username}"):
             cursor.execute(
                 "UPDATE users SET vip=1 WHERE username=?",
                 (username,)
@@ -130,14 +219,17 @@ def admin_panel():
             conn.commit()
             st.rerun()
 
-        # ✅ SUPPRIMER USER
-        if col4.button("❌", key=f"del_{username}"):
+        # DELETE
+        if c4.button("❌", key=f"del_{username}"):
             cursor.execute(
                 "DELETE FROM users WHERE username=?",
                 (username,)
             )
             conn.commit()
             st.rerun()
+
+# ==========================================
+
 
 # ==========================================
 # IA + ARBITRAGE
