@@ -5,6 +5,7 @@ import sqlite3
 import numpy as np
 import streamlit as st
 import bcrypt
+
 # ==========================================
 cursor.execute("""
 INSERT OR IGNORE INTO users VALUES (?, ?, ?)
