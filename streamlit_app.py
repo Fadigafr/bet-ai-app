@@ -33,7 +33,6 @@ conn.commit()
 # ==========================================
 # LOGIN
 # ==========================================
-
 def Créer compte"):def hash_password(password):
         hashed = hash_password(password)
 
