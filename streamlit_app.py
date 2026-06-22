@@ -1,5 +1,9 @@
 # ==========================================
-# IMPORTimport bcrypt# IMPORTS
+# IMPORTS (TOUJOURS EN PREMIER)
+# ==========================================
+import streamlit as st
+import sqlite3
+import bcrypt
 import numpy as np
 
 # ==========================================
