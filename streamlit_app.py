@@ -215,4 +215,3 @@ if not st.session_state.logged:
     login()
 else:
     app()
-``
