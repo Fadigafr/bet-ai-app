@@ -213,16 +213,6 @@ elif menu == "Profil":
 
 elif menu == "Admin":
     admin_panel()
-def update_score(user):
-    score = np.random.randint(1, 10)
-
-    cursor.execute(
-        "UPDATE users SET score = score + ? WHERE username=?",
-        (score, user)
-    )
-    conn.commit()
-
-    return score
 
 # ==========================================
 # ROUTER
