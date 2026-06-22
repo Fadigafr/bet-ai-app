@@ -6,15 +6,6 @@ import numpy as np
 import streamlit as st
 import bcrypt
 
-basecursor.execute("""
-CREATE TABLE IF NOT EXISTS users(
-    username TEXT PRIMARY KEY,
-    password TEXT,
-    vip INTEGER
-)
-""")
-conn.commit()
-
 # ==========================================
 # PASSWORD
 # ==========================================
@@ -73,7 +64,14 @@ def login():
         conn.commit()
 
         st.success("✅ Compte créé")
-
+basecursor.execute("""
+CREATE TABLE IF NOT EXISTS users(
+    username TEXT PRIMARY KEY,
+    password TEXT,
+    vip INTEGER
+)
+""")
+conn.commit()
 # ==========================================
 # ADMIN PANEL (CORRIGÉ)
 # ==========================================
