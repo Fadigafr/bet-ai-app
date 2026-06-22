@@ -198,45 +198,21 @@ def app():
     st.sidebar.write(f"👤 {st.session_state.user}")
 
     menu = st.sidebar.selectbox(
-        "Menu",
-        ["Dashboard", "Betting", "Admin"]
-    )
+    "Menu",
+    ["Dashboard", "Betting", "Profil", "Admin"]
+)
 
-    # DASHBOARD
-    if menu == "Dashboard":
-        st.title("📊 Dashboard")
-        st.success("✅ Application fonctionne parfaitement")
+if menu == "Dashboard":
+    st.title("📊 Dashboard")
 
-        data = np.random.randn(50).cumsum()
-        st.line_chart(data)
+elif menu == "Betting":
+    st.title("⚽ Betting")
 
-    # BETTING
-    elif menu == "Betting":
-        st.title("⚽ Scanner Arbitrage")
+elif menu == "Profil":
+    profile_page()
 
-        matches = [
-            ("PSG", "Marseille"),
-            ("Real Madrid", "Barcelone"),
-            ("Chelsea", "Arsenal"),
-        ]
-
-        for t1, t2 in matches:
-            o1 = np.random.uniform(1.5, 3)
-            oX = np.random.uniform(2.8, 4)
-            o2 = np.random.uniform(2, 4)
-
-            arb, profit = analyse(o1, oX, o2)
-
-            st.write(f"{t1} vs {t2}")
-            st.write(f"Odds: {round(o1,2)} | {round(oX,2)} | {round(o2,2)}")
-
-            if arb:
-                st.success(f"💰 Arbitrage : {profit}%")
-            update_score(st.session_state.user)
-
-    # ADMIN
-    elif menu == "Admin":
-        admin_panel()
+elif menu == "Admin":
+    admin_panel()
 def update_score(user):
     score = np.random.randint(1, 10)
 
